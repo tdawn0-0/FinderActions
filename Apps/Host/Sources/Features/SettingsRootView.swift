@@ -63,7 +63,7 @@ struct SettingsRootView: View {
                         Image(systemName: section.icon)
                             .foregroundStyle(section.color)
                             .frame(width: 18)
-                        Text(section.title)
+                        Text(LocalizedStringKey(section.title))
                             .font(.system(size: 13, weight: .medium))
                     }
                     .padding(.vertical, 2)
@@ -358,7 +358,7 @@ private struct ActionDetailInspectorView: View {
                     Spacer()
 
                     HStack(spacing: 6) {
-                        Text(action.enabled ? "Enabled" : "Disabled")
+                        Text(action.enabled ? LocalizedStringKey("Enabled") : LocalizedStringKey("Disabled"))
                             .font(.system(size: 12))
                             .foregroundStyle(Color.secondary)
                         Toggle("", isOn: $action.enabled)

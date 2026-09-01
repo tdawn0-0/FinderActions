@@ -3,6 +3,10 @@ options:
   bundleIdPrefix: com.finderactions
   deploymentTarget:
     macOS: "15.0"
+  developmentLanguage: en
+  knownRegions:
+    - en
+    - zh-Hans
   createIntermediateGroups: true
   groupSortPosition: top
   xcodeVersion: "16.0"
@@ -28,7 +32,7 @@ targets:
     platform: macOS
     sources:
       - path: Apps/Host/Sources
-    resources:
+      - path: Apps/Host/Resources/Localizable.xcstrings
       - path: BundledActions
         type: folder
         buildPhase: resources

@@ -94,9 +94,15 @@ struct MenuBarPopoverView: View {
                         .frame(width: 6, height: 6)
                 }
 
-                Text(isExtensionReady ? "\(activeActionsCount) actions ready in Finder" : "Extension setup required")
-                    .font(.system(size: 10))
-                    .foregroundStyle(Color.secondary)
+                if isExtensionReady {
+                    Text("\(activeActionsCount) actions ready in Finder")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Color.secondary)
+                } else {
+                    Text("Extension setup required")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Color.secondary)
+                }
             }
 
             Spacer()

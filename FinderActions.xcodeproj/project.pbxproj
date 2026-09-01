@@ -14,6 +14,7 @@
 		7B8081C98AED8C3A5AD98F7C /* FAFinderSync.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A363F7D86EBE5062E90EB7B6 /* FAFinderSync.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8AC9AFA642CF3D01DE822FA0 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98EE0AC7A1A06CA441562D03 /* AppState.swift */; };
 		A36F1E0CB5F990C7E67D4FCF /* FullDiskAccessSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81CD69140456375F62D6F5C9 /* FullDiskAccessSettings.swift */; };
+		A38A61E39C9F1F418ED4B120 /* BundledActions in Resources */ = {isa = PBXBuildFile; fileRef = F414D005950D759ED9F3E9C7 /* BundledActions */; };
 		AA6ED55D96E3115BC7FF3E76 /* ExecLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23866392BB58EB72C77BA52 /* ExecLogStore.swift */; };
 		AD7B8E9F07E21D8743255DBA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFDAA1CBBCD8945B4A3E0FF /* Cocoa.framework */; };
 		B85FF5B5226FADD6DEC43B98 /* ActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB44F5B789A2C2011CF0B8D /* ActionExecutor.swift */; };
@@ -22,6 +23,7 @@
 		EC1D4C2E75D7292CBF3C5669 /* MenuBarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A65A287793DFBEC3F7F1003 /* MenuBarPopoverView.swift */; };
 		ED5C0D9E7BAFEEF73965B593 /* IPCServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6015524AE62846F51B5C88A9 /* IPCServer.swift */; };
 		EDB956066B821160D18F73F7 /* FinderSync.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C28DE75EA01B130D0307790 /* FinderSync.framework */; };
+		F4E36732C2D51A728DD161AD /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 925A248CD571687760497699 /* Localizable.xcstrings */; };
 		F64A53ADFAE211709C7FC93B /* FinderActionsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47E78A4F475700EF178D8CF /* FinderActionsApp.swift */; };
 /* End PBXBuildFile section */
 
@@ -59,6 +61,7 @@
 		6015524AE62846F51B5C88A9 /* IPCServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPCServer.swift; sourceTree = "<group>"; };
 		6FFDAA1CBBCD8945B4A3E0FF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		81CD69140456375F62D6F5C9 /* FullDiskAccessSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullDiskAccessSettings.swift; sourceTree = "<group>"; };
+		925A248CD571687760497699 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		98EE0AC7A1A06CA441562D03 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		A363F7D86EBE5062E90EB7B6 /* FAFinderSync.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FAFinderSync.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC1F60E61AE5FD20AB46098A /* MenuRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuRenderer.swift; sourceTree = "<group>"; };
@@ -67,6 +70,7 @@
 		C47E78A4F475700EF178D8CF /* FinderActionsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinderActionsApp.swift; sourceTree = "<group>"; };
 		E0A12202D707B18FECD7B488 /* FinderSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinderSync.swift; sourceTree = "<group>"; };
 		F23866392BB58EB72C77BA52 /* ExecLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecLogStore.swift; sourceTree = "<group>"; };
+		F414D005950D759ED9F3E9C7 /* BundledActions */ = {isa = PBXFileReference; lastKnownFileType = folder; path = BundledActions; sourceTree = SOURCE_ROOT; };
 		FAB44F5B789A2C2011CF0B8D /* ActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionExecutor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -142,6 +146,7 @@
 		4CC13D23E3FC2DB9D0E2D55D /* Host */ = {
 			isa = PBXGroup;
 			children = (
+				88C8382DCEC1A1B7A0DCBAD0 /* Resources */,
 				3B233B4C590D3E4D8989D605 /* Sources */,
 			);
 			path = Host;
@@ -163,6 +168,14 @@
 			path = IPC;
 			sourceTree = "<group>";
 		};
+		88C8382DCEC1A1B7A0DCBAD0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				925A248CD571687760497699 /* Localizable.xcstrings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		8E80571FDA95D18A069375B6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -178,6 +191,7 @@
 				57EDDF682EF2E49E6F399FF9 /* Apps */,
 				1D746005B4EBE0D3A138C7B7 /* Extensions */,
 				CCDBB5ABA96D3C1452210E77 /* Packages */,
+				F414D005950D759ED9F3E9C7 /* BundledActions */,
 				8E80571FDA95D18A069375B6 /* Frameworks */,
 				4C21C3D631B56A778F4BCA56 /* Products */,
 			);
@@ -228,6 +242,7 @@
 			buildConfigurationList = 7621AC516DD08567C4BF367D /* Build configuration list for PBXNativeTarget "FinderActions" */;
 			buildPhases = (
 				6C3A827580C8616FE9C42E42 /* Sources */,
+				C598381F3C87A4C80075E38C /* Resources */,
 				181838BD9432B5A28E28254C /* Frameworks */,
 				47455B1F622B6099C0CC129C /* Embed Foundation Extensions */,
 			);
@@ -304,6 +319,18 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C598381F3C87A4C80075E38C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A38A61E39C9F1F418ED4B120 /* BundledActions in Resources */,
+				F4E36732C2D51A728DD161AD /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		6C3A827580C8616FE9C42E42 /* Sources */ = {

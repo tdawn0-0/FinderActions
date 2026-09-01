@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "FinderActions",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v15)
     ],
