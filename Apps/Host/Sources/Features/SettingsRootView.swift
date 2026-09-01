@@ -59,18 +59,18 @@ struct SettingsRootView: View {
         NavigationSplitView {
             List(SettingsSection.allCases, selection: $selectedSection) { section in
                 NavigationLink(value: section) {
-                    Label {
-                        Text(section.title)
-                            .font(.system(size: 13, weight: .medium))
-                    } icon: {
+                    HStack(spacing: 8) {
                         Image(systemName: section.icon)
                             .foregroundStyle(section.color)
-                            .imageScale(.medium)
+                            .frame(width: 18)
+                        Text(section.title)
+                            .font(.system(size: 13, weight: .medium))
                     }
+                    .padding(.vertical, 2)
                 }
             }
             .listStyle(.sidebar)
-            .navigationSplitViewColumnWidth(min: 170, ideal: 190, max: 220)
+            .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 250)
         } detail: {
             Group {
                 switch selectedSection ?? .actions {
@@ -90,7 +90,8 @@ struct SettingsRootView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(minWidth: 880, idealWidth: 960, minHeight: 540, idealHeight: 600)
+        .navigationSplitViewStyle(.balanced)
+        .frame(minWidth: 860, idealWidth: 960, minHeight: 560, idealHeight: 620)
         .environment(state)
     }
 }
@@ -119,10 +120,11 @@ struct ActionsSettingsView: View {
         HSplitView {
             // Master: Action list with search & toolbar
             VStack(spacing: 0) {
+                // Search Bar
                 HStack(spacing: 6) {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(Color.secondary)
-                    TextField("Search…", text: $searchText)
+                    TextField("Search actions…", text: $searchText)
                         .textFieldStyle(.plain)
                     if !searchText.isEmpty {
                         Button {
@@ -137,11 +139,11 @@ struct ActionsSettingsView: View {
                 .padding(6)
                 .background(Color(nsColor: .controlBackgroundColor))
                 .clipShape(RoundedRectangle(cornerRadius: 6))
-                .padding(.horizontal, 8)
-                .padding(.vertical, 6)
+                .padding(8)
 
                 Divider()
 
+                // Actions List
                 List(selection: $selectedId) {
                     ForEach(filteredActions) { action in
                         ActionListRow(action: action) { enabled in
@@ -153,12 +155,12 @@ struct ActionsSettingsView: View {
                         state.moveAction(from: src, to: dst)
                     }
                 }
-                .listStyle(.inset(alternatesRowBackgrounds: true))
+                .listStyle(.plain)
 
                 Divider()
 
                 // List bottom action bar
-                HStack(spacing: 4) {
+                HStack(spacing: 6) {
                     Button {
                         let newAction = state.addNewAction()
                         selectedId = newAction.id
@@ -199,10 +201,10 @@ struct ActionsSettingsView: View {
                 }
                 .buttonStyle(.borderless)
                 .padding(.horizontal, 8)
-                .padding(.vertical, 5)
+                .padding(.vertical, 6)
                 .background(Color(nsColor: .windowBackgroundColor))
             }
-            .frame(minWidth: 190, idealWidth: 220, maxWidth: 260)
+            .frame(minWidth: 200, idealWidth: 230, maxWidth: 280)
 
             // Detail: Action Editor & Live Runner
             if let id = selectedId,
@@ -216,14 +218,14 @@ struct ActionsSettingsView: View {
                         }
                     )
                 )
-                .frame(minWidth: 380, maxWidth: .infinity)
+                .frame(minWidth: 360, maxWidth: .infinity)
             } else {
                 ContentUnavailableView(
                     "No Action Selected",
                     systemImage: "bolt.badge.automatic",
                     description: Text("Select an action to inspect its settings, edit scripts, and test run.")
                 )
-                .frame(minWidth: 380, maxWidth: .infinity)
+                .frame(minWidth: 360, maxWidth: .infinity)
             }
         }
         .onAppear {
@@ -251,7 +253,7 @@ private struct ActionListRow: View {
             }
             .frame(width: 22, height: 22)
 
-            VStack(alignment: .leading, spacing: 1) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(action.name)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(action.enabled ? Color.primary : Color.secondary)
@@ -285,7 +287,7 @@ private struct ActionListRow: View {
             .toggleStyle(.switch)
             .controlSize(.mini)
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 3)
     }
 
     private var typeColor: Color {
@@ -317,7 +319,7 @@ private struct ActionDetailInspectorView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 14) {
                 // Header Card
                 HStack(spacing: 12) {
                     Button {
@@ -330,32 +332,38 @@ private struct ActionDetailInspectorView: View {
                                 .font(.system(size: 22))
                                 .foregroundStyle(Color.accentColor)
                         }
-                        .frame(width: 48, height: 48)
+                        .frame(width: 44, height: 44)
                     }
                     .buttonStyle(.plain)
                     .popover(isPresented: $showSymbolPicker) {
                         symbolPickerPopover
                     }
 
-                    VStack(alignment: .leading, spacing: 3) {
+                    VStack(alignment: .leading, spacing: 2) {
                         TextField("Action Name", text: $action.name)
-                            .font(.system(size: 16, weight: .bold))
+                            .font(.system(size: 15, weight: .bold))
                             .textFieldStyle(.plain)
 
                         TextField("Subtitle (Optional)", text: Binding(
                             get: { action.subtitle ?? "" },
                             set: { action.subtitle = $0.isEmpty ? nil : $0 }
                         ))
-                        .font(.system(size: 12))
+                        .font(.system(size: 11))
                         .foregroundStyle(Color.secondary)
                         .textFieldStyle(.plain)
                     }
 
                     Spacer(minLength: 8)
 
-                    Toggle("Enabled", isOn: $action.enabled)
-                        .toggleStyle(.switch)
-                        .controlSize(.regular)
+                    HStack(spacing: 6) {
+                        Text(action.enabled ? "Enabled" : "Disabled")
+                            .font(.system(size: 11))
+                            .foregroundStyle(Color.secondary)
+                        Toggle("", isOn: $action.enabled)
+                            .labelsHidden()
+                            .toggleStyle(.switch)
+                            .controlSize(.small)
+                    }
                 }
                 .padding(12)
                 .background(Color(nsColor: .controlBackgroundColor))
@@ -363,12 +371,12 @@ private struct ActionDetailInspectorView: View {
 
                 // Basic Properties
                 GroupBox("Display & Matching") {
-                    VStack(alignment: .leading, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Text("Show When:")
                                 .font(.system(size: 12))
                                 .foregroundStyle(Color.secondary)
-                                .frame(width: 90, alignment: .leading)
+                                .frame(width: 85, alignment: .leading)
                             Picker("", selection: $action.showWhen) {
                                 Text("Always").tag(ShowWhen.always)
                                 Text("Files Only").tag(ShowWhen.filesOnly)
@@ -378,13 +386,14 @@ private struct ActionDetailInspectorView: View {
                             }
                             .pickerStyle(.menu)
                             .labelsHidden()
+                            Spacer()
                         }
 
                         HStack {
                             Text("Menu Group:")
                                 .font(.system(size: 12))
                                 .foregroundStyle(Color.secondary)
-                                .frame(width: 90, alignment: .leading)
+                                .frame(width: 85, alignment: .leading)
                             TextField("e.g. Develop, Quick Actions", text: Binding(
                                 get: { action.group ?? "" },
                                 set: { action.group = $0.isEmpty ? nil : $0 }
@@ -396,7 +405,7 @@ private struct ActionDetailInspectorView: View {
                             Text("SF Symbol:")
                                 .font(.system(size: 12))
                                 .foregroundStyle(Color.secondary)
-                                .frame(width: 90, alignment: .leading)
+                                .frame(width: 85, alignment: .leading)
                             TextField("symbol name", text: Binding(
                                 get: { action.icon?.sfSymbol ?? "" },
                                 set: {
@@ -407,17 +416,17 @@ private struct ActionDetailInspectorView: View {
                             .textFieldStyle(.roundedBorder)
                         }
                     }
-                    .padding(6)
+                    .padding(4)
                 }
 
                 // Execution Configuration
                 GroupBox("Execution Logic") {
-                    VStack(alignment: .leading, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Text("Action Type:")
                                 .font(.system(size: 12))
                                 .foregroundStyle(Color.secondary)
-                                .frame(width: 90, alignment: .leading)
+                                .frame(width: 85, alignment: .leading)
                             Picker("", selection: $action.type) {
                                 Text("Shell Script").tag(ActionType.shell)
                                 Text("Application").tag(ActionType.application)
@@ -427,6 +436,7 @@ private struct ActionDetailInspectorView: View {
                             }
                             .pickerStyle(.menu)
                             .labelsHidden()
+                            Spacer()
                         }
 
                         Divider()
@@ -446,12 +456,12 @@ private struct ActionDetailInspectorView: View {
                                 .foregroundStyle(Color.secondary)
                         }
                     }
-                    .padding(6)
+                    .padding(4)
                 }
 
                 // Live Test Runner Panel
                 GroupBox("Live Test Console") {
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 6) {
                         HStack(spacing: 10) {
                             Button {
                                 runLiveTest()
@@ -459,14 +469,15 @@ private struct ActionDetailInspectorView: View {
                                 Label(isRunningTest ? "Running…" : "Run Test", systemImage: "play.fill")
                             }
                             .buttonStyle(.borderedProminent)
+                            .controlSize(.small)
                             .disabled(isRunningTest)
 
                             if let res = testResult {
                                 HStack(spacing: 4) {
                                     Image(systemName: res.success ? "checkmark.circle.fill" : "xmark.circle.fill")
                                         .foregroundStyle(res.success ? Color.green : Color.red)
-                                    Text(res.success ? "Success (Exit 0)" : "Failed (Exit \(res.exitCode))")
-                                        .font(.caption.bold())
+                                    Text(res.success ? "Success (0)" : "Failed (\(res.exitCode))")
+                                        .font(.system(size: 11, weight: .bold))
                                         .foregroundStyle(res.success ? Color.green : Color.red)
                                 }
                             }
@@ -474,7 +485,7 @@ private struct ActionDetailInspectorView: View {
                             Spacer()
                         }
 
-                        Text("Executes test run against current user home directory.")
+                        Text("Runs against user home directory.")
                             .font(.caption2)
                             .foregroundStyle(Color.secondary)
 
@@ -491,12 +502,12 @@ private struct ActionDetailInspectorView: View {
                                     ScrollView(.horizontal, showsIndicators: true) {
                                         Text(res.stdout)
                                             .font(.system(size: 11, design: .monospaced))
-                                            .padding(6)
+                                            .padding(4)
                                             .textSelection(.enabled)
                                     }
-                                    .frame(maxWidth: .infinity, maxHeight: 90, alignment: .leading)
+                                    .frame(maxWidth: .infinity, maxHeight: 80, alignment: .leading)
                                     .background(Color.black.opacity(0.1))
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                                    .clipShape(RoundedRectangle(cornerRadius: 4))
                                 }
 
                                 if !res.stderr.isEmpty {
@@ -507,23 +518,23 @@ private struct ActionDetailInspectorView: View {
                                         Text(res.stderr)
                                             .font(.system(size: 11, design: .monospaced))
                                             .foregroundStyle(Color.red)
-                                            .padding(6)
+                                            .padding(4)
                                             .textSelection(.enabled)
                                     }
-                                    .frame(maxWidth: .infinity, maxHeight: 90, alignment: .leading)
+                                    .frame(maxWidth: .infinity, maxHeight: 80, alignment: .leading)
                                     .background(Color.red.opacity(0.08))
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                                    .clipShape(RoundedRectangle(cornerRadius: 4))
                                 }
                             }
                             .padding(6)
                             .background(Color(nsColor: .controlBackgroundColor))
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
                     }
-                    .padding(6)
+                    .padding(4)
                 }
             }
-            .padding(14)
+            .padding(12)
         }
     }
 
@@ -552,12 +563,12 @@ private struct ActionDetailInspectorView: View {
     }
 
     private var shellConfigEditor: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text("Interpreter:")
                     .font(.system(size: 12))
                     .foregroundStyle(Color.secondary)
-                    .frame(width: 90, alignment: .leading)
+                    .frame(width: 85, alignment: .leading)
                 TextField("/bin/zsh", text: Binding(
                     get: { action.shell?.interpreter ?? "/bin/zsh" },
                     set: {
@@ -572,7 +583,7 @@ private struct ActionDetailInspectorView: View {
                 Text("Script File:")
                     .font(.system(size: 12))
                     .foregroundStyle(Color.secondary)
-                    .frame(width: 90, alignment: .leading)
+                    .frame(width: 85, alignment: .leading)
                 TextField("e.g. copy-path.zsh", text: Binding(
                     get: { action.shell?.scriptFile ?? "" },
                     set: {
@@ -601,7 +612,7 @@ private struct ActionDetailInspectorView: View {
                 }
             ))
             .font(.system(size: 11, design: .monospaced))
-            .frame(minHeight: 70, maxHeight: 140)
+            .frame(minHeight: 60, maxHeight: 120)
             .padding(4)
             .background(Color(nsColor: .textBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 6))
@@ -613,12 +624,12 @@ private struct ActionDetailInspectorView: View {
     }
 
     private var applicationConfigEditor: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text("Bundle ID:")
                     .font(.system(size: 12))
                     .foregroundStyle(Color.secondary)
-                    .frame(width: 90, alignment: .leading)
+                    .frame(width: 85, alignment: .leading)
                 TextField("com.example.app", text: Binding(
                     get: { action.application?.bundleId ?? "" },
                     set: {
@@ -635,7 +646,7 @@ private struct ActionDetailInspectorView: View {
                 Text("Fallback Path:")
                     .font(.system(size: 12))
                     .foregroundStyle(Color.secondary)
-                    .frame(width: 90, alignment: .leading)
+                    .frame(width: 85, alignment: .leading)
                 TextField("/Applications/App.app", text: Binding(
                     get: { action.application?.pathFallback ?? "" },
                     set: {
@@ -657,12 +668,12 @@ private struct ActionDetailInspectorView: View {
     }
 
     private var appleScriptConfigEditor: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text("Script File:")
                     .font(.system(size: 12))
                     .foregroundStyle(Color.secondary)
-                    .frame(width: 90, alignment: .leading)
+                    .frame(width: 85, alignment: .leading)
                 TextField("script.applescript", text: Binding(
                     get: { action.appleScript?.scriptFile ?? "" },
                     set: {
@@ -681,7 +692,7 @@ private struct ActionDetailInspectorView: View {
                 }
             ))
             .font(.system(size: 11, design: .monospaced))
-            .frame(minHeight: 70, maxHeight: 140)
+            .frame(minHeight: 60, maxHeight: 120)
             .padding(4)
             .background(Color(nsColor: .textBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 6))
@@ -733,7 +744,7 @@ struct ApplicationsSettingsView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 16) {
                 // Section: Terminal
                 GroupBox {
                     VStack(alignment: .leading, spacing: 10) {
@@ -751,7 +762,7 @@ struct ApplicationsSettingsView: View {
                             .font(.caption)
                             .foregroundStyle(Color.secondary)
 
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 160, maximum: 220))], spacing: 8) {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150, maximum: 200))], spacing: 8) {
                             ForEach(terminalChoices) { terminal in
                                 TerminalCard(
                                     application: terminal,
@@ -783,7 +794,7 @@ struct ApplicationsSettingsView: View {
                             .font(.caption)
                             .foregroundStyle(Color.secondary)
 
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 180, maximum: 260))], spacing: 8) {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 170, maximum: 240))], spacing: 8) {
                             ForEach(visibleEditors) { editor in
                                 EditorCard(
                                     application: editor,
@@ -804,7 +815,7 @@ struct ApplicationsSettingsView: View {
                     .padding(6)
                 }
             }
-            .padding(16)
+            .padding(14)
         }
     }
 
@@ -868,16 +879,16 @@ private struct TerminalCard: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: application.sfSymbol)
-                    .font(.system(size: 15))
+                    .font(.system(size: 14))
                     .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
-                    .frame(width: 20)
+                    .frame(width: 18)
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(application.name)
-                        .font(.system(size: 12, weight: isSelected ? .bold : .medium))
+                        .font(.system(size: 11, weight: isSelected ? .bold : .medium))
                         .lineLimit(1)
                     Text(isInstalled ? "Installed" : "Not Found")
-                        .font(.system(size: 9))
+                        .font(.system(size: 8))
                         .foregroundStyle(isInstalled ? Color.secondary : Color.orange)
                 }
 
@@ -886,10 +897,10 @@ private struct TerminalCard: View {
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(Color.accentColor)
-                        .font(.system(size: 12))
+                        .font(.system(size: 11))
                 }
             }
-            .padding(8)
+            .padding(6)
             .background(isSelected ? Color.accentColor.opacity(0.12) : Color(nsColor: .controlBackgroundColor))
             .overlay(
                 RoundedRectangle(cornerRadius: 6)
@@ -909,16 +920,16 @@ private struct EditorCard: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: application.sfSymbol)
-                .font(.system(size: 15))
+                .font(.system(size: 14))
                 .foregroundStyle(isOn ? Color.accentColor : Color.secondary)
-                .frame(width: 20)
+                .frame(width: 18)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(application.name)
-                    .font(.system(size: 12, weight: isOn ? .semibold : .regular))
+                    .font(.system(size: 11, weight: isOn ? .semibold : .regular))
                     .lineLimit(1)
                 Text(isInstalled ? application.bundleId : "Not Installed")
-                    .font(.system(size: 9))
+                    .font(.system(size: 8))
                     .foregroundStyle(isInstalled ? Color.secondary : Color.orange)
                     .lineLimit(1)
             }
@@ -930,7 +941,7 @@ private struct EditorCard: View {
                 .toggleStyle(.switch)
                 .controlSize(.mini)
         }
-        .padding(8)
+        .padding(6)
         .background(Color(nsColor: .controlBackgroundColor))
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }
@@ -943,10 +954,10 @@ struct ExtensionStatusView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 16) {
                 // Extension Status Card
                 GroupBox {
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 10) {
                         HStack {
                             Image(systemName: "puzzlepiece.extension.fill")
                                 .font(.title3)
@@ -1033,7 +1044,7 @@ struct ExtensionStatusView: View {
                     .padding(6)
                 }
             }
-            .padding(16)
+            .padding(14)
         }
         .task {
             state.refreshExtensionStatus()
@@ -1135,7 +1146,7 @@ struct LogsSettingsView: View {
                     }
                     .padding(.vertical, 3)
                 }
-                .listStyle(.inset(alternatesRowBackgrounds: true))
+                .listStyle(.plain)
             }
         }
     }
@@ -1151,7 +1162,7 @@ struct GeneralSettingsView: View {
         @Bindable var state = state
 
         ScrollView(.vertical, showsIndicators: true) {
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 16) {
                 GroupBox("Preferences") {
                     VStack(alignment: .leading, spacing: 8) {
                         Toggle("Show system notifications upon execution completion", isOn: $state.notificationsEnabled)
@@ -1232,7 +1243,7 @@ struct GeneralSettingsView: View {
                     .padding(6)
                 }
             }
-            .padding(16)
+            .padding(14)
         }
         .onChange(of: state.notificationsEnabled) { _, _ in state.persistSettings() }
     }

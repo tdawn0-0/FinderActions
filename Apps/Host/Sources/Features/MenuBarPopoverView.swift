@@ -12,9 +12,12 @@ struct MenuBarPopoverView: View {
                 Text("FinderActions")
                     .font(.headline)
                 Spacer()
-                SettingsLink {
+                Button {
+                    state.openSettings()
+                } label: {
                     Image(systemName: "gearshape")
                 }
+                .buttonStyle(.plain)
                 .help("Open Settings")
             }
             .padding(12)
@@ -34,13 +37,16 @@ struct MenuBarPopoverView: View {
 
             Divider()
             HStack {
-                SettingsLink {
-                    Text("Settings…")
+                Button("Settings…") {
+                    state.openSettings()
                 }
+                .buttonStyle(.plain)
+
                 Spacer()
                 Button("Quit") {
                     NSApp.terminate(nil)
                 }
+                .buttonStyle(.plain)
             }
             .padding(10)
             .font(.caption)
