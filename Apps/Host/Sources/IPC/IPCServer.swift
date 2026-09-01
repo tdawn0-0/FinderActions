@@ -75,18 +75,24 @@ final class IPCServer {
 
     private func notify(result: ExecResult, actionId: String) {
         guard appState.notificationsEnabled else { return }
-        let content = UNMutableNotificationContent()
-        content.title = result.success ? "FinderActions" : "FinderActions failed"
-        content.body = "\(actionId): \(result.summary)"
-        content.sound = result.success ? nil : .default
-        let req = UNNotificationRequest(
-            identifier: UUID().uuidString,
-            content: content,
-            trigger: nil
-        )
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, _ in
-            guard granted else { return }
-            UNUserNotificationCenter.current().add(req, withCompletionHandler: nil)
+        let title = result.success ? "FinderActions" : "FinderActions failed"
+        let body = "\(actionId): \(result.summary)"
+        let playFailureSound = !result.success
+
+        Task {
+            let center = UNUserNotificationCenter.current()
+            guard (try? await center.requestAuthorization(options: [.alert, .sound])) == true else { return }
+
+            let content = UNMutableNotificationContent()
+            content.title = title
+            content.body = body
+            content.sound = playFailureSound ? .default : nil
+            let request = UNNotificationRequest(
+                identifier: UUID().uuidString,
+                content: content,
+                trigger: nil
+            )
+            try? await center.add(request)
         }
     }
 }

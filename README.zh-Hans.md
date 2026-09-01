@@ -9,25 +9,36 @@
 ## 环境要求
 
 - macOS 15+
-- Apple Silicon
 - 构建需 Xcode 16+
 - [XcodeGen](https://github.com/yonaskolb/XcodeGen)（`brew install xcodegen`）
+- 发布需加入 Apple Developer Program
 
-## 构建与安装
+## 开发
 
 ```bash
-./Scripts/gen.sh
-./Scripts/build.sh
+./Scripts/dev.sh   # 生成工程并构建 Debug
+./Scripts/test.sh  # 运行 Swift 测试
 ```
 
-或用 Xcode 打开 `FinderActions.xcodeproj`，选择 **FinderActions** scheme 运行。
+`dev.sh` 根据 `project.yml` 生成 `FinderActions.xcodeproj`，因此 YAML 是工程配置的唯一事实来源。之后也可以用 Xcode 打开工程并运行 **FinderActions** scheme。
+
+## Mac App Store 之外发布
+
+发布流程使用 Developer ID 签名、Hardened Runtime、Apple 公证、票据装订和 Gatekeeper 验证。
+
+```bash
+./Scripts/setup-signing.sh  # 每台开发 Mac 只需执行一次
+./Scripts/release.sh        # 生成已测试、签名、公证的发布 ZIP
+```
+
+产物位于 `build/releases/`。凭据配置、流水线细节及故障排查见 [docs/releasing.md](docs/releasing.md)。
 
 建议把生成的 `FinderActions.app` 放到 `/Applications`，便于扩展注册。
 
 ### 无界面检查
 
 ```bash
-./build/DerivedData/Build/Products/Debug/FinderActions.app/Contents/MacOS/FinderActions --dump-actions
+./build/DerivedData/Debug/Build/Products/Debug/FinderActions.app/Contents/MacOS/FinderActions --dump-actions
 ```
 
 ### 单元测试与 Shell 路径 harness

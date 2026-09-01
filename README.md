@@ -9,18 +9,29 @@ Open-source **Finder right-click actions** for macOS.
 ## Requirements
 
 - macOS 15+
-- Apple Silicon
 - Xcode 16+ (to build)
 - [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`)
+- Apple Developer Program membership (release only)
 
-## Build & install
+## Development
 
 ```bash
-./Scripts/gen.sh          # generate FinderActions.xcodeproj
-./Scripts/build.sh        # Debug build into build/DerivedData
+./Scripts/dev.sh          # generate the project and build Debug
+./Scripts/test.sh         # run the Swift test suite
 ```
 
-Or open `FinderActions.xcodeproj` in Xcode, select the **FinderActions** scheme, Run.
+`dev.sh` generates `FinderActions.xcodeproj` from `project.yml`; treat the YAML file as the source of truth. You can then open the project in Xcode and run the **FinderActions** scheme.
+
+## Release outside the Mac App Store
+
+Releases use Developer ID signing, Hardened Runtime, Apple notarization, ticket stapling, and Gatekeeper validation.
+
+```bash
+./Scripts/setup-signing.sh  # once per development Mac
+./Scripts/release.sh        # tested, signed, notarized release ZIP
+```
+
+Release artifacts are written to `build/releases/`. See [docs/releasing.md](docs/releasing.md) for credential setup, pipeline details, and troubleshooting.
 
 Copy the built `FinderActions.app` to `/Applications` for everyday use (helps FinderSync registration).
 
@@ -36,7 +47,7 @@ macOS requires you to add and enable the app yourself.
 # Same load path as the GUI — prints seeded action ids
 open -W -a /path/to/FinderActions.app --args --dump-actions
 # or after build:
-./build/DerivedData/Build/Products/Debug/FinderActions.app/Contents/MacOS/FinderActions --dump-actions
+./build/DerivedData/Debug/Build/Products/Debug/FinderActions.app/Contents/MacOS/FinderActions --dump-actions
 ```
 
 ### Core tests & shell harness

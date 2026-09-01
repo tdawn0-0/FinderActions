@@ -44,4 +44,7 @@ Package.resolved
 .env
 .env.*
 !.env.example
+.release.env
 
+# Signed release artifacts
+build/releases/

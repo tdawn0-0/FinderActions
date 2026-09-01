@@ -14,7 +14,7 @@ pluginkit -e use -i com.finderactions.host.FinderSync
 killall Finder
 ```
 
-5. Rebuild so the appex is embedded: `./Scripts/build.sh`
+5. Rebuild so the appex is embedded: `./Scripts/dev.sh`
 
 ## Host not running item only
 

@@ -13,6 +13,7 @@
 		665AAD726D2562A6A373800B /* IPCClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E853D77FA333F44C3B7EA3 /* IPCClient.swift */; };
 		7B8081C98AED8C3A5AD98F7C /* FAFinderSync.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A363F7D86EBE5062E90EB7B6 /* FAFinderSync.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8AC9AFA642CF3D01DE822FA0 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98EE0AC7A1A06CA441562D03 /* AppState.swift */; };
+		A190E8F22F59DA0033B3267D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1365BEA5F34DC51401B1C5BC /* Assets.xcassets */; };
 		A36F1E0CB5F990C7E67D4FCF /* FullDiskAccessSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81CD69140456375F62D6F5C9 /* FullDiskAccessSettings.swift */; };
 		A38A61E39C9F1F418ED4B120 /* BundledActions in Resources */ = {isa = PBXBuildFile; fileRef = F414D005950D759ED9F3E9C7 /* BundledActions */; };
 		AA6ED55D96E3115BC7FF3E76 /* ExecLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23866392BB58EB72C77BA52 /* ExecLogStore.swift */; };
@@ -53,6 +54,7 @@
 
 /* Begin PBXFileReference section */
 		0201D3A1060B9BF8BE1D2D8B /* FinderActions.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinderActions.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1365BEA5F34DC51401B1C5BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1C28DE75EA01B130D0307790 /* FinderSync.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FinderSync.framework; path = System/Library/Frameworks/FinderSync.framework; sourceTree = SDKROOT; };
 		3C0CA36B23AB76C0A0A2602A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4980120D49FC6D3CEF90EF33 /* finder-menu */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "finder-menu"; path = .; sourceTree = SOURCE_ROOT; };
@@ -171,6 +173,7 @@
 		88C8382DCEC1A1B7A0DCBAD0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				1365BEA5F34DC51401B1C5BC /* Assets.xcassets */,
 				925A248CD571687760497699 /* Localizable.xcstrings */,
 			);
 			path = Resources;
@@ -288,11 +291,9 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					1FDEFDBD97B2A2ADA82EA3B3 = {
-						DevelopmentTeam = 29QDQBYQZG;
 						ProvisioningStyle = Automatic;
 					};
 					2DF849BE794305F69DDCED56 = {
-						DevelopmentTeam = 29QDQBYQZG;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -325,6 +326,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A190E8F22F59DA0033B3267D /* Assets.xcassets in Resources */,
 				A38A61E39C9F1F418ED4B120 /* BundledActions in Resources */,
 				F4E36732C2D51A728DD161AD /* Localizable.xcstrings in Resources */,
 			);
@@ -402,17 +404,16 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 29QDQBYQZG;
-				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -427,6 +428,7 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
@@ -506,13 +508,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 29QDQBYQZG;
-				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -545,7 +545,7 @@
 		7CE101AC8BE220C39F0A3257 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Apps/Host/Resources/FinderActions.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_APP_SANDBOX = NO;
@@ -564,7 +564,7 @@
 		DEA233EC791D44E38358B8E5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Apps/Host/Resources/FinderActions.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_APP_SANDBOX = NO;

@@ -2,6 +2,23 @@ import Foundation
 import AppKit
 import FinderActionsCore
 
+private final class LockedErrorBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var storedError: Error?
+
+    func store(_ error: Error?) {
+        lock.lock()
+        storedError = error
+        lock.unlock()
+    }
+
+    func load() -> Error? {
+        lock.lock()
+        defer { lock.unlock() }
+        return storedError
+    }
+}
+
 public struct ExecResult: Sendable {
     public var success: Bool
     public var summary: String
@@ -93,13 +110,15 @@ public final class ActionExecutor: @unchecked Sendable {
         let fileURLs = paths.map { URL(fileURLWithPath: $0) }
         let configOpen = NSWorkspace.OpenConfiguration()
         let sem = DispatchSemaphore(value: 0)
-        var err: Error?
+        let errorBox = LockedErrorBox()
         NSWorkspace.shared.open(fileURLs, withApplicationAt: appURL, configuration: configOpen) { _, error in
-            err = error
+            errorBox.store(error)
             sem.signal()
         }
-        _ = sem.wait(timeout: .now() + 10)
-        if let err {
+        guard sem.wait(timeout: .now() + 10) == .success else {
+            return ExecResult(success: false, summary: "Timed out opening \(action.name)", exitCode: 1)
+        }
+        if let err = errorBox.load() {
             return ExecResult(success: false, summary: err.localizedDescription, exitCode: 1)
         }
         return ExecResult(success: true, summary: "Opened with \(action.name)")
@@ -232,17 +251,19 @@ public final class ActionExecutor: @unchecked Sendable {
     private func openDirectory(_ path: String, with appURL: URL, appName: String) -> ExecResult {
         let conf = NSWorkspace.OpenConfiguration()
         let sem = DispatchSemaphore(value: 0)
-        var launchError: Error?
+        let errorBox = LockedErrorBox()
         NSWorkspace.shared.open(
             [URL(fileURLWithPath: path)],
             withApplicationAt: appURL,
             configuration: conf
         ) { _, error in
-            launchError = error
+            errorBox.store(error)
             sem.signal()
         }
-        _ = sem.wait(timeout: .now() + 10)
-        if let launchError {
+        guard sem.wait(timeout: .now() + 10) == .success else {
+            return ExecResult(success: false, summary: "Timed out opening \(appName)", exitCode: 1)
+        }
+        if let launchError = errorBox.load() {
             return ExecResult(success: false, summary: launchError.localizedDescription, exitCode: 1)
         }
         return ExecResult(success: true, summary: "Opened \(appName) at \(path)")

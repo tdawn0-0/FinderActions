@@ -20,7 +20,7 @@ Shared pure logic lives in **FinderActionsCore** (SwiftPM): models, manifest I/O
 
 ## Why no Runner
 
-Sandbox App Store apps needed a separate helper + bookmark relay. With a Developer ID / open-source Host that is **not** sandboxed, Host can execute directly. Fewer moving parts.
+Sandbox App Store apps needed a separate helper + bookmark relay. With a Developer ID-signed, Hardened Runtime-enabled Host that is **not** sandboxed, Host can execute directly. Fewer moving parts.
 
 ## Data flow
 
