@@ -70,7 +70,7 @@ struct SettingsRootView: View {
                 }
             }
             .listStyle(.sidebar)
-            .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 250)
+            .navigationSplitViewColumnWidth(min: 190, ideal: 210, max: 240)
         } detail: {
             Group {
                 switch selectedSection ?? .actions {
@@ -91,12 +91,12 @@ struct SettingsRootView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .navigationSplitViewStyle(.balanced)
-        .frame(minWidth: 860, idealWidth: 960, minHeight: 560, idealHeight: 620)
+        .frame(minWidth: 880, idealWidth: 960, minHeight: 560, idealHeight: 620)
         .environment(state)
     }
 }
 
-// MARK: - 1. Actions Management (Master-Detail)
+// MARK: - 1. Actions Management (Pure SwiftUI Flexible Layout)
 
 struct ActionsSettingsView: View {
     @Environment(AppState.self) private var state
@@ -117,8 +117,8 @@ struct ActionsSettingsView: View {
     }
 
     var body: some View {
-        HSplitView {
-            // Master: Action list with search & toolbar
+        HStack(spacing: 0) {
+            // Left Action List (Fixed width, zero autolayout conflict)
             VStack(spacing: 0) {
                 // Search Bar
                 HStack(spacing: 6) {
@@ -204,9 +204,11 @@ struct ActionsSettingsView: View {
                 .padding(.vertical, 6)
                 .background(Color(nsColor: .windowBackgroundColor))
             }
-            .frame(minWidth: 200, idealWidth: 230, maxWidth: 280)
+            .frame(width: 240)
 
-            // Detail: Action Editor & Live Runner
+            Divider()
+
+            // Right Detail Inspector (Flexible fill)
             if let id = selectedId,
                let idx = state.manifest.actions.firstIndex(where: { $0.id == id }) {
                 ActionDetailInspectorView(
@@ -218,14 +220,14 @@ struct ActionsSettingsView: View {
                         }
                     )
                 )
-                .frame(minWidth: 360, maxWidth: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ContentUnavailableView(
                     "No Action Selected",
                     systemImage: "bolt.badge.automatic",
                     description: Text("Select an action to inspect its settings, edit scripts, and test run.")
                 )
-                .frame(minWidth: 360, maxWidth: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .onAppear {
@@ -259,7 +261,7 @@ private struct ActionListRow: View {
                     .foregroundStyle(action.enabled ? Color.primary : Color.secondary)
                     .lineLimit(1)
 
-                HStack(spacing: 3) {
+                HStack(spacing: 4) {
                     Text(action.type.rawValue.uppercased())
                         .font(.system(size: 8, weight: .bold))
                         .padding(.horizontal, 3)
@@ -319,7 +321,7 @@ private struct ActionDetailInspectorView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 16) {
                 // Header Card
                 HStack(spacing: 12) {
                     Button {
@@ -339,7 +341,7 @@ private struct ActionDetailInspectorView: View {
                         symbolPickerPopover
                     }
 
-                    VStack(alignment: .leading, spacing: 2) {
+                    VStack(alignment: .leading, spacing: 3) {
                         TextField("Action Name", text: $action.name)
                             .font(.system(size: 15, weight: .bold))
                             .textFieldStyle(.plain)
@@ -353,11 +355,11 @@ private struct ActionDetailInspectorView: View {
                         .textFieldStyle(.plain)
                     }
 
-                    Spacer(minLength: 8)
+                    Spacer()
 
                     HStack(spacing: 6) {
                         Text(action.enabled ? "Enabled" : "Disabled")
-                            .font(.system(size: 11))
+                            .font(.system(size: 12))
                             .foregroundStyle(Color.secondary)
                         Toggle("", isOn: $action.enabled)
                             .labelsHidden()
@@ -371,7 +373,7 @@ private struct ActionDetailInspectorView: View {
 
                 // Basic Properties
                 GroupBox("Display & Matching") {
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 10) {
                         HStack {
                             Text("Show When:")
                                 .font(.system(size: 12))
@@ -416,12 +418,12 @@ private struct ActionDetailInspectorView: View {
                             .textFieldStyle(.roundedBorder)
                         }
                     }
-                    .padding(4)
+                    .padding(6)
                 }
 
                 // Execution Configuration
                 GroupBox("Execution Logic") {
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 10) {
                         HStack {
                             Text("Action Type:")
                                 .font(.system(size: 12))
@@ -456,12 +458,12 @@ private struct ActionDetailInspectorView: View {
                                 .foregroundStyle(Color.secondary)
                         }
                     }
-                    .padding(4)
+                    .padding(6)
                 }
 
                 // Live Test Runner Panel
                 GroupBox("Live Test Console") {
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 8) {
                         HStack(spacing: 10) {
                             Button {
                                 runLiveTest()
@@ -531,10 +533,10 @@ private struct ActionDetailInspectorView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
                     }
-                    .padding(4)
+                    .padding(6)
                 }
             }
-            .padding(12)
+            .padding(16)
         }
     }
 
@@ -563,7 +565,7 @@ private struct ActionDetailInspectorView: View {
     }
 
     private var shellConfigEditor: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("Interpreter:")
                     .font(.system(size: 12))
@@ -579,7 +581,7 @@ private struct ActionDetailInspectorView: View {
                 .textFieldStyle(.roundedBorder)
             }
 
-            HStack {
+            HStack(spacing: 8) {
                 Text("Script File:")
                     .font(.system(size: 12))
                     .foregroundStyle(Color.secondary)
@@ -593,11 +595,13 @@ private struct ActionDetailInspectorView: View {
                 ))
                 .textFieldStyle(.roundedBorder)
 
-                Button("Open") {
+                Button {
                     state.openActionsDirectory()
+                } label: {
+                    Image(systemName: "folder")
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
+                .buttonStyle(.borderless)
+                .help("Open Scripts Directory in Finder")
             }
 
             Text("Or Inline Script:")
@@ -612,7 +616,7 @@ private struct ActionDetailInspectorView: View {
                 }
             ))
             .font(.system(size: 11, design: .monospaced))
-            .frame(minHeight: 60, maxHeight: 120)
+            .frame(minHeight: 60, maxHeight: 110)
             .padding(4)
             .background(Color(nsColor: .textBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 6))
@@ -624,7 +628,7 @@ private struct ActionDetailInspectorView: View {
     }
 
     private var applicationConfigEditor: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("Bundle ID:")
                     .font(.system(size: 12))
@@ -668,7 +672,7 @@ private struct ActionDetailInspectorView: View {
     }
 
     private var appleScriptConfigEditor: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("Script File:")
                     .font(.system(size: 12))
@@ -692,7 +696,7 @@ private struct ActionDetailInspectorView: View {
                 }
             ))
             .font(.system(size: 11, design: .monospaced))
-            .frame(minHeight: 60, maxHeight: 120)
+            .frame(minHeight: 60, maxHeight: 110)
             .padding(4)
             .background(Color(nsColor: .textBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 6))
@@ -815,7 +819,7 @@ struct ApplicationsSettingsView: View {
                     .padding(6)
                 }
             }
-            .padding(14)
+            .padding(16)
         }
     }
 
@@ -1044,7 +1048,7 @@ struct ExtensionStatusView: View {
                     .padding(6)
                 }
             }
-            .padding(14)
+            .padding(16)
         }
         .task {
             state.refreshExtensionStatus()
@@ -1243,7 +1247,7 @@ struct GeneralSettingsView: View {
                     .padding(6)
                 }
             }
-            .padding(14)
+            .padding(16)
         }
         .onChange(of: state.notificationsEnabled) { _, _ in state.persistSettings() }
     }
