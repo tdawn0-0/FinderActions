@@ -1,0 +1,47 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Build & Derived Data
+.build/
+build/
+DerivedData/
+*.dSYM/
+*.dSYM.zip
+*.ipa
+
+# Xcode / User Data
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcodeproj/project.xcworkspace/
+!*.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcuserdatad/
+xcuserdata/
+
+# Swift Package Manager
+.swiftpm/
+Package.resolved
+
+# IDEs & Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.bak
+
+# Environment & Logs
+*.log
+.env
+.env.*
+!.env.example
+
