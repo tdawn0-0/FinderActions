@@ -4,6 +4,7 @@ import FinderActionsCore
 
 struct MenuBarPopoverView: View {
     @Environment(AppState.self) private var state
+    @Environment(\.openWindow) private var openWindow
     @State private var selectedTab = 0
     @State private var searchText = ""
     @State private var hoveredActionId: String?
@@ -115,7 +116,8 @@ struct MenuBarPopoverView: View {
                 .help("Open Scripts Folder")
 
                 Button {
-                    state.openSettings()
+                    openWindow(id: "settings")
+                    NSApp.activate(ignoringOtherApps: true)
                 } label: {
                     Image(systemName: "gearshape.fill")
                         .font(.system(size: 12))
@@ -349,7 +351,8 @@ struct MenuBarPopoverView: View {
     private var footerView: some View {
         HStack {
             Button {
-                state.openSettings()
+                openWindow(id: "settings")
+                NSApp.activate(ignoringOtherApps: true)
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "slider.horizontal.3")

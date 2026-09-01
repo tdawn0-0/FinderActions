@@ -1351,6 +1351,7 @@ struct FullDiskAccessGuideView: View {
 
 struct OnboardingView: View {
     @Environment(AppState.self) private var state
+    @Environment(\.dismissWindow) private var dismissWindow
     private let onDismiss: (() -> Void)?
 
     init(onDismiss: (() -> Void)? = nil) {
@@ -1411,5 +1412,6 @@ struct OnboardingView: View {
     private func finish() {
         state.completeOnboarding()
         onDismiss?()
+        dismissWindow(id: "onboarding")
     }
 }

@@ -7,26 +7,38 @@ struct FinderActionsApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        // Modern menu bar UI (no NSStatusItem / NSPopover)
+        // 1. Modern MenuBar Window Scene
         MenuBarExtra("FinderActions", systemImage: "hammer.fill") {
             MenuBarPopoverView()
                 .environment(appDelegate.appState)
         }
         .menuBarExtraStyle(.window)
 
-        Settings {
+        // 2. Declarative Settings Window
+        Window("FinderActions Settings", id: "settings") {
             SettingsRootView()
                 .environment(appDelegate.appState)
         }
+        .windowResizability(.contentSize)
+        .defaultSize(width: 940, height: 600)
+        .defaultPosition(.center)
+
+        // 3. Declarative Onboarding Setup Window
+        Window("Set Up FinderActions", id: "onboarding") {
+            OnboardingView()
+                .environment(appDelegate.appState)
+        }
+        .windowResizability(.contentSize)
+        .defaultSize(width: 540, height: 500)
+        .defaultPosition(.center)
     }
 }
 
-/// Process lifecycle only: bootstrap, IPC, headless dump. UI is pure SwiftUI.
+/// Process lifecycle: bootstrap, IPC server, headless CLI dump.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let appState = AppState()
     private var ipcServer: IPCServer?
-    private var onboardingWindowController: NSWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         if CommandLine.arguments.contains("--dump-actions") {
@@ -37,7 +49,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appState.bootstrap()
         startIPC()
         publishSnapshot()
-        presentOnboardingIfNeeded()
+
         DistributedNotificationCenter.default().post(
             name: Notification.Name(IPCConstants.hostReadyNotification),
             object: nil
@@ -73,26 +85,5 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let snap = SnapshotBuilder.build(from: appState.effectiveManifest, hostRunning: true)
         SnapshotPublisher.publish(snap)
         appState.lastSnapshot = snap
-    }
-
-    private func presentOnboardingIfNeeded() {
-        guard appState.showOnboarding, onboardingWindowController == nil else { return }
-
-        let rootView = OnboardingView { [weak self] in
-            self?.onboardingWindowController?.close()
-            self?.onboardingWindowController = nil
-        }
-        .environment(appState)
-        let hostingController = NSHostingController(rootView: rootView)
-        let window = NSWindow(contentViewController: hostingController)
-        window.title = "Set Up FinderActions"
-        window.styleMask = [.titled, .closable, .miniaturizable]
-        window.isReleasedWhenClosed = false
-        window.center()
-
-        let controller = NSWindowController(window: window)
-        onboardingWindowController = controller
-        controller.showWindow(nil)
-        NSApp.activate(ignoringOtherApps: true)
     }
 }

@@ -267,32 +267,6 @@ final class AppState {
         }
     }
 
-    // MARK: - Settings Window Management
-
-    private var settingsWindowController: NSWindowController?
-
-    func openSettings() {
-        NSApp.activate(ignoringOtherApps: true)
-        if let controller = settingsWindowController, let window = controller.window {
-            window.makeKeyAndOrderFront(nil)
-            controller.showWindow(nil)
-            return
-        }
-        let rootView = SettingsRootView().environment(self)
-        let hosting = NSHostingController(rootView: rootView)
-        let window = NSWindow(contentViewController: hosting)
-        window.title = "FinderActions Settings"
-        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
-        window.setContentSize(NSSize(width: 920, height: 600))
-        window.minSize = NSSize(width: 860, height: 520)
-        window.center()
-        window.isReleasedWhenClosed = false
-        let controller = NSWindowController(window: window)
-        settingsWindowController = controller
-        controller.showWindow(nil)
-        window.makeKeyAndOrderFront(nil)
-    }
-
     func completeOnboarding() {
         UserDefaults.standard.set(true, forKey: "didCompleteOnboarding")
         showOnboarding = false
