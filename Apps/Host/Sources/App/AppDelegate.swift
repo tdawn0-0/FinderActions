@@ -1,44 +1,22 @@
-import SwiftUI
 import AppKit
 import FinderActionsCore
 
+/// Process lifecycle: bootstrap, status menu, lazy windows, IPC, and headless CLI dump.
 @main
-struct FinderActionsApp: App {
-    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-
-    var body: some Scene {
-        // 1. Modern MenuBar Window Scene
-        MenuBarExtra("FinderActions", systemImage: "hammer.fill") {
-            MenuBarPopoverView()
-                .environment(appDelegate.appState)
-        }
-        .menuBarExtraStyle(.window)
-
-        // 2. Declarative Settings Window
-        Window("FinderActions Settings", id: "settings") {
-            SettingsRootView()
-                .environment(appDelegate.appState)
-        }
-        .windowResizability(.contentSize)
-        .defaultSize(width: 940, height: 600)
-        .defaultPosition(.center)
-
-        // 3. Declarative Onboarding Setup Window
-        Window("Set Up FinderActions", id: "onboarding") {
-            OnboardingView()
-                .environment(appDelegate.appState)
-        }
-        .windowResizability(.contentSize)
-        .defaultSize(width: 540, height: 500)
-        .defaultPosition(.center)
-    }
-}
-
-/// Process lifecycle: bootstrap, IPC server, headless CLI dump.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let appState = AppState()
+
     private var ipcServer: IPCServer?
+    private var statusMenuController: StatusMenuController?
+    private var windowController: AppWindowController?
+
+    static func main() {
+        let application = NSApplication.shared
+        let delegate = AppDelegate()
+        application.delegate = delegate
+        application.run()
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         if CommandLine.arguments.contains("--dump-actions") {
@@ -47,6 +25,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         appState.bootstrap()
+
+        let windowController = AppWindowController(appState: appState)
+        self.windowController = windowController
+        statusMenuController = StatusMenuController(
+            appState: appState,
+            openSettings: { [weak windowController] in
+                windowController?.showSettings()
+            }
+        )
+
         startIPC()
         publishSnapshot()
 
@@ -54,6 +42,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             name: Notification.Name(IPCConstants.hostReadyNotification),
             object: nil
         )
+
+        if appState.showOnboarding {
+            windowController.showOnboarding()
+        }
+    }
+
+    func applicationShouldHandleReopen(
+        _ sender: NSApplication,
+        hasVisibleWindows flag: Bool
+    ) -> Bool {
+        windowController?.showSettings()
+        return true
     }
 
     private func dumpActionsAndExit() {
@@ -82,8 +82,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func publishSnapshot() {
-        let snap = SnapshotBuilder.build(from: appState.effectiveManifest, hostRunning: true)
-        SnapshotPublisher.publish(snap)
-        appState.lastSnapshot = snap
+        let snapshot = SnapshotBuilder.build(
+            from: appState.effectiveManifest,
+            hostRunning: true
+        )
+        SnapshotPublisher.publish(snapshot)
+        appState.lastSnapshot = snapshot
     }
 }

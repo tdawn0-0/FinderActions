@@ -3,7 +3,9 @@
 ## Platform
 
 - **macOS 15+** only (no legacy fallbacks)
-- **Swift 6**, SwiftUI (`MenuBarExtra`, `@Observable`, `Tab`, `SettingsLink`)
+- **Swift 6**, AppKit (`NSStatusItem`, `NSMenu`, `NSWindowController`) for the
+  always-resident shell and SwiftUI (`@Observable`, `NavigationSplitView`) for
+  settings created only on demand
 - **Swift Testing** for Core unit tests
 
 ## 方案 B summary
@@ -11,7 +13,7 @@
 Two processes only:
 
 1. **Host** (`com.finderactions.host`) — not sandboxed  
-   Owns configuration, script files, execution (application / shell / terminal / AppleScript), menu-snapshot publishing, logs, and SwiftUI settings / menu bar UI.
+   Owns configuration, script files, execution (application / shell / terminal / AppleScript), menu-snapshot publishing, logs, a lightweight AppKit status menu, and lazy SwiftUI settings windows. Closing a settings window disconnects and releases its hosting controller.
 
 2. **FinderSync** (`com.finderactions.host.FinderSync`) — sandboxed  
    Pure UI probe: caches the last menu snapshot, builds Finder contextual menus, on click sends `ExecuteRequest` JSON and returns. Does **not** run scripts, spawn `Process`, or hold long-term security-scoped bookmarks.
