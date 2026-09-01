@@ -3,330 +3,724 @@ import AppKit
 import UniformTypeIdentifiers
 import FinderActionsCore
 
+// MARK: - Navigation Sections
+
+enum SettingsSection: String, CaseIterable, Identifiable {
+    case actions = "Actions"
+    case applications = "Applications"
+    case extensions = "Extensions & Permissions"
+    case logs = "Activity Logs"
+    case general = "General"
+    case about = "About"
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .actions: return "Actions"
+        case .applications: return "Applications"
+        case .extensions: return "Extension & Permissions"
+        case .logs: return "Activity Logs"
+        case .general: return "General"
+        case .about: return "About"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .actions: return "bolt.fill"
+        case .applications: return "app.badge.fill"
+        case .extensions: return "puzzlepiece.extension.fill"
+        case .logs: return "list.bullet.rectangle.portrait.fill"
+        case .general: return "gearshape.fill"
+        case .about: return "info.circle.fill"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .actions: return .blue
+        case .applications: return .purple
+        case .extensions: return .orange
+        case .logs: return .teal
+        case .general: return .gray
+        case .about: return .indigo
+        }
+    }
+}
+
+// MARK: - Root Settings View
+
 struct SettingsRootView: View {
     @Environment(AppState.self) private var state
+    @State private var selectedSection: SettingsSection? = .actions
 
     var body: some View {
-        TabView {
-            Tab("Actions", systemImage: "bolt.fill") {
-                ActionsSettingsView()
+        NavigationSplitView {
+            List(SettingsSection.allCases, selection: $selectedSection) { section in
+                NavigationLink(value: section) {
+                    Label {
+                        Text(section.title)
+                            .font(.system(size: 13, weight: .medium))
+                    } icon: {
+                        Image(systemName: section.icon)
+                            .foregroundStyle(section.color)
+                            .imageScale(.medium)
+                    }
+                }
             }
-            Tab("Extension", systemImage: "puzzlepiece.extension") {
-                ExtensionStatusView()
+            .listStyle(.sidebar)
+            .navigationSplitViewColumnWidth(min: 170, ideal: 190, max: 220)
+        } detail: {
+            Group {
+                switch selectedSection ?? .actions {
+                case .actions:
+                    ActionsSettingsView()
+                case .applications:
+                    ApplicationsSettingsView()
+                case .extensions:
+                    ExtensionStatusView()
+                case .logs:
+                    LogsSettingsView()
+                case .general:
+                    GeneralSettingsView()
+                case .about:
+                    AboutView()
+                }
             }
-            Tab("Logs", systemImage: "list.bullet.rectangle") {
-                LogsSettingsView()
-            }
-            Tab("Applications", systemImage: "app.badge") {
-                ApplicationsSettingsView()
-            }
-            Tab("Settings", systemImage: "gearshape") {
-                GeneralSettingsView()
-            }
-            Tab("About", systemImage: "info.circle") {
-                AboutView()
-            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(minWidth: 560, minHeight: 420)
+        .frame(minWidth: 880, idealWidth: 960, minHeight: 540, idealHeight: 600)
         .environment(state)
     }
 }
 
+// MARK: - 1. Actions Management (Master-Detail)
+
 struct ActionsSettingsView: View {
     @Environment(AppState.self) private var state
     @State private var selectedId: String?
+    @State private var searchText: String = ""
+
+    private var filteredActions: [ActionDefinition] {
+        let sorted = state.manifest.actions.sorted(by: { $0.sortIndex < $1.sortIndex })
+        if searchText.trimmingCharacters(in: .whitespaces).isEmpty {
+            return sorted
+        }
+        return sorted.filter { action in
+            action.name.localizedCaseInsensitiveContains(searchText)
+                || (action.subtitle?.localizedCaseInsensitiveContains(searchText) ?? false)
+                || (action.group?.localizedCaseInsensitiveContains(searchText) ?? false)
+                || action.id.localizedCaseInsensitiveContains(searchText)
+        }
+    }
 
     var body: some View {
-        @Bindable var state = state
-
         HSplitView {
-            List(selection: $selectedId) {
-                ForEach(state.manifest.actions.sorted(by: { $0.sortIndex < $1.sortIndex })) { action in
-                    HStack {
-                        Image(systemName: action.icon?.sfSymbol ?? "bolt")
-                        Text(action.name)
-                        Spacer()
-                        if !action.enabled {
-                            Text("Off")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+            // Master: Action list with search & toolbar
+            VStack(spacing: 0) {
+                HStack(spacing: 6) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundStyle(Color.secondary)
+                    TextField("Search…", text: $searchText)
+                        .textFieldStyle(.plain)
+                    if !searchText.isEmpty {
+                        Button {
+                            searchText = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(Color.secondary)
                         }
+                        .buttonStyle(.plain)
                     }
-                    .tag(action.id)
                 }
-                .onMove { src, dst in
-                    state.moveAction(from: src, to: dst)
-                }
-            }
-            .frame(minWidth: 200)
+                .padding(6)
+                .background(Color(nsColor: .controlBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
 
+                Divider()
+
+                List(selection: $selectedId) {
+                    ForEach(filteredActions) { action in
+                        ActionListRow(action: action) { enabled in
+                            state.setEnabled(actionId: action.id, enabled: enabled)
+                        }
+                        .tag(action.id)
+                    }
+                    .onMove { src, dst in
+                        state.moveAction(from: src, to: dst)
+                    }
+                }
+                .listStyle(.inset(alternatesRowBackgrounds: true))
+
+                Divider()
+
+                // List bottom action bar
+                HStack(spacing: 4) {
+                    Button {
+                        let newAction = state.addNewAction()
+                        selectedId = newAction.id
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .help("Add New Action")
+
+                    Button {
+                        if let id = selectedId {
+                            state.deleteAction(id: id)
+                            selectedId = filteredActions.first?.id
+                        }
+                    } label: {
+                        Image(systemName: "minus")
+                    }
+                    .disabled(selectedId == nil)
+                    .help("Delete Selected Action")
+
+                    Button {
+                        if let id = selectedId, let copy = state.duplicateAction(id: id) {
+                            selectedId = copy.id
+                        }
+                    } label: {
+                        Image(systemName: "doc.on.doc")
+                    }
+                    .disabled(selectedId == nil)
+                    .help("Duplicate Action")
+
+                    Spacer()
+
+                    Button {
+                        state.openActionsDirectory()
+                    } label: {
+                        Image(systemName: "folder")
+                    }
+                    .help("Open Scripts Directory in Finder")
+                }
+                .buttonStyle(.borderless)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .background(Color(nsColor: .windowBackgroundColor))
+            }
+            .frame(minWidth: 190, idealWidth: 220, maxWidth: 260)
+
+            // Detail: Action Editor & Live Runner
             if let id = selectedId,
                let idx = state.manifest.actions.firstIndex(where: { $0.id == id }) {
-                ActionEditorView(action: $state.manifest.actions[idx]) {
-                    state.saveManifest()
-                } onTest: {
-                    testRun(action: state.manifest.actions[idx])
-                }
+                ActionDetailInspectorView(
+                    action: Binding(
+                        get: { state.manifest.actions[idx] },
+                        set: {
+                            state.manifest.actions[idx] = $0
+                            state.saveManifest()
+                        }
+                    )
+                )
+                .frame(minWidth: 380, maxWidth: .infinity)
             } else {
                 ContentUnavailableView(
-                    "Select an action",
-                    systemImage: "bolt",
-                    description: Text("Choose an action to edit its type, script, and visibility rules.")
+                    "No Action Selected",
+                    systemImage: "bolt.badge.automatic",
+                    description: Text("Select an action to inspect its settings, edit scripts, and test run.")
                 )
+                .frame(minWidth: 380, maxWidth: .infinity)
             }
         }
-        .padding()
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button("Open Scripts Folder") {
-                    state.openActionsDirectory()
-                }
-            }
-            ToolbarItem(placement: .primaryAction) {
-                Button("Reset Defaults") {
-                    state.seedDefaults()
-                }
+        .onAppear {
+            if selectedId == nil {
+                selectedId = state.manifest.actions.sorted(by: { $0.sortIndex < $1.sortIndex }).first?.id
             }
         }
-    }
-
-    private func testRun(action: ActionDefinition) {
-        let paths = [NSHomeDirectory()]
-        let result = state.executor.execute(
-            action: action,
-            paths: paths,
-            containerPath: paths.first
-        )
-        state.recordLog(ExecLogEntry(
-            actionId: action.id,
-            success: result.success,
-            summary: "Test: \(result.summary)",
-            paths: paths
-        ))
     }
 }
 
-struct ActionEditorView: View {
+// MARK: - Action List Row
+
+private struct ActionListRow: View {
+    let action: ActionDefinition
+    var onToggle: (Bool) -> Void
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 5)
+                    .fill(typeColor.opacity(0.15))
+                Image(systemName: action.icon?.sfSymbol ?? "bolt")
+                    .foregroundStyle(typeColor)
+                    .font(.system(size: 11, weight: .semibold))
+            }
+            .frame(width: 22, height: 22)
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(action.name)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(action.enabled ? Color.primary : Color.secondary)
+                    .lineLimit(1)
+
+                HStack(spacing: 3) {
+                    Text(action.type.rawValue.uppercased())
+                        .font(.system(size: 8, weight: .bold))
+                        .padding(.horizontal, 3)
+                        .padding(.vertical, 1)
+                        .background(typeColor.opacity(0.12))
+                        .foregroundStyle(typeColor)
+                        .clipShape(RoundedRectangle(cornerRadius: 3))
+
+                    if let sub = action.subtitle, !sub.isEmpty {
+                        Text(sub)
+                            .font(.system(size: 10))
+                            .foregroundStyle(Color.secondary)
+                            .lineLimit(1)
+                    }
+                }
+            }
+
+            Spacer(minLength: 4)
+
+            Toggle("", isOn: Binding(
+                get: { action.enabled },
+                set: { onToggle($0) }
+            ))
+            .labelsHidden()
+            .toggleStyle(.switch)
+            .controlSize(.mini)
+        }
+        .padding(.vertical, 2)
+    }
+
+    private var typeColor: Color {
+        switch action.type {
+        case .shell: return .blue
+        case .terminal: return .purple
+        case .application: return .green
+        case .appleScript: return .orange
+        case .builtin: return .pink
+        }
+    }
+}
+
+// MARK: - Action Detail Inspector
+
+private struct ActionDetailInspectorView: View {
+    @Environment(AppState.self) private var state
     @Binding var action: ActionDefinition
-    var onSave: () -> Void
-    var onTest: () -> Void
+    @State private var isRunningTest = false
+    @State private var testResult: ExecResult?
+    @State private var showSymbolPicker = false
+
+    private let commonSymbols = [
+        "bolt", "bolt.fill", "terminal", "terminal.fill",
+        "doc.on.doc", "doc.plaintext", "folder", "link",
+        "gearshape", "hammer", "wrench.and.screwdriver", "play.fill",
+        "scissors", "trash", "arrow.up.right.square", "shippingbox"
+    ]
 
     var body: some View {
-        Form {
-            Section("Identity") {
-                TextField("Name", text: $action.name)
-                TextField("Subtitle", text: Binding(
-                    get: { action.subtitle ?? "" },
-                    set: { action.subtitle = $0.isEmpty ? nil : $0 }
-                ))
-                Toggle("Enabled", isOn: $action.enabled)
-                Picker("Show when", selection: $action.showWhen) {
-                    ForEach(ShowWhen.allCases, id: \.self) { w in
-                        Text(w.rawValue).tag(w)
+        ScrollView(.vertical, showsIndicators: true) {
+            VStack(alignment: .leading, spacing: 16) {
+                // Header Card
+                HStack(spacing: 12) {
+                    Button {
+                        showSymbolPicker.toggle()
+                    } label: {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.accentColor.opacity(0.12))
+                            Image(systemName: action.icon?.sfSymbol ?? "bolt")
+                                .font(.system(size: 22))
+                                .foregroundStyle(Color.accentColor)
+                        }
+                        .frame(width: 48, height: 48)
                     }
-                }
-                TextField("Group", text: Binding(
-                    get: { action.group ?? "" },
-                    set: { action.group = $0.isEmpty ? nil : $0 }
-                ))
-                TextField("SF Symbol", text: Binding(
-                    get: { action.icon?.sfSymbol ?? "" },
-                    set: {
-                        if action.icon == nil { action.icon = ActionIcon() }
-                        action.icon?.sfSymbol = $0.isEmpty ? nil : $0
+                    .buttonStyle(.plain)
+                    .popover(isPresented: $showSymbolPicker) {
+                        symbolPickerPopover
                     }
-                ))
-            }
 
-            Section("Type") {
-                switch action.type {
-                case .terminal:
-                    Label("Configure the terminal in Applications settings.", systemImage: "app.badge")
-                        .foregroundStyle(.secondary)
-                case .shell:
-                    TextField("Interpreter", text: Binding(
-                        get: { action.shell?.interpreter ?? "/bin/zsh" },
-                        set: {
-                            if action.shell == nil { action.shell = ShellConfig() }
-                            action.shell?.interpreter = $0
-                        }
-                    ))
-                    TextField("Script file", text: Binding(
-                        get: { action.shell?.scriptFile ?? "" },
-                        set: {
-                            if action.shell == nil { action.shell = ShellConfig() }
-                            action.shell?.scriptFile = $0
-                        }
-                    ))
-                case .application:
-                    TextField("Bundle ID", text: Binding(
-                        get: { action.application?.bundleId ?? "" },
-                        set: {
-                            action.application = ApplicationConfig(
-                                bundleId: $0,
-                                pathFallback: action.application?.pathFallback
-                            )
-                        }
-                    ))
-                    TextField("Path fallback", text: Binding(
-                        get: { action.application?.pathFallback ?? "" },
-                        set: {
-                            action.application = ApplicationConfig(
-                                bundleId: action.application?.bundleId ?? "",
-                                pathFallback: $0.isEmpty ? nil : $0
-                            )
-                        }
-                    ))
-                case .appleScript:
-                    TextField("Script file", text: Binding(
-                        get: { action.appleScript?.scriptFile ?? "" },
-                        set: {
-                            if action.appleScript == nil { action.appleScript = AppleScriptConfig() }
-                            action.appleScript?.scriptFile = $0
-                        }
-                    ))
-                case .builtin:
-                    Text("Builtin: \(action.builtinId ?? "—")")
+                    VStack(alignment: .leading, spacing: 3) {
+                        TextField("Action Name", text: $action.name)
+                            .font(.system(size: 16, weight: .bold))
+                            .textFieldStyle(.plain)
+
+                        TextField("Subtitle (Optional)", text: Binding(
+                            get: { action.subtitle ?? "" },
+                            set: { action.subtitle = $0.isEmpty ? nil : $0 }
+                        ))
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.secondary)
+                        .textFieldStyle(.plain)
+                    }
+
+                    Spacer(minLength: 8)
+
+                    Toggle("Enabled", isOn: $action.enabled)
+                        .toggleStyle(.switch)
+                        .controlSize(.regular)
                 }
-            }
+                .padding(12)
+                .background(Color(nsColor: .controlBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
 
-            Section {
-                HStack {
-                    Button("Save") { onSave() }
-                        .keyboardShortcut(.defaultAction)
-                    Button("Test Run") { onTest() }
-                }
-            }
-        }
-        .formStyle(.grouped)
-        .padding()
-    }
-}
-
-struct ExtensionStatusView: View {
-    @Environment(AppState.self) private var state
-
-    var body: some View {
-        Form {
-            Section("FinderSync") {
-                LabeledContent("Status") {
-                    Text(state.extensionEnabledHint)
-                        .textSelection(.enabled)
-                        .font(.caption)
-                }
-                Button("Refresh Status") { state.refreshExtensionStatus() }
-                Button("Open System Settings → Extensions") { state.openExtensionSettings() }
-                Button("Restart Finder") { state.restartFinder() }
-            }
-            Section("Troubleshooting") {
-                Text("""
-                1. Build & run Host so the extension is embedded.
-                2. System Settings → Privacy & Security → Extensions → Added Extensions → enable FinderActions.
-                3. If the toggle is missing:
-                   pluginkit -a "/path/to/FinderActions.app/Contents/PlugIns/FAFinderSync.appex"
-                   pluginkit -e use -i \(IPCConstants.extensionBundleId)
-                4. Restart Finder, then right-click a file.
-                """)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .textSelection(.enabled)
-            }
-        }
-        .formStyle(.grouped)
-        .padding()
-        .task { state.refreshExtensionStatus() }
-    }
-}
-
-struct LogsSettingsView: View {
-    @Environment(AppState.self) private var state
-
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text("Recent executions")
-                    .font(.headline)
-                Spacer()
-                Button("Clear", role: .destructive) { state.clearLogs() }
-            }
-            if state.logs.isEmpty {
-                ContentUnavailableView(
-                    "No logs",
-                    systemImage: "tray",
-                    description: Text("Execution history stays on this Mac only.")
-                )
-            } else {
-                List(state.logs) { log in
-                    VStack(alignment: .leading, spacing: 4) {
+                // Basic Properties
+                GroupBox("Display & Matching") {
+                    VStack(alignment: .leading, spacing: 10) {
                         HStack {
-                            Image(systemName: log.success ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                .foregroundStyle(log.success ? .green : .red)
-                            Text(log.actionId).bold()
-                            Spacer()
-                            Text(log.timestamp).font(.caption).foregroundStyle(.secondary)
+                            Text("Show When:")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Color.secondary)
+                                .frame(width: 90, alignment: .leading)
+                            Picker("", selection: $action.showWhen) {
+                                Text("Always").tag(ShowWhen.always)
+                                Text("Files Only").tag(ShowWhen.filesOnly)
+                                Text("Folders Only").tag(ShowWhen.foldersOnly)
+                                Text("Single Selection").tag(ShowWhen.single)
+                                Text("Multiple Selection").tag(ShowWhen.multiple)
+                            }
+                            .pickerStyle(.menu)
+                            .labelsHidden()
                         }
-                        Text(log.summary).font(.caption)
-                        if !log.paths.isEmpty {
-                            Text(log.paths.joined(separator: ", "))
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(2)
+
+                        HStack {
+                            Text("Menu Group:")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Color.secondary)
+                                .frame(width: 90, alignment: .leading)
+                            TextField("e.g. Develop, Quick Actions", text: Binding(
+                                get: { action.group ?? "" },
+                                set: { action.group = $0.isEmpty ? nil : $0 }
+                            ))
+                            .textFieldStyle(.roundedBorder)
+                        }
+
+                        HStack {
+                            Text("SF Symbol:")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Color.secondary)
+                                .frame(width: 90, alignment: .leading)
+                            TextField("symbol name", text: Binding(
+                                get: { action.icon?.sfSymbol ?? "" },
+                                set: {
+                                    if action.icon == nil { action.icon = ActionIcon() }
+                                    action.icon?.sfSymbol = $0.isEmpty ? nil : $0
+                                }
+                            ))
+                            .textFieldStyle(.roundedBorder)
                         }
                     }
+                    .padding(6)
+                }
+
+                // Execution Configuration
+                GroupBox("Execution Logic") {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Text("Action Type:")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Color.secondary)
+                                .frame(width: 90, alignment: .leading)
+                            Picker("", selection: $action.type) {
+                                Text("Shell Script").tag(ActionType.shell)
+                                Text("Application").tag(ActionType.application)
+                                Text("Terminal").tag(ActionType.terminal)
+                                Text("AppleScript").tag(ActionType.appleScript)
+                                Text("Built-in").tag(ActionType.builtin)
+                            }
+                            .pickerStyle(.menu)
+                            .labelsHidden()
+                        }
+
+                        Divider()
+
+                        switch action.type {
+                        case .shell:
+                            shellConfigEditor
+                        case .application:
+                            applicationConfigEditor
+                        case .terminal:
+                            terminalConfigEditor
+                        case .appleScript:
+                            appleScriptConfigEditor
+                        case .builtin:
+                            Text("Built-in Identifier: \(action.builtinId ?? "—")")
+                                .font(.caption)
+                                .foregroundStyle(Color.secondary)
+                        }
+                    }
+                    .padding(6)
+                }
+
+                // Live Test Runner Panel
+                GroupBox("Live Test Console") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 10) {
+                            Button {
+                                runLiveTest()
+                            } label: {
+                                Label(isRunningTest ? "Running…" : "Run Test", systemImage: "play.fill")
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(isRunningTest)
+
+                            if let res = testResult {
+                                HStack(spacing: 4) {
+                                    Image(systemName: res.success ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                        .foregroundStyle(res.success ? Color.green : Color.red)
+                                    Text(res.success ? "Success (Exit 0)" : "Failed (Exit \(res.exitCode))")
+                                        .font(.caption.bold())
+                                        .foregroundStyle(res.success ? Color.green : Color.red)
+                                }
+                            }
+
+                            Spacer()
+                        }
+
+                        Text("Executes test run against current user home directory.")
+                            .font(.caption2)
+                            .foregroundStyle(Color.secondary)
+
+                        if let res = testResult {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Summary: \(res.summary)")
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+
+                                if !res.stdout.isEmpty {
+                                    Text("STDOUT:")
+                                        .font(.system(size: 9, weight: .bold))
+                                        .foregroundStyle(Color.secondary)
+                                    ScrollView(.horizontal, showsIndicators: true) {
+                                        Text(res.stdout)
+                                            .font(.system(size: 11, design: .monospaced))
+                                            .padding(6)
+                                            .textSelection(.enabled)
+                                    }
+                                    .frame(maxWidth: .infinity, maxHeight: 90, alignment: .leading)
+                                    .background(Color.black.opacity(0.1))
+                                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                                }
+
+                                if !res.stderr.isEmpty {
+                                    Text("STDERR:")
+                                        .font(.system(size: 9, weight: .bold))
+                                        .foregroundStyle(Color.red)
+                                    ScrollView(.horizontal, showsIndicators: true) {
+                                        Text(res.stderr)
+                                            .font(.system(size: 11, design: .monospaced))
+                                            .foregroundStyle(Color.red)
+                                            .padding(6)
+                                            .textSelection(.enabled)
+                                    }
+                                    .frame(maxWidth: .infinity, maxHeight: 90, alignment: .leading)
+                                    .background(Color.red.opacity(0.08))
+                                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                                }
+                            }
+                            .padding(6)
+                            .background(Color(nsColor: .controlBackgroundColor))
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                        }
+                    }
+                    .padding(6)
+                }
+            }
+            .padding(14)
+        }
+    }
+
+    private var symbolPickerPopover: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Quick Choose Symbol")
+                .font(.caption.bold())
+            LazyVGrid(columns: Array(repeating: GridItem(.fixed(32)), count: 4), spacing: 8) {
+                ForEach(commonSymbols, id: \.self) { sym in
+                    Button {
+                        if action.icon == nil { action.icon = ActionIcon() }
+                        action.icon?.sfSymbol = sym
+                        showSymbolPicker = false
+                    } label: {
+                        Image(systemName: sym)
+                            .font(.system(size: 14))
+                            .frame(width: 32, height: 32)
+                            .background(Color(nsColor: .controlBackgroundColor))
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
-        .padding()
+        .padding(12)
     }
-}
 
-struct GeneralSettingsView: View {
-    @Environment(AppState.self) private var state
-
-    var body: some View {
-        @Bindable var state = state
-
-        Form {
-            Section("Preferences") {
-                Toggle("Show notifications", isOn: $state.notificationsEnabled)
+    private var shellConfigEditor: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Interpreter:")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color.secondary)
+                    .frame(width: 90, alignment: .leading)
+                TextField("/bin/zsh", text: Binding(
+                    get: { action.shell?.interpreter ?? "/bin/zsh" },
+                    set: {
+                        if action.shell == nil { action.shell = ShellConfig() }
+                        action.shell?.interpreter = $0
+                    }
+                ))
+                .textFieldStyle(.roundedBorder)
             }
-            Section {
-                FullDiskAccessGuideView()
-            } header: {
-                Text("Full Disk Access")
-            } footer: {
-                Text("macOS requires you to grant this permission yourself. FinderActions never changes system privacy settings, and Automation may still ask once before controlling a terminal app.")
-            }
-            Section("Data") {
-                LabeledContent("Config") {
-                    Text(state.store.fileURL.path)
-                        .font(.caption)
-                        .textSelection(.enabled)
-                }
-                Button("Open Application Support") {
-                    NSWorkspace.shared.open(state.store.fileURL.deletingLastPathComponent())
-                }
-                Button("Open Scripts Folder") {
+
+            HStack {
+                Text("Script File:")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color.secondary)
+                    .frame(width: 90, alignment: .leading)
+                TextField("e.g. copy-path.zsh", text: Binding(
+                    get: { action.shell?.scriptFile ?? "" },
+                    set: {
+                        if action.shell == nil { action.shell = ShellConfig() }
+                        action.shell?.scriptFile = $0
+                    }
+                ))
+                .textFieldStyle(.roundedBorder)
+
+                Button("Open") {
                     state.openActionsDirectory()
                 }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
             }
-            Section("Privacy") {
-                Text("No telemetry. No network client. Logs stay on this Mac.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+
+            Text("Or Inline Script:")
+                .font(.caption2)
+                .foregroundStyle(Color.secondary)
+
+            TextEditor(text: Binding(
+                get: { action.shell?.scriptInline ?? "" },
+                set: {
+                    if action.shell == nil { action.shell = ShellConfig() }
+                    action.shell?.scriptInline = $0.isEmpty ? nil : $0
+                }
+            ))
+            .font(.system(size: 11, design: .monospaced))
+            .frame(minHeight: 70, maxHeight: 140)
+            .padding(4)
+            .background(Color(nsColor: .textBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+            )
+        }
+    }
+
+    private var applicationConfigEditor: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Bundle ID:")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color.secondary)
+                    .frame(width: 90, alignment: .leading)
+                TextField("com.example.app", text: Binding(
+                    get: { action.application?.bundleId ?? "" },
+                    set: {
+                        action.application = ApplicationConfig(
+                            bundleId: $0,
+                            pathFallback: action.application?.pathFallback
+                        )
+                    }
+                ))
+                .textFieldStyle(.roundedBorder)
+            }
+
+            HStack {
+                Text("Fallback Path:")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color.secondary)
+                    .frame(width: 90, alignment: .leading)
+                TextField("/Applications/App.app", text: Binding(
+                    get: { action.application?.pathFallback ?? "" },
+                    set: {
+                        action.application = ApplicationConfig(
+                            bundleId: action.application?.bundleId ?? "",
+                            pathFallback: $0.isEmpty ? nil : $0
+                        )
+                    }
+                ))
+                .textFieldStyle(.roundedBorder)
             }
         }
-        .formStyle(.grouped)
-        .padding()
-        .onChange(of: state.notificationsEnabled) { _, _ in state.persistSettings() }
+    }
+
+    private var terminalConfigEditor: some View {
+        Label("Configure default terminal in the Applications tab.", systemImage: "app.badge")
+            .font(.caption)
+            .foregroundStyle(Color.secondary)
+    }
+
+    private var appleScriptConfigEditor: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Script File:")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color.secondary)
+                    .frame(width: 90, alignment: .leading)
+                TextField("script.applescript", text: Binding(
+                    get: { action.appleScript?.scriptFile ?? "" },
+                    set: {
+                        if action.appleScript == nil { action.appleScript = AppleScriptConfig() }
+                        action.appleScript?.scriptFile = $0
+                    }
+                ))
+                .textFieldStyle(.roundedBorder)
+            }
+
+            TextEditor(text: Binding(
+                get: { action.appleScript?.scriptInline ?? "" },
+                set: {
+                    if action.appleScript == nil { action.appleScript = AppleScriptConfig() }
+                    action.appleScript?.scriptInline = $0.isEmpty ? nil : $0
+                }
+            ))
+            .font(.system(size: 11, design: .monospaced))
+            .frame(minHeight: 70, maxHeight: 140)
+            .padding(4)
+            .background(Color(nsColor: .textBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+        }
+    }
+
+    private func runLiveTest() {
+        isRunningTest = true
+        let currentAction = action
+        let executor = state.executor
+        Task {
+            let res = await Task.detached {
+                executor.execute(
+                    action: currentAction,
+                    paths: [NSHomeDirectory()],
+                    containerPath: NSHomeDirectory()
+                )
+            }.value
+            await MainActor.run {
+                state.recordLog(ExecLogEntry(
+                    actionId: currentAction.id,
+                    success: res.success,
+                    summary: "Test Run: \(res.summary)",
+                    paths: [NSHomeDirectory()]
+                ))
+                testResult = res
+                isRunningTest = false
+            }
+        }
     }
 }
+
+// MARK: - 2. Applications Settings
 
 struct ApplicationsSettingsView: View {
     @Environment(AppState.self) private var state
 
     private var terminalChoices: [ExternalApplication] {
-        var choices = ExternalApplicationCatalog.terminals.filter(state.isApplicationInstalled)
+        var choices = ExternalApplicationCatalog.terminals
         if !choices.contains(where: { $0.bundleId == state.openWithSettings.terminal.bundleId }) {
             choices.append(state.openWithSettings.terminal)
         }
@@ -334,91 +728,84 @@ struct ApplicationsSettingsView: View {
     }
 
     private var visibleEditors: [ExternalApplication] {
-        ExternalApplicationCatalog.editors.filter {
-            state.isApplicationInstalled($0) || state.isEditorEnabled($0)
-        }
+        ExternalApplicationCatalog.editors
     }
 
     var body: some View {
-        Form {
-            Section {
-                Picker("Default terminal", selection: terminalSelection) {
-                    ForEach(terminalChoices) { application in
-                        Label(application.name, systemImage: application.sfSymbol)
-                            .tag(application.id)
+        ScrollView(.vertical, showsIndicators: true) {
+            VStack(alignment: .leading, spacing: 18) {
+                // Section: Terminal
+                GroupBox {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Label("Default Terminal", systemImage: "terminal.fill")
+                                .font(.headline)
+                            Spacer()
+                            Button("Choose Other Terminal…") {
+                                chooseApplications(kind: .terminal)
+                            }
+                            .controlSize(.small)
+                        }
+
+                        Text("Finder always renders one single “Open in Terminal” menu item. Selected terminal will launch with the working directory.")
+                            .font(.caption)
+                            .foregroundStyle(Color.secondary)
+
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 160, maximum: 220))], spacing: 8) {
+                            ForEach(terminalChoices) { terminal in
+                                TerminalCard(
+                                    application: terminal,
+                                    isInstalled: state.isApplicationInstalled(terminal),
+                                    isSelected: state.openWithSettings.terminal.bundleId == terminal.bundleId
+                                ) {
+                                    state.selectTerminal(terminal)
+                                }
+                            }
+                        }
                     }
+                    .padding(6)
                 }
-                .pickerStyle(.menu)
 
-                Button("Choose Terminal Application…") {
-                    chooseApplications(kind: .terminal)
-                }
-            } header: {
-                Text("Terminal")
-            } footer: {
-                Text("Finder always shows one “Open in Terminal” command. The selected application is shown as its subtitle.")
-            }
+                // Section: Editors
+                GroupBox {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Label("Code Editors & IDEs", systemImage: "chevron.left.forwardslash.chevron.right")
+                                .font(.headline)
+                            Spacer()
+                            Button("Add Custom Editor…") {
+                                chooseApplications(kind: .editor)
+                            }
+                            .controlSize(.small)
+                        }
 
-            Section {
-                if visibleEditors.isEmpty && state.customEditors.isEmpty {
-                    ContentUnavailableView(
-                        "No editors found",
-                        systemImage: "chevron.left.forwardslash.chevron.right",
-                        description: Text("Choose any application to add it as a Finder editor action.")
-                    )
-                } else {
-                    ForEach(visibleEditors) { application in
-                        ApplicationToggleRow(
-                            application: application,
-                            isInstalled: state.isApplicationInstalled(application),
-                            isOn: editorBinding(for: application)
-                        )
+                        Text("Each enabled editor creates its own dedicated menu entry in Finder.")
+                            .font(.caption)
+                            .foregroundStyle(Color.secondary)
+
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 180, maximum: 260))], spacing: 8) {
+                            ForEach(visibleEditors) { editor in
+                                EditorCard(
+                                    application: editor,
+                                    isInstalled: state.isApplicationInstalled(editor),
+                                    isOn: editorBinding(for: editor)
+                                )
+                            }
+
+                            ForEach(state.customEditors) { editor in
+                                EditorCard(
+                                    application: editor,
+                                    isInstalled: state.isApplicationInstalled(editor),
+                                    isOn: editorBinding(for: editor)
+                                )
+                            }
+                        }
                     }
-
-                    ForEach(state.customEditors) { application in
-                        ApplicationToggleRow(
-                            application: application,
-                            isInstalled: state.isApplicationInstalled(application),
-                            isOn: editorBinding(for: application)
-                        )
-                    }
+                    .padding(6)
                 }
-
-                Button("Add Editor Application…") {
-                    chooseApplications(kind: .editor)
-                }
-            } header: {
-                Text("Editors")
-            } footer: {
-                Text("Each selected editor gets its own Finder command. You can enable one or several.")
             }
-
-            Section("Supported Applications") {
-                LabeledContent("Terminals") {
-                    Text("Terminal, iTerm2, Ghostty, Warp, WezTerm, kitty, Alacritty, Hyper")
-                        .multilineTextAlignment(.trailing)
-                }
-                LabeledContent("Editors") {
-                    Text("VS Code, Cursor, Windsurf, Zed, Sublime Text, Nova, BBEdit, TextMate, CotEditor, VSCodium, Xcode, Android Studio, JetBrains IDEs, Neovide, MacVim, VimR")
-                        .multilineTextAlignment(.trailing)
-                }
-                Text("The application picker supports any additional macOS .app, even when it is not in the built-in catalog.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
+            .padding(16)
         }
-        .formStyle(.grouped)
-        .padding()
-    }
-
-    private var terminalSelection: Binding<String> {
-        Binding(
-            get: { state.openWithSettings.terminal.id },
-            set: { id in
-                guard let application = terminalChoices.first(where: { $0.id == id }) else { return }
-                state.selectTerminal(application)
-            }
-        )
     }
 
     private func editorBinding(for application: ExternalApplication) -> Binding<Bool> {
@@ -449,10 +836,7 @@ struct ApplicationsSettingsView: View {
         }
     }
 
-    private func externalApplication(
-        at url: URL,
-        kind: ExternalApplicationKind
-    ) -> ExternalApplication? {
+    private func externalApplication(at url: URL, kind: ExternalApplicationKind) -> ExternalApplication? {
         guard let bundle = Bundle(url: url), let bundleId = bundle.bundleIdentifier else { return nil }
         if let known = ExternalApplicationCatalog.knownApplication(bundleId: bundleId, kind: kind) {
             return known
@@ -472,52 +856,483 @@ struct ApplicationsSettingsView: View {
     }
 }
 
-private struct ApplicationToggleRow: View {
+private struct TerminalCard: View {
+    let application: ExternalApplication
+    let isInstalled: Bool
+    let isSelected: Bool
+    var onSelect: () -> Void
+
+    var body: some View {
+        Button {
+            onSelect()
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: application.sfSymbol)
+                    .font(.system(size: 15))
+                    .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
+                    .frame(width: 20)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(application.name)
+                        .font(.system(size: 12, weight: isSelected ? .bold : .medium))
+                        .lineLimit(1)
+                    Text(isInstalled ? "Installed" : "Not Found")
+                        .font(.system(size: 9))
+                        .foregroundStyle(isInstalled ? Color.secondary : Color.orange)
+                }
+
+                Spacer(minLength: 2)
+
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(Color.accentColor)
+                        .font(.system(size: 12))
+                }
+            }
+            .padding(8)
+            .background(isSelected ? Color.accentColor.opacity(0.12) : Color(nsColor: .controlBackgroundColor))
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 1.5)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct EditorCard: View {
     let application: ExternalApplication
     let isInstalled: Bool
     @Binding var isOn: Bool
 
     var body: some View {
-        Toggle(isOn: $isOn) {
-            HStack(spacing: 10) {
-                Image(systemName: application.sfSymbol)
-                    .frame(width: 20)
-                    .foregroundStyle(.secondary)
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text(application.name)
-                        if !isInstalled {
-                            Text("Not installed")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+        HStack(spacing: 8) {
+            Image(systemName: application.sfSymbol)
+                .font(.system(size: 15))
+                .foregroundStyle(isOn ? Color.accentColor : Color.secondary)
+                .frame(width: 20)
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(application.name)
+                    .font(.system(size: 12, weight: isOn ? .semibold : .regular))
+                    .lineLimit(1)
+                Text(isInstalled ? application.bundleId : "Not Installed")
+                    .font(.system(size: 9))
+                    .foregroundStyle(isInstalled ? Color.secondary : Color.orange)
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: 2)
+
+            Toggle("", isOn: $isOn)
+                .labelsHidden()
+                .toggleStyle(.switch)
+                .controlSize(.mini)
+        }
+        .padding(8)
+        .background(Color(nsColor: .controlBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+    }
+}
+
+// MARK: - 3. Extensions & Permissions Dashboard
+
+struct ExtensionStatusView: View {
+    @Environment(AppState.self) private var state
+
+    var body: some View {
+        ScrollView(.vertical, showsIndicators: true) {
+            VStack(alignment: .leading, spacing: 18) {
+                // Extension Status Card
+                GroupBox {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Image(systemName: "puzzlepiece.extension.fill")
+                                .font(.title3)
+                                .foregroundStyle(Color.orange)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("FinderSync Extension")
+                                    .font(.headline)
+                                Text("Displays right-click action items in Finder.")
+                                    .font(.caption)
+                                    .foregroundStyle(Color.secondary)
+                            }
+                            Spacer()
+                            Button("Refresh") {
+                                state.refreshExtensionStatus()
+                            }
+                            .controlSize(.small)
+                        }
+
+                        HStack(spacing: 8) {
+                            Circle()
+                                .fill(statusColor)
+                                .frame(width: 8, height: 8)
+                            Text(state.extensionEnabledHint)
+                                .font(.system(size: 12))
+                                .textSelection(.enabled)
+                        }
+                        .padding(8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(statusColor.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+
+                        HStack {
+                            Button("Open System Settings → Extensions") {
+                                state.openExtensionSettings()
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.small)
+
+                            Button("Restart Finder") {
+                                state.restartFinder()
+                            }
+                            .controlSize(.small)
                         }
                     }
-                    Text(application.bundleId)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .textSelection(.enabled)
+                    .padding(6)
                 }
+
+                // Full Disk Access Card
+                GroupBox {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Image(systemName: "lock.shield.fill")
+                                .font(.title3)
+                                .foregroundStyle(Color.blue)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Full Disk Access (FDA)")
+                                    .font(.headline)
+                                Text("Grants permission for scripts to access protected folders without prompts.")
+                                    .font(.caption)
+                                    .foregroundStyle(Color.secondary)
+                            }
+                        }
+
+                        FullDiskAccessGuideView()
+                    }
+                    .padding(6)
+                }
+
+                // Troubleshooting Box
+                GroupBox("Troubleshooting Terminal Commands") {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("If the menu does not show after enabling in System Settings:")
+                            .font(.caption2)
+                            .foregroundStyle(Color.secondary)
+
+                        Text("pluginkit -a \"/Applications/FinderActions.app/Contents/PlugIns/FAFinderSync.appex\"\npluginkit -e use -i com.finderactions.host.FinderSync\nkillall Finder")
+                            .font(.system(size: 10, design: .monospaced))
+                            .padding(6)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.black.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                            .textSelection(.enabled)
+                    }
+                    .padding(6)
+                }
+            }
+            .padding(16)
+        }
+        .task {
+            state.refreshExtensionStatus()
+        }
+    }
+
+    private var statusColor: Color {
+        if state.extensionEnabledHint.contains("Registered") && !state.extensionEnabledHint.contains("Not") {
+            return .green
+        }
+        return .orange
+    }
+}
+
+// MARK: - 4. Logs Settings View
+
+struct LogsSettingsView: View {
+    @Environment(AppState.self) private var state
+    @State private var filterStatus: Int = 0 // 0: all, 1: success, 2: failure
+    @State private var searchText = ""
+
+    private var filteredLogs: [ExecLogEntry] {
+        state.logs.filter { log in
+            if filterStatus == 1 && !log.success { return false }
+            if filterStatus == 2 && log.success { return false }
+            if !searchText.isEmpty {
+                return log.actionId.localizedCaseInsensitiveContains(searchText)
+                    || log.summary.localizedCaseInsensitiveContains(searchText)
+                    || log.paths.contains(where: { $0.localizedCaseInsensitiveContains(searchText) })
+            }
+            return true
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Filter Toolbar
+            HStack(spacing: 8) {
+                HStack(spacing: 6) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundStyle(Color.secondary)
+                    TextField("Search logs…", text: $searchText)
+                        .textFieldStyle(.plain)
+                }
+                .padding(5)
+                .background(Color(nsColor: .controlBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+
+                Picker("", selection: $filterStatus) {
+                    Text("All").tag(0)
+                    Text("Success").tag(1)
+                    Text("Failed").tag(2)
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 180)
+
+                Spacer(minLength: 4)
+
+                Button("Clear", role: .destructive) {
+                    state.clearLogs()
+                }
+                .controlSize(.small)
+                .disabled(state.logs.isEmpty)
+            }
+            .padding(10)
+
+            Divider()
+
+            if filteredLogs.isEmpty {
+                ContentUnavailableView(
+                    "No Logs Found",
+                    systemImage: "tray",
+                    description: Text("Execution history stays strictly on this Mac.")
+                )
+            } else {
+                List(filteredLogs) { log in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Image(systemName: log.success ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                .foregroundStyle(log.success ? Color.green : Color.red)
+                            Text(log.actionId)
+                                .font(.system(size: 12, weight: .semibold))
+                            Spacer()
+                            Text(log.timestamp)
+                                .font(.system(size: 10))
+                                .foregroundStyle(Color.secondary)
+                        }
+
+                        Text(log.summary)
+                            .font(.system(size: 11))
+                            .foregroundStyle(Color.primary)
+
+                        if !log.paths.isEmpty {
+                            Text(log.paths.joined(separator: "\n"))
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundStyle(Color.secondary)
+                                .lineLimit(2)
+                        }
+                    }
+                    .padding(.vertical, 3)
+                }
+                .listStyle(.inset(alternatesRowBackgrounds: true))
             }
         }
     }
 }
 
-struct AboutView: View {
+// MARK: - 5. General Settings
+
+struct GeneralSettingsView: View {
+    @Environment(AppState.self) private var state
+    @State private var showResetConfirm = false
+
     var body: some View {
-        ContentUnavailableView {
-            Label("FinderActions", systemImage: "hammer.fill")
-        } description: {
-            Text("Open-source Finder right-click actions\nNon-sandbox Host + thin FinderSync")
-        } actions: {
-            Link("GitHub", destination: URL(string: "https://github.com/finderactions/FinderActions")!)
-            Text("MIT License")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+        @Bindable var state = state
+
+        ScrollView(.vertical, showsIndicators: true) {
+            VStack(alignment: .leading, spacing: 18) {
+                GroupBox("Preferences") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Toggle("Show system notifications upon execution completion", isOn: $state.notificationsEnabled)
+                    }
+                    .padding(6)
+                }
+
+                GroupBox("Storage & Configurations") {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Manifest Config")
+                                    .font(.subheadline.bold())
+                                Text(state.store.fileURL.path)
+                                    .font(.caption)
+                                    .foregroundStyle(Color.secondary)
+                                    .textSelection(.enabled)
+                            }
+                            Spacer()
+                            Button("Reveal in Finder") {
+                                NSWorkspace.shared.open(state.store.fileURL.deletingLastPathComponent())
+                            }
+                            .controlSize(.small)
+                        }
+
+                        Divider()
+
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Scripts Folder")
+                                    .font(.subheadline.bold())
+                                Text(state.store.actionsDirectoryURL.path)
+                                    .font(.caption)
+                                    .foregroundStyle(Color.secondary)
+                                    .textSelection(.enabled)
+                            }
+                            Spacer()
+                            Button("Open Folder") {
+                                state.openActionsDirectory()
+                            }
+                            .controlSize(.small)
+                        }
+                    }
+                    .padding(6)
+                }
+
+                GroupBox("Factory Reset") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Reset actions and application configurations back to the initial defaults.")
+                            .font(.caption)
+                            .foregroundStyle(Color.secondary)
+
+                        Button("Reset to Defaults", role: .destructive) {
+                            showResetConfirm = true
+                        }
+                        .controlSize(.small)
+                        .alert("Reset all actions to default?", isPresented: $showResetConfirm) {
+                            Button("Reset", role: .destructive) {
+                                state.seedDefaults()
+                            }
+                            Button("Cancel", role: .cancel) {}
+                        } message: {
+                            Text("This will restore the default manifest and bundled scripts.")
+                        }
+                    }
+                    .padding(6)
+                }
+
+                GroupBox("Privacy & Offline") {
+                    HStack(spacing: 10) {
+                        Image(systemName: "hand.raised.shield.fill")
+                            .font(.title3)
+                            .foregroundStyle(Color.green)
+                        Text("FinderActions is completely offline. No telemetry, no accounts, and no data leaves your device.")
+                            .font(.caption)
+                            .foregroundStyle(Color.secondary)
+                    }
+                    .padding(6)
+                }
+            }
+            .padding(16)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
+        .onChange(of: state.notificationsEnabled) { _, _ in state.persistSettings() }
     }
 }
+
+// MARK: - 6. About View
+
+struct AboutView: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            Spacer()
+
+            ZStack {
+                Circle()
+                    .fill(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .frame(width: 72, height: 72)
+                Image(systemName: "hammer.fill")
+                    .font(.system(size: 36))
+                    .foregroundStyle(Color.white)
+            }
+
+            VStack(spacing: 4) {
+                Text("FinderActions")
+                    .font(.title2.bold())
+                Text("Version 1.0.0 (Native)")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.secondary)
+            }
+
+            Text("Fast, non-sandboxed Host + lightweight FinderSync extension for custom context menu actions.")
+                .font(.body)
+                .foregroundStyle(Color.secondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 380)
+
+            HStack(spacing: 12) {
+                Link("GitHub Repository", destination: URL(string: "https://github.com/finderactions/FinderActions")!)
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+
+                Text("MIT License")
+                    .font(.caption)
+                    .foregroundStyle(Color.secondary)
+            }
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(20)
+    }
+}
+
+// MARK: - Full Disk Access Helper
+
+struct FullDiskAccessGuideView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(FullDiskAccessSettings.isInstalledInApplications
+                         ? "FinderActions is installed in /Applications"
+                         : "Recommended: Move FinderActions to /Applications")
+                        .fontWeight(.medium)
+                    Text(FullDiskAccessSettings.isInstalledInApplications
+                         ? "Ready to grant permissions stably."
+                         : "Running from Downloads or build folders can invalidate permissions on update.")
+                        .font(.caption2)
+                        .foregroundStyle(Color.secondary)
+                }
+            } icon: {
+                Image(systemName: FullDiskAccessSettings.isInstalledInApplications ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                    .foregroundStyle(FullDiskAccessSettings.isInstalledInApplications ? Color.green : Color.orange)
+            }
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text("1. Open Full Disk Access in macOS System Settings.")
+                Text("2. Click + and select FinderActions.app, or drag the app into the list.")
+                Text("3. Turn FinderActions on.")
+            }
+            .font(.caption)
+            .foregroundStyle(Color.secondary)
+
+            HStack {
+                Button("Show in Finder") {
+                    FullDiskAccessSettings.revealApplication()
+                }
+                .controlSize(.small)
+
+                Button("Open Full Disk Access") {
+                    FullDiskAccessSettings.openSystemSettings()
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+// MARK: - Onboarding View
 
 struct OnboardingView: View {
     @Environment(AppState.self) private var state
@@ -529,38 +1344,35 @@ struct OnboardingView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    VStack(alignment: .leading, spacing: 6) {
+            ScrollView(.vertical) {
+                VStack(alignment: .leading, spacing: 18) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text("Set up FinderActions")
                             .font(.title2.bold())
-                        Text("Two quick system settings make Finder actions available across protected folders. You stay in control of both.")
-                            .foregroundStyle(.secondary)
+                        Text("Two quick system settings make Finder actions available across protected folders.")
+                            .foregroundStyle(Color.secondary)
                     }
 
-                    GroupBox("Allow access to protected folders") {
+                    GroupBox("1. Allow access to protected folders") {
                         FullDiskAccessGuideView()
-                            .padding(.top, 4)
+                            .padding(.top, 2)
                     }
 
-                    GroupBox("Enable the Finder extension") {
-                        VStack(alignment: .leading, spacing: 10) {
+                    GroupBox("2. Enable the Finder extension") {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("Open Extensions, enable FinderActions under Added Extensions, then return here.")
+                                .font(.caption)
                             Button("Open Extension Settings") {
                                 state.openExtensionSettings()
                             }
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.small)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 4)
+                        .padding(.top, 2)
                     }
-
-                    Label(
-                        "Then right-click a file and try Copy Path or Open in Terminal.",
-                        systemImage: "cursorarrow.click.2"
-                    )
-                    .foregroundStyle(.secondary)
                 }
-                .padding(24)
+                .padding(20)
             }
 
             Divider()
@@ -573,75 +1385,16 @@ struct OnboardingView: View {
                     finish()
                 }
                 .keyboardShortcut(.defaultAction)
+                .buttonStyle(.borderedProminent)
             }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 16)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
         }
-        .frame(width: 560, height: 570)
+        .frame(width: 540, height: 500)
     }
 
     private func finish() {
         state.completeOnboarding()
         onDismiss?()
-    }
-}
-
-private struct FullDiskAccessGuideView: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(FullDiskAccessSettings.isInstalledInApplications
-                         ? "FinderActions is ready to add"
-                         : "Move FinderActions to Applications first")
-                        .fontWeight(.medium)
-                    Text(installationMessage)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            } icon: {
-                Image(systemName: FullDiskAccessSettings.isInstalledInApplications
-                      ? "checkmark.circle.fill"
-                      : "exclamationmark.triangle.fill")
-                    .foregroundStyle(FullDiskAccessSettings.isInstalledInApplications ? .green : .orange)
-            }
-
-            Text("Full Disk Access lets actions work with protected locations without asking you to choose the same folders repeatedly.")
-
-            LabeledContent("Current app") {
-                Text(FullDiskAccessSettings.applicationURL.path)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-                    .truncationMode(.middle)
-                    .textSelection(.enabled)
-            }
-
-            VStack(alignment: .leading, spacing: 5) {
-                Text("1. Open Full Disk Access.")
-                Text("2. Click + and select FinderActions.app, or drag the revealed app into the list.")
-                Text("3. Turn FinderActions on. If macOS asks to quit and reopen it, allow that.")
-            }
-            .font(.caption)
-            .foregroundStyle(.secondary)
-
-            HStack {
-                Button("Show FinderActions in Finder") {
-                    FullDiskAccessSettings.revealApplication()
-                }
-                Button("Open Full Disk Access") {
-                    FullDiskAccessSettings.openSystemSettings()
-                }
-                .buttonStyle(.borderedProminent)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var installationMessage: String {
-        if FullDiskAccessSettings.isInstalledInApplications {
-            return "Grant access to this stable copy once."
-        }
-        return "A build or Downloads copy can move after an update, causing macOS to treat it as a different app."
     }
 }

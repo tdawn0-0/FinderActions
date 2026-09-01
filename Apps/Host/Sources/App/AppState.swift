@@ -164,6 +164,57 @@ final class AppState {
         saveManifest()
     }
 
+    func addNewAction(
+        name: String = "New Action",
+        type: ActionType = .shell,
+        symbol: String = "bolt"
+    ) -> ActionDefinition {
+        let maxIndex = manifest.actions.map(\.sortIndex).max() ?? 0
+        let newId = "user.action.\(UUID().uuidString.prefix(8).lowercased())"
+        let action = ActionDefinition(
+            id: newId,
+            name: name,
+            type: type,
+            enabled: true,
+            sortIndex: maxIndex + 10,
+            group: "Custom",
+            icon: ActionIcon(sfSymbol: symbol),
+            showWhen: .always,
+            shell: type == .shell ? ShellConfig(interpreter: "/bin/zsh", scriptFile: "", scriptInline: "#!/bin/zsh\n\necho \"Executing on $@\"\n") : nil
+        )
+        manifest.actions.append(action)
+        saveManifest()
+        return action
+    }
+
+    func duplicateAction(id: String) -> ActionDefinition? {
+        guard let original = manifest.actions.first(where: { $0.id == id }) else { return nil }
+        var copy = original
+        copy.id = "user.action.\(UUID().uuidString.prefix(8).lowercased())"
+        copy.name = "\(original.name) (Copy)"
+        let maxIndex = manifest.actions.map(\.sortIndex).max() ?? 0
+        copy.sortIndex = maxIndex + 10
+        manifest.actions.append(copy)
+        saveManifest()
+        return copy
+    }
+
+    func executeForTesting(action: ActionDefinition, paths: [String] = []) -> ExecResult {
+        let testPaths = paths.isEmpty ? [NSHomeDirectory()] : paths
+        let result = executor.execute(
+            action: action,
+            paths: testPaths,
+            containerPath: testPaths.first
+        )
+        recordLog(ExecLogEntry(
+            actionId: action.id,
+            success: result.success,
+            summary: "Test Run: \(result.summary)",
+            paths: testPaths
+        ))
+        return result
+    }
+
     func deleteAction(id: String) {
         manifest.actions.removeAll { $0.id == id }
         saveManifest()
