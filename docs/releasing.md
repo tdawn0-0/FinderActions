@@ -28,12 +28,12 @@ The Apple ID and app-specific password are never written to the repository or an
 
 ## Versioning
 
-Before releasing, update the values in both `Apps/Host/Resources/Info.plist` and `Extensions/FinderSync/Info.plist`:
+Before releasing, update the values in `Apps/Host/Resources/Info.plist`, `Apps/Settings/Resources/Info.plist`, and `Extensions/FinderSync/Info.plist`:
 
 - `CFBundleShortVersionString`: public semantic version, for example `1.2.0`
 - `CFBundleVersion`: monotonically increasing build number, for example `42`
 
-Keep the Host and embedded FinderSync extension versions aligned.
+Keep the Host, embedded Settings helper, and FinderSync extension versions aligned.
 
 ## Create a release
 
@@ -47,7 +47,7 @@ The script fails closed and runs these stages in order:
 2. Regenerate the Xcode project from `project.yml`.
 3. Create a Release archive with the newest matching `Developer ID Application` certificate for the configured team.
 4. Export with Xcode's `developer-id` method and a `Developer ID Application` certificate.
-5. Verify nested signatures, secure timestamps, and Hardened Runtime flags.
+5. Verify nested signatures, secure timestamps, Hardened Runtime flags, and that only Settings links SwiftUI.
 6. Submit a temporary ZIP to Apple with `notarytool --wait`.
 7. Require an `Accepted` result, staple the ticket to the app, and validate it with `stapler`, `codesign`, and `spctl`.
 8. Create the final ZIP and SHA-256 checksum.
@@ -61,6 +61,7 @@ build/releases/<version>-<build>-<UTC timestamp>/
 ├── FinderActions-<version>-<build>.zip
 ├── FinderActions-<version>-<build>.zip.sha256
 ├── FinderActions.entitlements.plist
+├── FinderActionsSettings.entitlements.plist
 ├── FAFinderSync.entitlements.plist
 └── notarization.json
 ```
@@ -72,8 +73,9 @@ Only distribute the final ZIP produced after stapling. The temporary upload ZIP 
 ## Signing model
 
 - The Host intentionally remains outside App Sandbox so it can execute user-authored actions.
+- The embedded Settings app is also non-sandboxed so explicit test runs have the same execution behavior as Host.
 - Hardened Runtime is enabled for every target.
-- The Host receives only the Apple Events entitlement required to automate supported terminal apps.
+- Host and Settings receive only the Apple Events entitlement required to automate supported terminal apps.
 - The FinderSync extension remains sandboxed and declares no unrelated entitlement.
 - No JIT, unsigned executable memory, DYLD, or library-validation exceptions are enabled.
 

@@ -5,14 +5,16 @@ import FinderActionsCore
 /// Host IPC: receives execute requests from the extension; coordinates snapshot publish.
 @MainActor
 final class IPCServer {
-    private let appState: AppState
+    private let appState: HostRuntimeState
     var onSnapshotNeeded: (() -> Void)?
+    var onConfigurationChanged: (() -> Void)?
     private nonisolated(unsafe) var executeObserver: NSObjectProtocol?
     private nonisolated(unsafe) var snapshotRequestObserver: NSObjectProtocol?
+    private nonisolated(unsafe) var configurationObserver: NSObjectProtocol?
     /// Ignore duplicate requestIds (e.g. launch-and-retry posts both landing).
     private let requestDedupe = RequestIdDedupe(windowSeconds: 5)
 
-    init(appState: AppState) {
+    init(appState: HostRuntimeState) {
         self.appState = appState
     }
 
@@ -38,6 +40,15 @@ final class IPCServer {
                 self?.onSnapshotNeeded?()
             }
         }
+        configurationObserver = center.addObserver(
+            forName: Notification.Name(IPCConstants.configurationChangedNotification),
+            object: nil,
+            queue: nil
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.onConfigurationChanged?()
+            }
+        }
     }
 
     deinit {
@@ -46,6 +57,9 @@ final class IPCServer {
         }
         if let snapshotRequestObserver {
             DistributedNotificationCenter.default().removeObserver(snapshotRequestObserver)
+        }
+        if let configurationObserver {
+            DistributedNotificationCenter.default().removeObserver(configurationObserver)
         }
     }
 

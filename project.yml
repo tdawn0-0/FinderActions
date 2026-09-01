@@ -34,6 +34,7 @@ targets:
     platform: macOS
     sources:
       - path: Apps/Host/Sources
+      - path: Apps/Shared/Sources
       - path: Apps/Host/Resources/Localizable.xcstrings
       - path: Apps/Host/Resources/Assets.xcassets
       - path: BundledActions
@@ -57,8 +58,38 @@ targets:
       - target: FAFinderSync
         embed: true
         codeSign: true
+      - target: FinderActionsSettings
+        link: false
+        codeSign: true
+        copy:
+          destination: wrapper
+          subpath: Contents/Helpers
     scheme:
       testTargets: []
+
+  FinderActionsSettings:
+    type: application
+    platform: macOS
+    sources:
+      - path: Apps/Settings/Sources
+      - path: Apps/Shared/Sources
+      - path: Apps/Host/Resources/Localizable.xcstrings
+      - path: BundledActions
+        type: folder
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.finderactions.host.Settings
+        PRODUCT_NAME: FinderActionsSettings
+        INFOPLIST_FILE: Apps/Settings/Resources/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Apps/Settings/Resources/FinderActionsSettings.entitlements
+        LD_RUNPATH_SEARCH_PATHS: ["$(inherited)", "@executable_path/../Frameworks"]
+        GENERATE_INFOPLIST_FILE: NO
+        ENABLE_APP_SANDBOX: NO
+        SKIP_INSTALL: YES
+    dependencies:
+      - package: FinderActionsCore
+        product: FinderActionsCore
 
   # Module name must NOT be "FinderSync" (clashes with Apple's FinderSync.framework).
   FAFinderSync:
@@ -93,6 +124,7 @@ schemes:
     build:
       targets:
         FinderActions: all
+        FinderActionsSettings: all
         FAFinderSync: all
     run:
       config: Debug

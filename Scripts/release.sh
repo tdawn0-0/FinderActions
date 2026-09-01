@@ -8,6 +8,7 @@ RELEASE_CONFIG="$PROJECT_ROOT/.release.env"
 EXPORT_OPTIONS="$PROJECT_ROOT/Config/DeveloperIDExportOptions.plist"
 INFO_PLIST="$PROJECT_ROOT/Apps/Host/Resources/Info.plist"
 EXTENSION_INFO_PLIST="$PROJECT_ROOT/Extensions/FinderSync/Info.plist"
+SETTINGS_INFO_PLIST="$PROJECT_ROOT/Apps/Settings/Resources/Info.plist"
 
 if [[ -f "$RELEASE_CONFIG" ]]; then
   set -a
@@ -46,7 +47,7 @@ assert_hardened_signature() {
   fi
 }
 
-for tool in xcodegen xcodebuild xcrun security codesign ditto plutil shasum spctl; do
+for tool in xcodegen xcodebuild xcrun security codesign ditto otool plutil shasum spctl; do
   require_tool "$tool"
 done
 
@@ -79,9 +80,12 @@ VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$INFO
 BUILD_NUMBER="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$INFO_PLIST")"
 EXTENSION_VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$EXTENSION_INFO_PLIST")"
 EXTENSION_BUILD_NUMBER="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$EXTENSION_INFO_PLIST")"
-if [[ "$VERSION" != "$EXTENSION_VERSION" || "$BUILD_NUMBER" != "$EXTENSION_BUILD_NUMBER" ]]; then
-  echo "Host and FinderSync versions must match before release." >&2
-  echo "Host: $VERSION ($BUILD_NUMBER); FinderSync: $EXTENSION_VERSION ($EXTENSION_BUILD_NUMBER)" >&2
+SETTINGS_VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$SETTINGS_INFO_PLIST")"
+SETTINGS_BUILD_NUMBER="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$SETTINGS_INFO_PLIST")"
+if [[ "$VERSION" != "$EXTENSION_VERSION" || "$BUILD_NUMBER" != "$EXTENSION_BUILD_NUMBER" \
+   || "$VERSION" != "$SETTINGS_VERSION" || "$BUILD_NUMBER" != "$SETTINGS_BUILD_NUMBER" ]]; then
+  echo "Host, Settings, and FinderSync versions must match before release." >&2
+  echo "Host: $VERSION ($BUILD_NUMBER); Settings: $SETTINGS_VERSION ($SETTINGS_BUILD_NUMBER); FinderSync: $EXTENSION_VERSION ($EXTENSION_BUILD_NUMBER)" >&2
   exit 1
 fi
 RELEASE_STAMP="$(date -u '+%Y%m%dT%H%M%SZ')"
@@ -90,6 +94,7 @@ ARCHIVE_PATH="$RELEASE_DIR/FinderActions.xcarchive"
 EXPORT_PATH="$RELEASE_DIR/export"
 APP_PATH="$EXPORT_PATH/FinderActions.app"
 EXTENSION_PATH="$APP_PATH/Contents/PlugIns/FAFinderSync.appex"
+SETTINGS_PATH="$APP_PATH/Contents/Helpers/FinderActionsSettings.app"
 NOTARY_JSON="$RELEASE_DIR/notarization.json"
 NOTARY_LOG="$RELEASE_DIR/notarization-log.json"
 FINAL_ZIP="$RELEASE_DIR/FinderActions-$VERSION-$BUILD_NUMBER.zip"
@@ -131,15 +136,18 @@ xcodebuild \
   -exportPath "$EXPORT_PATH" \
   -exportOptionsPlist "$EXPORT_OPTIONS"
 
-if [[ ! -d "$APP_PATH" || ! -d "$EXTENSION_PATH" ]]; then
-  echo "The exported app or embedded FinderSync extension is missing." >&2
+if [[ ! -d "$APP_PATH" || ! -d "$EXTENSION_PATH" || ! -d "$SETTINGS_PATH" ]]; then
+  echo "The exported app, embedded Settings app, or FinderSync extension is missing." >&2
   exit 1
 fi
 
 codesign --verify --deep --strict --verbose=2 "$APP_PATH"
 assert_hardened_signature "$APP_PATH"
+assert_hardened_signature "$SETTINGS_PATH"
 assert_hardened_signature "$EXTENSION_PATH"
+bash "$SCRIPT_DIR/check-host-dependencies.sh" "$APP_PATH"
 codesign -d --entitlements :- "$APP_PATH" >"$RELEASE_DIR/FinderActions.entitlements.plist" 2>/dev/null
+codesign -d --entitlements :- "$SETTINGS_PATH" >"$RELEASE_DIR/FinderActionsSettings.entitlements.plist" 2>/dev/null
 codesign -d --entitlements :- "$EXTENSION_PATH" >"$RELEASE_DIR/FAFinderSync.entitlements.plist" 2>/dev/null
 
 echo "[5/7] Submitting to Apple's notary service"

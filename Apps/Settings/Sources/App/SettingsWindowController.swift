@@ -1,9 +1,9 @@
 import AppKit
 import SwiftUI
 
-/// Owns SwiftUI windows only while they are visible so their view graphs can be reclaimed.
+/// Owns the Settings helper's SwiftUI windows. The app exits after the final close.
 @MainActor
-final class AppWindowController: NSObject, NSWindowDelegate {
+final class SettingsWindowController: NSObject, NSWindowDelegate {
     private enum WindowKind: String {
         case settings = "FinderActions.Settings"
         case onboarding = "FinderActions.Onboarding"

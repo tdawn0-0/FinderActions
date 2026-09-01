@@ -102,11 +102,15 @@ public enum IPCConstants {
     public static let snapshotRequestNotification = "com.finderactions.extension.snapshot-request"
     /// DistributedNotification name: Host ready ping
     public static let hostReadyNotification = "com.finderactions.host.ready"
+    /// DistributedNotification name: Settings helper → Host configuration reload
+    public static let configurationChangedNotification = "com.finderactions.settings.configuration-changed"
     /// UserDefaults / App Group suite (optional cold-start fallback)
     public static let appGroupId = "group.com.finderactions.shared"
     public static let snapshotFileName = "menu-snapshot.json"
     /// Host bundle id
     public static let hostBundleId = "com.finderactions.host"
+    /// On-demand Settings helper bundle id
+    public static let settingsBundleId = "com.finderactions.host.Settings"
     /// Extension bundle id
     public static let extensionBundleId = "com.finderactions.host.FinderSync"
 }

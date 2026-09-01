@@ -53,7 +53,8 @@ public struct ExecLogEntry: Codable, Identifiable, Sendable, Equatable {
     }
 }
 
-/// Host-side sole executor for all action types.
+/// Sole executor for all action types. The Host owns production execution;
+/// Settings uses it only for explicit test runs.
 public final class ActionExecutor: @unchecked Sendable {
     public let store: ManifestStore
 

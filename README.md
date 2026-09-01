@@ -2,7 +2,7 @@
 
 Open-source **Finder right-click actions** for macOS.
 
-**Architecture (方案 B):** non-sandbox **Host** (menu bar) is the sole executor; a **thin FinderSync** extension only renders a menu snapshot and forwards clicks. No Runner process, no security-scoped bookmark pipeline, no telemetry, no in-app purchase.
+**Architecture:** the non-sandbox **Host** is a small AppKit-only resident executor; the SwiftUI **Settings helper** starts on demand and exits when its window closes; a thin **FinderSync** extension only renders a menu snapshot and forwards clicks. No Runner process, security-scoped bookmark pipeline, telemetry, or in-app purchase.
 
 > Finder right-click script launcher — edit scripts as files, git them, share them.
 
@@ -21,6 +21,7 @@ Open-source **Finder right-click actions** for macOS.
 ```
 
 `dev.sh` generates `FinderActions.xcodeproj` from `project.yml`; treat the YAML file as the source of truth. You can then open the project in Xcode and run the **FinderActions** scheme.
+The build also verifies that the Host binary does not link SwiftUI.
 
 ## Release outside the Mac App Store
 
@@ -150,10 +151,13 @@ Exit code `0` = success (first stdout line can appear in the notification). Non-
 ## Architecture
 
 ```
-Host (not sandboxed)          FinderSync (sandboxed, thin)
-  config, scripts, logs   ←→    render snapshot menu only
-  execute app/shell/term        forward actionId + paths
-  publish menu snapshot         no Process / no script run
+Settings helper (SwiftUI, exits on close)
+             │ saves config + reload notification
+             ▼
+Host (AppKit, not sandboxed)    FinderSync (sandboxed, thin)
+  config, scripts, logs     ←→    render snapshot menu only
+  execute app/shell/term          forward actionId + paths
+  publish menu snapshot           no Process / no script run
 ```
 
 IPC uses `DistributedNotificationCenter` (JSON v1 payloads). Optional App Group / Application Support file caches the last snapshot for cold start.

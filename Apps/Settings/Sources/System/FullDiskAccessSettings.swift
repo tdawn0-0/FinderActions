@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+import FinderActionsCore
 
 /// The supported interaction surface for macOS Full Disk Access.
 ///
@@ -12,7 +13,17 @@ enum FullDiskAccessSettings {
     )!
 
     static var applicationURL: URL {
-        Bundle.main.bundleURL.standardizedFileURL
+        if let runningHost = NSRunningApplication
+            .runningApplications(withBundleIdentifier: IPCConstants.hostBundleId)
+            .first?.bundleURL {
+            return runningHost.standardizedFileURL
+        }
+
+        return Bundle.main.bundleURL
+            .deletingLastPathComponent() // Helpers
+            .deletingLastPathComponent() // Contents
+            .deletingLastPathComponent() // FinderActions.app
+            .standardizedFileURL
     }
 
     static var isInstalledInApplications: Bool {

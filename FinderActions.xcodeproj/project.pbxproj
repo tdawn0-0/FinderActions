@@ -7,24 +7,35 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		047A61D80D45D4B1E51ADC9F /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF596A31B37E7E28454817F /* AppPreferences.swift */; };
+		0A23AB501544D9100D3740F2 /* SettingsAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A67F7BEFBF44E55CDB0E9A /* SettingsAppDelegate.swift */; };
+		1B197EF3F7B3C06C9FA875D4 /* ActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FF0FD93DEE2B6A9585FB016 /* ActionExecutor.swift */; };
+		2DD4357AA5AD33A359A6C9FB /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D62117BF63C6480DA2365C /* SettingsWindowController.swift */; };
 		2F3DF8CAF4FF9C379E722A5D /* StatusMenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3603FD712481486FC01F45 /* StatusMenuController.swift */; };
 		309B6E685BC1EFDF40A36F0F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC554E3AB2D3655752F79BE9 /* AppDelegate.swift */; };
 		3587CAFDC9EB561519931903 /* MenuRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1F60E61AE5FD20AB46098A /* MenuRenderer.swift */; };
+		40C439D7B4E3ED45BB70C86B /* SettingsHelperLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4872A5DDB6A1673B1067DE /* SettingsHelperLauncher.swift */; };
 		50F60BB409EB2ED7825984C9 /* FinderActionsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 66A55974A1F677927C32FED0 /* FinderActionsCore */; };
 		63437717695A4854C13B9E54 /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A12202D707B18FECD7B488 /* FinderSync.swift */; };
 		665AAD726D2562A6A373800B /* IPCClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E853D77FA333F44C3B7EA3 /* IPCClient.swift */; };
+		6BCA8CFD73B8E4045AB43441 /* ExecLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC848CFB654E30C158C09CCE /* ExecLogStore.swift */; };
 		7B8081C98AED8C3A5AD98F7C /* FAFinderSync.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A363F7D86EBE5062E90EB7B6 /* FAFinderSync.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		8AC9AFA642CF3D01DE822FA0 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98EE0AC7A1A06CA441562D03 /* AppState.swift */; };
+		928757B509F2448D3489AC69 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 925A248CD571687760497699 /* Localizable.xcstrings */; };
+		95836D976504824DC4EC4FB4 /* ExecLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC848CFB654E30C158C09CCE /* ExecLogStore.swift */; };
+		95F3C579F5E95EB7B06851A0 /* SettingsRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88110F323E758AF168E9C2F3 /* SettingsRootView.swift */; };
+		A0A4DA8F40454491A34A0BD0 /* FullDiskAccessSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F3FF1F91F6CAB781C5B33E2 /* FullDiskAccessSettings.swift */; };
 		A190E8F22F59DA0033B3267D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1365BEA5F34DC51401B1C5BC /* Assets.xcassets */; };
-		A36F1E0CB5F990C7E67D4FCF /* FullDiskAccessSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81CD69140456375F62D6F5C9 /* FullDiskAccessSettings.swift */; };
 		A38A61E39C9F1F418ED4B120 /* BundledActions in Resources */ = {isa = PBXBuildFile; fileRef = F414D005950D759ED9F3E9C7 /* BundledActions */; };
-		AA6ED55D96E3115BC7FF3E76 /* ExecLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23866392BB58EB72C77BA52 /* ExecLogStore.swift */; };
 		AD7B8E9F07E21D8743255DBA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFDAA1CBBCD8945B4A3E0FF /* Cocoa.framework */; };
-		AF87DA788A06051690B8B910 /* AppWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0D16C301EB6969990B3078 /* AppWindowController.swift */; };
-		B85FF5B5226FADD6DEC43B98 /* ActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB44F5B789A2C2011CF0B8D /* ActionExecutor.swift */; };
+		AE4013674045AAD367BCE30D /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41B8FBA0CA7319CEB69B3DE /* AppState.swift */; };
+		B7123785A9C9AD95800B5D44 /* BundledActions in Resources */ = {isa = PBXBuildFile; fileRef = F414D005950D759ED9F3E9C7 /* BundledActions */; };
 		BA9DF81A35E6E1E78BE1077C /* FinderActionsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 1C567E8C0115EAD1B54919C2 /* FinderActionsCore */; };
-		CD7BD6235B4593BD8911AC38 /* SettingsRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E5010A7973C145836809E0 /* SettingsRootView.swift */; };
+		CD6AD28EAB69338F55C93119 /* FinderActionsCore in Frameworks */ = {isa = PBXBuildFile; productRef = A11D449A768675EF447F82DC /* FinderActionsCore */; };
+		D401C9755F6F6A24A23081CD /* FinderActionsSettings.app in Embed Dependencies */ = {isa = PBXBuildFile; fileRef = 4B7272FDFC4D7C9030BA26CF /* FinderActionsSettings.app */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBCE7CD6EF9009A1F7F93422 /* HostRuntimeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68390FB08D84B31124DE28E1 /* HostRuntimeState.swift */; };
+		DED3A02B80BEA8EBEA1848C2 /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF596A31B37E7E28454817F /* AppPreferences.swift */; };
 		ED5C0D9E7BAFEEF73965B593 /* IPCServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6015524AE62846F51B5C88A9 /* IPCServer.swift */; };
+		ED60589A61F340B490EFF61A /* ActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FF0FD93DEE2B6A9585FB016 /* ActionExecutor.swift */; };
 		EDB956066B821160D18F73F7 /* FinderSync.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C28DE75EA01B130D0307790 /* FinderSync.framework */; };
 		F4E36732C2D51A728DD161AD /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 925A248CD571687760497699 /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
@@ -37,9 +48,27 @@
 			remoteGlobalIDString = 2DF849BE794305F69DDCED56;
 			remoteInfo = FAFinderSync;
 		};
+		A6C383C1AC11DA9919926406 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6074FE49B3B81AE48F38F948 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3AFCB6B1E1618ED310ADDBD2;
+			remoteInfo = FinderActionsSettings;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		3747AFADAA803D3C733BF68C /* Embed Dependencies */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Helpers;
+			dstSubfolderSpec = 1;
+			files = (
+				D401C9755F6F6A24A23081CD /* FinderActionsSettings.app in Embed Dependencies */,
+			);
+			name = "Embed Dependencies";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		47455B1F622B6099C0CC129C /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -59,23 +88,28 @@
 		1C28DE75EA01B130D0307790 /* FinderSync.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FinderSync.framework; path = System/Library/Frameworks/FinderSync.framework; sourceTree = SDKROOT; };
 		3C0CA36B23AB76C0A0A2602A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4980120D49FC6D3CEF90EF33 /* finder-menu */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "finder-menu"; path = .; sourceTree = SOURCE_ROOT; };
+		4B4872A5DDB6A1673B1067DE /* SettingsHelperLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHelperLauncher.swift; sourceTree = "<group>"; };
+		4B7272FDFC4D7C9030BA26CF /* FinderActionsSettings.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinderActionsSettings.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C3603FD712481486FC01F45 /* StatusMenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMenuController.swift; sourceTree = "<group>"; };
-		52E5010A7973C145836809E0 /* SettingsRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRootView.swift; sourceTree = "<group>"; };
+		59D62117BF63C6480DA2365C /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
 		6015524AE62846F51B5C88A9 /* IPCServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPCServer.swift; sourceTree = "<group>"; };
+		67A67F7BEFBF44E55CDB0E9A /* SettingsAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAppDelegate.swift; sourceTree = "<group>"; };
+		68390FB08D84B31124DE28E1 /* HostRuntimeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostRuntimeState.swift; sourceTree = "<group>"; };
 		6FFDAA1CBBCD8945B4A3E0FF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
-		81CD69140456375F62D6F5C9 /* FullDiskAccessSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullDiskAccessSettings.swift; sourceTree = "<group>"; };
+		88110F323E758AF168E9C2F3 /* SettingsRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRootView.swift; sourceTree = "<group>"; };
+		8F3FF1F91F6CAB781C5B33E2 /* FullDiskAccessSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullDiskAccessSettings.swift; sourceTree = "<group>"; };
+		8FF0FD93DEE2B6A9585FB016 /* ActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionExecutor.swift; sourceTree = "<group>"; };
 		925A248CD571687760497699 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
-		98EE0AC7A1A06CA441562D03 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
-		9E0D16C301EB6969990B3078 /* AppWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppWindowController.swift; sourceTree = "<group>"; };
 		A363F7D86EBE5062E90EB7B6 /* FAFinderSync.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FAFinderSync.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC1F60E61AE5FD20AB46098A /* MenuRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuRenderer.swift; sourceTree = "<group>"; };
 		B61E3A2EE69E471A126A2BDE /* FinderSync.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FinderSync.entitlements; sourceTree = "<group>"; };
 		B7E853D77FA333F44C3B7EA3 /* IPCClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPCClient.swift; sourceTree = "<group>"; };
 		BC554E3AB2D3655752F79BE9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E0A12202D707B18FECD7B488 /* FinderSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinderSync.swift; sourceTree = "<group>"; };
-		F23866392BB58EB72C77BA52 /* ExecLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecLogStore.swift; sourceTree = "<group>"; };
+		EC848CFB654E30C158C09CCE /* ExecLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecLogStore.swift; sourceTree = "<group>"; };
 		F414D005950D759ED9F3E9C7 /* BundledActions */ = {isa = PBXFileReference; lastKnownFileType = folder; path = BundledActions; sourceTree = SOURCE_ROOT; };
-		FAB44F5B789A2C2011CF0B8D /* ActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionExecutor.swift; sourceTree = "<group>"; };
+		F41B8FBA0CA7319CEB69B3DE /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		FBF596A31B37E7E28454817F /* AppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferences.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +118,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				50F60BB409EB2ED7825984C9 /* FinderActionsCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A5F8141325D81E87F01FA092 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD6AD28EAB69338F55C93119 /* FinderActionsCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,20 +142,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		03C194F000B8BBD36F07F19D /* Features */ = {
+		0626FA5207FF38229C45A543 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				52E5010A7973C145836809E0 /* SettingsRootView.swift */,
+				DF66318CBF12F49BB708801C /* Configuration */,
+				5BF6F161EB043F63175B0056 /* Execution */,
 			);
-			path = Features;
+			path = Sources;
 			sourceTree = "<group>";
 		};
 		1BFB2B1C8568FA617714CD6B /* App */ = {
 			isa = PBXGroup;
 			children = (
 				BC554E3AB2D3655752F79BE9 /* AppDelegate.swift */,
-				98EE0AC7A1A06CA441562D03 /* AppState.swift */,
-				9E0D16C301EB6969990B3078 /* AppWindowController.swift */,
+				68390FB08D84B31124DE28E1 /* HostRuntimeState.swift */,
+				4B4872A5DDB6A1673B1067DE /* SettingsHelperLauncher.swift */,
 				4C3603FD712481486FC01F45 /* StatusMenuController.swift */,
 			);
 			path = App;
@@ -127,14 +170,43 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		23E6128F1877C876BEA054CC /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				9168FFADBD74D99A048AC602 /* Sources */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		33DCEC3E39B4EBD2549865E5 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				88110F323E758AF168E9C2F3 /* SettingsRootView.swift */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		371F60DBFC32EB145486A1A7 /* System */ = {
+			isa = PBXGroup;
+			children = (
+				8F3FF1F91F6CAB781C5B33E2 /* FullDiskAccessSettings.swift */,
+			);
+			path = System;
+			sourceTree = "<group>";
+		};
+		38080868D5428606B0468AD7 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				0626FA5207FF38229C45A543 /* Sources */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		3B233B4C590D3E4D8989D605 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
 				1BFB2B1C8568FA617714CD6B /* App */,
-				AF276621A44073BA637FF581 /* Execution */,
-				03C194F000B8BBD36F07F19D /* Features */,
 				6D31162D00C762A16D2C9F08 /* IPC */,
-				A8938D8254D13B61BD837C22 /* System */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -144,6 +216,7 @@
 			children = (
 				A363F7D86EBE5062E90EB7B6 /* FAFinderSync.appex */,
 				0201D3A1060B9BF8BE1D2D8B /* FinderActions.app */,
+				4B7272FDFC4D7C9030BA26CF /* FinderActionsSettings.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -161,8 +234,19 @@
 			isa = PBXGroup;
 			children = (
 				4CC13D23E3FC2DB9D0E2D55D /* Host */,
+				23E6128F1877C876BEA054CC /* Settings */,
+				38080868D5428606B0468AD7 /* Shared */,
 			);
 			path = Apps;
+			sourceTree = "<group>";
+		};
+		5BF6F161EB043F63175B0056 /* Execution */ = {
+			isa = PBXGroup;
+			children = (
+				8FF0FD93DEE2B6A9585FB016 /* ActionExecutor.swift */,
+				EC848CFB654E30C158C09CCE /* ExecLogStore.swift */,
+			);
+			path = Execution;
 			sourceTree = "<group>";
 		};
 		6D31162D00C762A16D2C9F08 /* IPC */ = {
@@ -171,6 +255,16 @@
 				6015524AE62846F51B5C88A9 /* IPCServer.swift */,
 			);
 			path = IPC;
+			sourceTree = "<group>";
+		};
+		6E60B8D9DB83993F5D47CBD2 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				F41B8FBA0CA7319CEB69B3DE /* AppState.swift */,
+				67A67F7BEFBF44E55CDB0E9A /* SettingsAppDelegate.swift */,
+				59D62117BF63C6480DA2365C /* SettingsWindowController.swift */,
+			);
+			path = App;
 			sourceTree = "<group>";
 		};
 		88C8382DCEC1A1B7A0DCBAD0 /* Resources */ = {
@@ -191,6 +285,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		9168FFADBD74D99A048AC602 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				6E60B8D9DB83993F5D47CBD2 /* App */,
+				33DCEC3E39B4EBD2549865E5 /* Features */,
+				371F60DBFC32EB145486A1A7 /* System */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
 		A53D8C59F203417A8DE68AAA = {
 			isa = PBXGroup;
 			children = (
@@ -203,29 +307,20 @@
 			);
 			sourceTree = "<group>";
 		};
-		A8938D8254D13B61BD837C22 /* System */ = {
-			isa = PBXGroup;
-			children = (
-				81CD69140456375F62D6F5C9 /* FullDiskAccessSettings.swift */,
-			);
-			path = System;
-			sourceTree = "<group>";
-		};
-		AF276621A44073BA637FF581 /* Execution */ = {
-			isa = PBXGroup;
-			children = (
-				FAB44F5B789A2C2011CF0B8D /* ActionExecutor.swift */,
-				F23866392BB58EB72C77BA52 /* ExecLogStore.swift */,
-			);
-			path = Execution;
-			sourceTree = "<group>";
-		};
 		CCDBB5ABA96D3C1452210E77 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
 				4980120D49FC6D3CEF90EF33 /* finder-menu */,
 			);
 			path = Packages;
+			sourceTree = "<group>";
+		};
+		DF66318CBF12F49BB708801C /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				FBF596A31B37E7E28454817F /* AppPreferences.swift */,
+			);
+			path = Configuration;
 			sourceTree = "<group>";
 		};
 		FB7D205B4C79B57C3085EE93 /* FinderSync */ = {
@@ -251,11 +346,13 @@
 				C598381F3C87A4C80075E38C /* Resources */,
 				181838BD9432B5A28E28254C /* Frameworks */,
 				47455B1F622B6099C0CC129C /* Embed Foundation Extensions */,
+				3747AFADAA803D3C733BF68C /* Embed Dependencies */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				A689D35208C7C4F1AB7E7C44 /* PBXTargetDependency */,
+				9255CD53B299259E1D86DA8D /* PBXTargetDependency */,
 			);
 			name = FinderActions;
 			packageProductDependencies = (
@@ -284,6 +381,26 @@
 			productReference = A363F7D86EBE5062E90EB7B6 /* FAFinderSync.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		3AFCB6B1E1618ED310ADDBD2 /* FinderActionsSettings */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BDA3DA17DA82BD24A1A1F885 /* Build configuration list for PBXNativeTarget "FinderActionsSettings" */;
+			buildPhases = (
+				7ABC58ABB47356B6E1867889 /* Sources */,
+				EE770BD7CE98EC49CB9EE4ED /* Resources */,
+				A5F8141325D81E87F01FA092 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FinderActionsSettings;
+			packageProductDependencies = (
+				A11D449A768675EF447F82DC /* FinderActionsCore */,
+			);
+			productName = FinderActionsSettings;
+			productReference = 4B7272FDFC4D7C9030BA26CF /* FinderActionsSettings.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -297,6 +414,9 @@
 						ProvisioningStyle = Automatic;
 					};
 					2DF849BE794305F69DDCED56 = {
+						ProvisioningStyle = Automatic;
+					};
+					3AFCB6B1E1618ED310ADDBD2 = {
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -319,6 +439,7 @@
 			projectRoot = "";
 			targets = (
 				1FDEFDBD97B2A2ADA82EA3B3 /* FinderActions */,
+				3AFCB6B1E1618ED310ADDBD2 /* FinderActionsSettings */,
 				2DF849BE794305F69DDCED56 /* FAFinderSync */,
 			);
 		};
@@ -335,6 +456,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EE770BD7CE98EC49CB9EE4ED /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B7123785A9C9AD95800B5D44 /* BundledActions in Resources */,
+				928757B509F2448D3489AC69 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -342,15 +472,29 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B85FF5B5226FADD6DEC43B98 /* ActionExecutor.swift in Sources */,
+				1B197EF3F7B3C06C9FA875D4 /* ActionExecutor.swift in Sources */,
 				309B6E685BC1EFDF40A36F0F /* AppDelegate.swift in Sources */,
-				8AC9AFA642CF3D01DE822FA0 /* AppState.swift in Sources */,
-				AF87DA788A06051690B8B910 /* AppWindowController.swift in Sources */,
-				AA6ED55D96E3115BC7FF3E76 /* ExecLogStore.swift in Sources */,
-				A36F1E0CB5F990C7E67D4FCF /* FullDiskAccessSettings.swift in Sources */,
+				047A61D80D45D4B1E51ADC9F /* AppPreferences.swift in Sources */,
+				6BCA8CFD73B8E4045AB43441 /* ExecLogStore.swift in Sources */,
+				DBCE7CD6EF9009A1F7F93422 /* HostRuntimeState.swift in Sources */,
 				ED5C0D9E7BAFEEF73965B593 /* IPCServer.swift in Sources */,
-				CD7BD6235B4593BD8911AC38 /* SettingsRootView.swift in Sources */,
+				40C439D7B4E3ED45BB70C86B /* SettingsHelperLauncher.swift in Sources */,
 				2F3DF8CAF4FF9C379E722A5D /* StatusMenuController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7ABC58ABB47356B6E1867889 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ED60589A61F340B490EFF61A /* ActionExecutor.swift in Sources */,
+				DED3A02B80BEA8EBEA1848C2 /* AppPreferences.swift in Sources */,
+				AE4013674045AAD367BCE30D /* AppState.swift in Sources */,
+				95836D976504824DC4EC4FB4 /* ExecLogStore.swift in Sources */,
+				A0A4DA8F40454491A34A0BD0 /* FullDiskAccessSettings.swift in Sources */,
+				0A23AB501544D9100D3740F2 /* SettingsAppDelegate.swift in Sources */,
+				95F3C579F5E95EB7B06851A0 /* SettingsRootView.swift in Sources */,
+				2DD4357AA5AD33A359A6C9FB /* SettingsWindowController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -367,6 +511,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		9255CD53B299259E1D86DA8D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3AFCB6B1E1618ED310ADDBD2 /* FinderActionsSettings */;
+			targetProxy = A6C383C1AC11DA9919926406 /* PBXContainerItemProxy */;
+		};
 		A689D35208C7C4F1AB7E7C44 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 2DF849BE794305F69DDCED56 /* FAFinderSync */;
@@ -458,6 +607,26 @@
 			};
 			name = Debug;
 		};
+		5A25D23DC06804375E03FE39 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Apps/Settings/Resources/FinderActionsSettings.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Apps/Settings/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.finderactions.host.Settings;
+				PRODUCT_NAME = FinderActionsSettings;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		5C3726327F6AB20C61D4566E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -478,6 +647,26 @@
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
+		};
+		620D9AA70A524AAFC44519DE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Apps/Settings/Resources/FinderActionsSettings.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Apps/Settings/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.finderactions.host.Settings;
+				PRODUCT_NAME = FinderActionsSettings;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
 		};
 		7BFA5EF104F463C77D317D4E /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -605,6 +794,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		BDA3DA17DA82BD24A1A1F885 /* Build configuration list for PBXNativeTarget "FinderActionsSettings" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				620D9AA70A524AAFC44519DE /* Debug */,
+				5A25D23DC06804375E03FE39 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		CEBC7A11652CC710832BB478 /* Build configuration list for PBXNativeTarget "FAFinderSync" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -629,6 +827,10 @@
 			productName = FinderActionsCore;
 		};
 		66A55974A1F677927C32FED0 /* FinderActionsCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FinderActionsCore;
+		};
+		A11D449A768675EF447F82DC /* FinderActionsCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FinderActionsCore;
 		};

@@ -1,15 +1,15 @@
 import AppKit
 import FinderActionsCore
 
-/// Process lifecycle: bootstrap, status menu, lazy windows, IPC, and headless CLI dump.
+/// Always-resident process lifecycle: native status menu, IPC, execution, and CLI dump.
 @main
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    let appState = AppState()
+    let appState = HostRuntimeState()
 
     private var ipcServer: IPCServer?
     private var statusMenuController: StatusMenuController?
-    private var windowController: AppWindowController?
+    private var settingsLauncher: SettingsHelperLauncher?
 
     static func main() {
         let application = NSApplication.shared
@@ -26,12 +26,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         appState.bootstrap()
 
-        let windowController = AppWindowController(appState: appState)
-        self.windowController = windowController
+        let settingsLauncher = SettingsHelperLauncher()
+        self.settingsLauncher = settingsLauncher
         statusMenuController = StatusMenuController(
             appState: appState,
-            openSettings: { [weak windowController] in
-                windowController?.showSettings()
+            openSettings: { [weak settingsLauncher] in
+                settingsLauncher?.open(.settings)
             }
         )
 
@@ -43,8 +43,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             object: nil
         )
 
-        if appState.showOnboarding {
-            windowController.showOnboarding()
+        if appState.needsOnboarding {
+            settingsLauncher.open(.onboarding)
         }
     }
 
@@ -52,7 +52,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ sender: NSApplication,
         hasVisibleWindows flag: Bool
     ) -> Bool {
-        windowController?.showSettings()
+        settingsLauncher?.open(.settings)
         return true
     }
 
@@ -74,11 +74,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         server.onSnapshotNeeded = { [weak self] in
             self?.publishSnapshot()
         }
-        server.start()
-        ipcServer = server
-        appState.onManifestChanged = { [weak self] in
+        server.onConfigurationChanged = { [weak self] in
+            self?.appState.reloadConfiguration()
             self?.publishSnapshot()
         }
+        server.start()
+        ipcServer = server
     }
 
     private func publishSnapshot() {
@@ -87,6 +88,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             hostRunning: true
         )
         SnapshotPublisher.publish(snapshot)
-        appState.lastSnapshot = snapshot
+        appState.setLastSnapshot(snapshot)
     }
 }

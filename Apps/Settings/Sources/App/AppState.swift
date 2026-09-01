@@ -1,6 +1,5 @@
 import Foundation
 import AppKit
-import SwiftUI
 import Observation
 import FinderActionsCore
 
@@ -59,11 +58,10 @@ final class AppState {
         logs = logStore.recent(limit: 200)
         refreshExtensionStatus()
 
-        let defaults = UserDefaults.standard
-        if !defaults.bool(forKey: "didCompleteOnboarding") {
+        if !AppPreferences.bool(forKey: "didCompleteOnboarding") {
             showOnboarding = true
         }
-        notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? true
+        notificationsEnabled = AppPreferences.object(forKey: "notificationsEnabled") as? Bool ?? true
     }
 
     func seedDefaults() {
@@ -268,12 +266,13 @@ final class AppState {
     }
 
     func completeOnboarding() {
-        UserDefaults.standard.set(true, forKey: "didCompleteOnboarding")
+        AppPreferences.set(true, forKey: "didCompleteOnboarding")
         showOnboarding = false
     }
 
     func persistSettings() {
-        UserDefaults.standard.set(notificationsEnabled, forKey: "notificationsEnabled")
+        AppPreferences.set(notificationsEnabled, forKey: "notificationsEnabled")
+        onManifestChanged?()
     }
 
     private func canonicalApplication(
@@ -285,7 +284,7 @@ final class AppState {
     }
 
     private func loadOpenWithSettings() -> OpenWithSettings {
-        guard let data = UserDefaults.standard.data(forKey: openWithDefaultsKey),
+        guard let data = AppPreferences.data(forKey: openWithDefaultsKey),
               let settings = try? JSONDecoder().decode(OpenWithSettings.self, from: data) else {
             return .defaults
         }
@@ -294,7 +293,7 @@ final class AppState {
 
     private func saveOpenWithSettings() {
         if let data = try? JSONEncoder().encode(openWithSettings) {
-            UserDefaults.standard.set(data, forKey: openWithDefaultsKey)
+            AppPreferences.set(data, forKey: openWithDefaultsKey)
         }
         onManifestChanged?()
     }

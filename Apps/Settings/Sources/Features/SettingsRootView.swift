@@ -51,6 +51,7 @@ enum SettingsSection: String, CaseIterable, Identifiable {
 
 // MARK: - Root Settings View
 
+/// Root view for the short-lived Settings helper process.
 struct SettingsRootView: View {
     @Environment(AppState.self) private var state
     @State private var selectedSection: SettingsSection? = .actions

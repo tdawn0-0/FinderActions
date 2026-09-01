@@ -2,7 +2,7 @@
 
 开源的 macOS **Finder 自定义右键菜单**。
 
-**架构（方案 B）：** 非沙盒 **Host**（菜单栏）是唯一执行器；**极薄 FinderSync** 只负责展示菜单快照并转发点击。无 Runner 进程、无 security-scoped 书签链路、无遥测、无内购。
+**架构：** 非沙盒 **Host** 是仅含 AppKit 的轻量常驻执行器；SwiftUI **Settings helper** 按需启动、窗口关闭即退出；**极薄 FinderSync** 只负责展示菜单快照并转发点击。无 Runner 进程、security-scoped 书签链路、遥测或内购。
 
 > 一句话：Finder 右键脚本启动器 — 脚本即插件，可编辑、可 git、可分享。
 
@@ -21,6 +21,7 @@
 ```
 
 `dev.sh` 根据 `project.yml` 生成 `FinderActions.xcodeproj`，因此 YAML 是工程配置的唯一事实来源。之后也可以用 Xcode 打开工程并运行 **FinderActions** scheme。
+构建还会强制检查 Host 二进制没有链接 SwiftUI。
 
 ## Mac App Store 之外发布
 
@@ -110,10 +111,13 @@ Finder 始终只显示一个通用的“在终端中打开”；每个已选编�
 ## 架构
 
 ```
-Host（非沙盒）                 FinderSync（沙盒、极薄）
-  配置 / 脚本 / 日志     ←→      只渲染快照菜单
-  执行 app/shell/终端            只转发 actionId + 路径
-  发布菜单快照                   不跑 Process / 脚本
+Settings helper（SwiftUI，关窗即退出）
+              │ 保存配置 + 通知 Host 重载
+              ▼
+Host（AppKit、非沙盒）          FinderSync（沙盒、极薄）
+  配置 / 脚本 / 日志       ←→      只渲染快照菜单
+  执行 app/shell/终端              只转发 actionId + 路径
+  发布菜单快照                     不跑 Process / 脚本
 ```
 
 ## 隐私

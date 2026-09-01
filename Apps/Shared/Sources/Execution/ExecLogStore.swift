@@ -1,6 +1,6 @@
 import Foundation
 
-/// Local-only execution log (no network). Rotates to last N entries.
+/// Local-only execution log shared by Host execution and Settings inspection.
 public final class ExecLogStore: @unchecked Sendable {
     public let fileURL: URL
     public let maxEntries: Int

@@ -26,4 +26,7 @@ xcodebuild \
   CODE_SIGNING_REQUIRED=NO \
   build
 
-echo "Debug app: $DERIVED_DATA_PATH/Build/Products/Debug/FinderActions.app"
+APP_PATH="$DERIVED_DATA_PATH/Build/Products/Debug/FinderActions.app"
+bash "$SCRIPT_DIR/check-host-dependencies.sh" "$APP_PATH"
+
+echo "Debug app: $APP_PATH"

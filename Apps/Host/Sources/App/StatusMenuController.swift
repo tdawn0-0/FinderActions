@@ -1,15 +1,15 @@
 import AppKit
 
-/// Minimal, always-resident menu bar UI. Configuration lives in the lazy settings window.
+/// Minimal, always-resident menu bar UI. Configuration lives in a separate process.
 @MainActor
 final class StatusMenuController: NSObject, NSMenuDelegate {
-    private let appState: AppState
+    private let appState: HostRuntimeState
     private let openSettings: @MainActor () -> Void
     private let statusItem: NSStatusItem
     private let summaryItem = NSMenuItem()
 
     init(
-        appState: AppState,
+        appState: HostRuntimeState,
         openSettings: @escaping @MainActor () -> Void
     ) {
         self.appState = appState
