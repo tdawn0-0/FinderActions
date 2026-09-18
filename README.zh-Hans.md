@@ -106,7 +106,7 @@ Finder 始终只显示一个通用的“在终端中打开”；每个已选编�
 | `FA_CONTAINER` | 容器路径 |
 | `FA_ACTION_ID` | 动作 id |
 
-详见 [docs/scripting.md](docs/scripting.md)。
+详见 [docs/architecture.md](docs/architecture.md)、[docs/ipc.md](docs/ipc.md)、[docs/scripting.md](docs/scripting.md)、[docs/troubleshooting.md](docs/troubleshooting.md) 与 [docs/releasing.zh-Hans.md](docs/releasing.zh-Hans.md)（打包公证与网站部署）。
 
 ## 架构
 

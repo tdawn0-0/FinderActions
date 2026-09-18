@@ -108,15 +108,15 @@ if [[ -e "$RELEASE_DIR" ]]; then
 fi
 mkdir -p "$RELEASE_DIR"
 
-echo "[1/7] Running tests"
+echo "[1/8] Running tests"
 "$SCRIPT_DIR/test.sh"
 
-echo "[2/7] Generating the Xcode project"
+echo "[2/8] Generating the Xcode project"
 xcodegen generate \
   --spec "$PROJECT_ROOT/project.yml" \
   --project "$PROJECT_ROOT"
 
-echo "[3/7] Creating the release archive"
+echo "[3/8] Creating the release archive"
 xcodebuild \
   -project "$PROJECT_ROOT/FinderActions.xcodeproj" \
   -scheme FinderActions \
@@ -129,7 +129,7 @@ xcodebuild \
   OTHER_CODE_SIGN_FLAGS=--timestamp \
   archive
 
-echo "[4/7] Exporting with Developer ID"
+echo "[4/8] Exporting with Developer ID"
 xcodebuild \
   -exportArchive \
   -archivePath "$ARCHIVE_PATH" \
@@ -150,7 +150,7 @@ codesign -d --entitlements :- "$APP_PATH" >"$RELEASE_DIR/FinderActions.entitleme
 codesign -d --entitlements :- "$SETTINGS_PATH" >"$RELEASE_DIR/FinderActionsSettings.entitlements.plist" 2>/dev/null
 codesign -d --entitlements :- "$EXTENSION_PATH" >"$RELEASE_DIR/FAFinderSync.entitlements.plist" 2>/dev/null
 
-echo "[5/7] Submitting to Apple's notary service"
+echo "[5/8] Submitting to Apple's notary service"
 ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$SUBMISSION_ZIP"
 
 if ! xcrun notarytool submit "$SUBMISSION_ZIP" \
@@ -178,22 +178,38 @@ if [[ "$NOTARY_STATUS" != "Accepted" ]]; then
   exit 1
 fi
 
-echo "[6/7] Stapling and validating the notarization ticket"
+echo "[6/8] Stapling and validating the notarization ticket"
 xcrun stapler staple -v "$APP_PATH"
 xcrun stapler validate -v "$APP_PATH"
 codesign --verify --deep --strict --verbose=2 "$APP_PATH"
 spctl --assess --type execute --verbose=4 "$APP_PATH"
 
-echo "[7/7] Creating the final distribution archive"
+echo "[7/8] Creating the final distribution ZIP archive"
 ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$FINAL_ZIP"
 (
   cd "$RELEASE_DIR"
   shasum -a 256 "$(basename "$FINAL_ZIP")" >"$(basename "$FINAL_ZIP").sha256"
 )
 
+FINAL_DMG="$RELEASE_DIR/FinderActions-$VERSION.dmg"
+if command -v create-dmg >/dev/null 2>&1; then
+  echo "[8/8] Building, signing, and notarizing the DMG package"
+  bash "$SCRIPT_DIR/build-dmg.sh" "$APP_PATH" "$FINAL_DMG"
+else
+  echo "[8/8] create-dmg not found. Skipping DMG creation (install with 'brew install create-dmg')."
+fi
+
 echo
-echo "Release complete"
+echo "=========================================="
+echo "          Release Complete!               "
+echo "=========================================="
 echo "App:      $APP_PATH"
-echo "Archive:  $FINAL_ZIP"
-echo "Checksum: $FINAL_ZIP.sha256"
+echo "ZIP:      $FINAL_ZIP"
+echo "ZIP SHA:  $FINAL_ZIP.sha256"
+if [[ -f "$FINAL_DMG" ]]; then
+  echo "DMG:      $FINAL_DMG"
+  echo "DMG SHA:  $FINAL_DMG.sha256"
+fi
 echo "Notary:   $NOTARY_ID ($NOTARY_STATUS)"
+echo "Output:   $RELEASE_DIR"
+echo "=========================================="

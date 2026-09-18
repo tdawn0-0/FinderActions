@@ -162,7 +162,7 @@ Host (AppKit, not sandboxed)    FinderSync (sandboxed, thin)
 
 IPC uses `DistributedNotificationCenter` (JSON v1 payloads). Optional App Group / Application Support file caches the last snapshot for cold start.
 
-See [docs/architecture.md](docs/architecture.md), [docs/ipc.md](docs/ipc.md), [docs/scripting.md](docs/scripting.md), [docs/troubleshooting.md](docs/troubleshooting.md).
+See [docs/architecture.md](docs/architecture.md), [docs/ipc.md](docs/ipc.md), [docs/scripting.md](docs/scripting.md), [docs/troubleshooting.md](docs/troubleshooting.md), and [docs/releasing.md](docs/releasing.md) (App release & Web deployment).
 
 ## Privacy
 
