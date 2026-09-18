@@ -19,7 +19,7 @@ enum SettingsSection: String, CaseIterable, Identifiable {
         switch self {
         case .actions: return "Actions"
         case .applications: return "Applications"
-        case .extensions: return "Extension & Permissions"
+        case .extensions: return "Extensions & Permissions"
         case .logs: return "Activity Logs"
         case .general: return "General"
         case .about: return "About"
@@ -71,7 +71,7 @@ struct SettingsRootView: View {
                 }
             }
             .listStyle(.sidebar)
-            .navigationSplitViewColumnWidth(min: 190, ideal: 210, max: 240)
+            .navigationSplitViewColumnWidth(min: 200, ideal: 225, max: 280)
         } detail: {
             Group {
                 switch selectedSection ?? .actions {
@@ -89,6 +89,7 @@ struct SettingsRootView: View {
                     AboutView()
                 }
             }
+            .safeAreaPadding(.top, 52)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .navigationSplitViewStyle(.balanced)

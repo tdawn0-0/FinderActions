@@ -681,6 +681,23 @@
         }
       }
     },
+    "Extensions & Permissions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extensions & Permissions"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "扩展与权限"
+          }
+        }
+      }
+    },
     "Extension setup required" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -94,6 +94,10 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         )
         window.identifier = NSUserInterfaceItemIdentifier(kind.rawValue)
         window.title = title
+        if kind == .settings {
+            window.titleVisibility = .hidden
+            window.toolbarStyle = .unified
+        }
         window.contentViewController = hostingController
         window.isReleasedWhenClosed = false
         window.setContentSize(contentSize)
