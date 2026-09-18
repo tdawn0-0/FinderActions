@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Download, Check, Copy, Sparkles, Terminal, ShieldCheck, Zap, Cpu } from 'lucide-react';
+import React from 'react';
+import { Download, Sparkles, ShieldCheck, Zap, Cpu } from 'lucide-react';
 import { GithubIcon } from './GithubIcon';
 import type { Language } from '../types';
 import { translations } from '../i18n';
@@ -9,15 +9,7 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({ lang }) => {
-  const [copied, setCopied] = useState(false);
   const t = translations[lang].hero;
-  const brewCmd = "brew install --cask finderactions";
-
-  const handleCopyBrew = () => {
-    navigator.clipboard.writeText(brewCmd);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   return (
     <section className="relative pt-12 pb-16 md:pt-20 md:pb-24 overflow-hidden text-center px-4 sm:px-6">
@@ -77,24 +69,6 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
           </a>
         </div>
 
-        {/* Interactive Copyable Brew Command */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-black/50 border border-white/10 font-mono text-xs text-zinc-300 mb-6 shadow-inner group hover:border-white/25 transition-all">
-          <Terminal className="w-3.5 h-3.5 text-zinc-400 group-hover:text-blue-400 transition-colors" />
-          <span className="text-zinc-400">$</span>
-          <span className="text-zinc-200 font-medium select-all">{brewCmd}</span>
-          <button
-            onClick={handleCopyBrew}
-            className="ml-2 p-1 text-zinc-400 hover:text-white transition-colors rounded hover:bg-white/10"
-            title="Copy command"
-          >
-            {copied ? (
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
-            ) : (
-              <Copy className="w-3.5 h-3.5" />
-            )}
-          </button>
-        </div>
-
         {/* Micro highlights pill bar */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl w-full pt-4 border-t border-white/5 text-xs text-zinc-400 font-medium">
           <div className="flex items-center justify-center gap-1.5 py-1">
@@ -111,7 +85,7 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
           </div>
           <div className="flex items-center justify-center gap-1.5 py-1">
             <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-            <span>AppKit Native</span>
+            <span>SwiftUI Native</span>
           </div>
         </div>
       </div>

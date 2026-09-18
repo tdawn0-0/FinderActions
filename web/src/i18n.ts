@@ -11,15 +11,13 @@ export const translations = {
       download: "Download",
     },
     hero: {
-      badge: "Engineered for macOS 15+ Sequoia • Pure Swift 6 & AppKit",
+      badge: "Engineered for macOS 15+ Sequoia • Pure Swift 6 & SwiftUI",
       titleStart: "Your Finder. ",
       titleHighlight: "Supercharged & Scriptable.",
       subtitle: "The missing right-click action launcher for macOS. Scripts are plugins — edit them as files, track in git, and trigger in one click. Zero background bloat, no runner daemons, 100% private.",
       ctaPrimary: "Download for macOS",
       ctaSecondary: "Star on GitHub",
       metaNotice: "Requires macOS 15.0 or later • Free & Open Source (MIT)",
-      brewPrompt: "Install via Homebrew",
-      copiedBrew: "Command copied to clipboard!",
     },
     demo: {
       tag: "Interactive Simulator",
@@ -88,8 +86,8 @@ export const translations = {
         {
           id: "lightweight",
           badge: "< 10 MB RAM",
-          title: "Pure AppKit Host, Zero Idle CPU",
-          desc: "The background Host never loads SwiftUI into resident memory. Consumes virtually zero CPU and negligible RAM. The SwiftUI Settings helper runs on-demand and exits instantly when closed.",
+          title: "Lightweight Native Host, Zero Idle CPU",
+          desc: "The resident Host is built with native Swift. Consumes virtually zero CPU and negligible RAM. The SwiftUI Settings helper runs on-demand and exits instantly when closed.",
         },
         {
           id: "showWhen",
@@ -127,7 +125,7 @@ export const translations = {
       tag: "Under The Hood",
       title: "Three-tier architecture without the legacy drag",
       subtitle: "Traditional Mac App Store sandbox apps require a separate runner daemon and complex security-scoped bookmark relays. FinderActions takes a cleaner, modern path.",
-      hostTitle: "Host (AppKit Resident)",
+      hostTitle: "Host (Resident Core)",
       hostDesc: "Non-sandboxed, lightweight menu bar controller and execution engine. Spawns processes, manages logs, and publishes menu snapshots via DistributedNotification.",
       settingsTitle: "Settings Helper (SwiftUI)",
       settingsDesc: "Modern SwiftUI 6 interface (@Observable). Starts only when requested, saves configuration, and terminates immediately upon window closure.",
@@ -147,7 +145,7 @@ export const translations = {
       tag: "Get Started in 60s",
       title: "Up and running in three simple steps",
       step1Title: "1. Download & Move to /Applications",
-      step1Desc: "Grab the latest notarized release from GitHub or install via Homebrew.",
+      step1Desc: "Grab the latest notarized release from GitHub Releases (ZIP / DMG).",
       step2Title: "2. Enable Finder Extension",
       step2Desc: "Open System Settings → Privacy & Security → Extensions, and toggle FinderActions on.",
       step3Title: "3. Right-Click in Finder",
@@ -161,7 +159,7 @@ export const translations = {
       items: [
         {
           q: "Does FinderActions work on older macOS versions like Sonoma or Ventura?",
-          a: "FinderActions is specifically engineered for macOS 15 Sequoia and later, leveraging the newest Swift 6 concurrency models, updated FinderSync capabilities, and modern AppKit optimizations. We intentionally do not carry legacy compatibility baggage."
+          a: "FinderActions is specifically engineered for macOS 15 Sequoia and later, leveraging the newest Swift 6 concurrency models, updated FinderSync capabilities, and modern SwiftUI optimizations. We intentionally do not carry legacy compatibility baggage."
         },
         {
           q: "Why is the Host process not sandboxed?",
@@ -186,7 +184,7 @@ export const translations = {
       license: "Released under the open-source MIT License.",
       github: "GitHub Repository",
       releases: "Releases & Changelog",
-      builtWith: "Crafted with Swift 6, AppKit, and SwiftUI for macOS.",
+      builtWith: "Crafted with Swift 6 and SwiftUI for macOS.",
       backToTop: "Back to top ↑"
     }
   },
@@ -202,15 +200,13 @@ export const translations = {
       download: "免费下载",
     },
     hero: {
-      badge: "专为 macOS 15+ Sequoia 打造 • 纯原生 Swift 6 与 AppKit",
+      badge: "专为 macOS 15+ Sequoia 打造 • 纯原生 Swift 6 与 SwiftUI",
       titleStart: "让访达右键，",
       titleHighlight: "真正为你所用。",
       subtitle: "macOS 访达原生右键动作增强利器。脚本即插件 — 文件化管理、git 协同版本控制、右键一键触发。无常驻 Runner 守护进程、无 security-scoped 书签包袱、100% 本地隐私。",
       ctaPrimary: "下载 macOS 版",
       ctaSecondary: "在 GitHub 上 Star",
       metaNotice: "兼容 macOS 15.0 及以上 • 自由开源 (MIT 许可)",
-      brewPrompt: "使用 Homebrew 安装",
-      copiedBrew: "安装命令已复制到剪贴板！",
     },
     demo: {
       tag: "交互式拟真演示",
@@ -279,8 +275,8 @@ export const translations = {
         {
           id: "lightweight",
           badge: "< 10 MB 内存",
-          title: "AppKit 常驻，闲置零 CPU",
-          desc: "常驻后台的 Host 绝不加载 SwiftUI 运行时，占用极低内存且空闲 CPU 恒定为 0%。SwiftUI 设置助手按需启动，窗口关闭后立即彻底退出释放资源。",
+          title: "轻量常驻核心，闲置零 CPU",
+          desc: "常驻后台的 Host 基于纯 Swift 原生打造，占用极低内存且空闲 CPU 恒定为 0%。SwiftUI 设置助手按需启动，窗口关闭后立即彻底退出释放资源。",
         },
         {
           id: "showWhen",
@@ -318,7 +314,7 @@ export const translations = {
       tag: "技术底座",
       title: "三层精简架构，彻底摆脱历史包袱",
       subtitle: "传统 Mac App Store 沙盒应用依赖繁琐的 Runner 辅助进程与安全书签（Bookmark）中继链路。FinderActions 采用更纯粹现代的技术路径。",
-      hostTitle: "Host（AppKit 常驻核心）",
+      hostTitle: "Host（轻量常驻核心）",
       hostDesc: "非沙盒、轻量级菜单栏与执行控制器。负责拉起子进程、管理日志，并通过 DistributedNotification 发布右键菜单快照。",
       settingsTitle: "Settings Helper（SwiftUI 设置助手）",
       settingsDesc: "现代 SwiftUI 6 界面（@Observable）。仅在用户需要调整配置时启动，保存后立即退出，绝不在后台常驻吃内存。",
@@ -338,7 +334,7 @@ export const translations = {
       tag: "60 秒快速上手",
       title: "仅需三步，开启效率飞升",
       step1Title: "1. 下载并拖入 /Applications",
-      step1Desc: "从 GitHub Releases 获取经苹果公证的免安装 ZIP/DMG，或直接通过 Homebrew 安装。",
+      step1Desc: "从 GitHub Releases 获取经苹果公证的免安装发布版本（ZIP / DMG）。",
       step2Title: "2. 在系统设置中启用访达扩展",
       step2Desc: "打开「系统设置 → 隐私与安全性 → 扩展」，勾选启用 FinderActions 访达扩展插件。",
       step3Title: "3. 在访达中右键即可触发",
@@ -352,7 +348,7 @@ export const translations = {
       items: [
         {
           q: "FinderActions 是否支持旧版 macOS（如 Sonoma 或 Ventura）？",
-          a: "FinderActions 专为 macOS 15 Sequoia 及以上版本设计，采用了 Swift 6 最新并发模型与现代化 AppKit 优化，不背负历史兼容包袱，确保最前沿系统的极速体验。"
+          a: "FinderActions 专为 macOS 15 Sequoia 及以上版本设计，采用了 Swift 6 最新并发模型与现代化 SwiftUI 界面设计，不背负历史兼容包袱，确保最前沿系统的极速体验。"
         },
         {
           q: "为什么 Host 进程没有开启沙盒？",
@@ -377,7 +373,7 @@ export const translations = {
       license: "基于 MIT 开源协议开放全部源代码。",
       github: "GitHub 仓库",
       releases: "版本发布与更新日志",
-      builtWith: "使用 Swift 6、AppKit 与 SwiftUI 倾心打造。",
+      builtWith: "使用 Swift 6 与 SwiftUI 倾心打造。",
       backToTop: "回到顶部 ↑"
     }
   }

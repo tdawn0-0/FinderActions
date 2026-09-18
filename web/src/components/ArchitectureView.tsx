@@ -70,7 +70,7 @@ export const ArchitectureView: React.FC<ArchitectureViewProps> = ({ lang }) => {
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-white/10 text-[11px] font-mono text-blue-400">
-              Pure AppKit • Non-Sandboxed
+              Pure Swift • Non-Sandboxed
             </div>
           </div>
 

@@ -121,7 +121,7 @@ export const Navbar: React.FC<NavbarProps> = ({ lang, onToggleLang }) => {
               <GithubIcon className="w-4 h-4" />
               <span>{t.github}</span>
             </a>
-            <span className="text-[11px] text-zinc-500 font-mono">Swift 6 & AppKit</span>
+            <span className="text-[11px] text-zinc-500 font-mono">Swift 6 & SwiftUI</span>
           </div>
         </div>
       )}
