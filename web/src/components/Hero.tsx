@@ -8,7 +8,8 @@ import {
   BookOpen,
   ShieldCheck, 
   Zap, 
-  Cpu 
+  Cpu,
+  Download
 } from 'lucide-react';
 import { GithubIcon } from './GithubIcon';
 import type { Language } from '../types';
@@ -94,15 +95,25 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
           </a>
         </div>
 
-        {/* Release link */}
-        <a
-          href="https://github.com/tdawn0-0/FinderActions/releases"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-zinc-400 hover:text-blue-400 transition-colors flex items-center gap-1 mb-10"
-        >
-          <span>{lang === 'zh' ? '获取最新 Release 发布版本 (.zip / .dmg) ›' : 'Get latest releases & changelog ›'}</span>
-        </a>
+        {/* Direct DMG link & Release page */}
+        <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-zinc-400 mb-10">
+          <a
+            href="https://github.com/tdawn0-0/FinderActions/releases/download/v1.0.0/FinderActions-1.0.0.dmg"
+            className="hover:text-blue-400 transition-colors flex items-center gap-1.5 font-medium text-zinc-300 hover:underline"
+          >
+            <Download className="w-3.5 h-3.5 text-blue-400" />
+            <span>{lang === 'zh' ? '直接下载 FinderActions-1.0.0.dmg' : 'Download FinderActions-1.0.0.dmg'}</span>
+          </a>
+          <span className="text-zinc-600">•</span>
+          <a
+            href="https://github.com/tdawn0-0/FinderActions/releases/tag/v1.0.0"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-zinc-200 transition-colors"
+          >
+            <span>{lang === 'zh' ? '查看发布日志›' : 'Release notes›'}</span>
+          </a>
+        </div>
 
         {/* 4 Core Pillars Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full max-w-4xl text-left mb-8">

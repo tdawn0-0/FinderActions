@@ -51,14 +51,20 @@ killall Finder`;
                 {t.step1Desc}
               </p>
             </div>
-            <div className="mt-6">
+            <div className="mt-6 flex flex-col gap-1.5">
               <a
-                href="https://github.com/tdawn0-0/FinderActions/releases"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="https://github.com/tdawn0-0/FinderActions/releases/download/v1.0.0/FinderActions-1.0.0.dmg"
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300"
               >
-                GitHub Releases ›
+                <span>FinderActions-1.0.0.dmg ›</span>
+              </a>
+              <a
+                href="https://github.com/tdawn0-0/FinderActions/releases/tag/v1.0.0"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] text-zinc-500 hover:text-zinc-300"
+              >
+                Release Notes & Checksums ›
               </a>
             </div>
           </div>
