@@ -69,7 +69,7 @@ export const Navbar: React.FC<NavbarProps> = ({ lang, onToggleLang }) => {
 
           {/* GitHub Repo */}
           <a
-            href="https://github.com/jyeu/finder-menu"
+            href="https://github.com/tdawn0-0/FinderActions"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/10 transition-colors border border-white/5 whitespace-nowrap shrink-0"
@@ -113,7 +113,7 @@ export const Navbar: React.FC<NavbarProps> = ({ lang, onToggleLang }) => {
           ))}
           <div className="pt-2 border-t border-white/10 flex items-center justify-between">
             <a
-              href="https://github.com/jyeu/finder-menu"
+              href="https://github.com/tdawn0-0/FinderActions"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-zinc-400 hover:text-white flex items-center gap-1.5 py-1"

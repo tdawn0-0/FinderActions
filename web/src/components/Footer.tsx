@@ -36,7 +36,7 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
         {/* Links */}
         <div className="flex items-center gap-6 text-xs text-zinc-400">
           <a
-            href="https://github.com/jyeu/finder-menu"
+            href="https://github.com/tdawn0-0/FinderActions"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-white transition-colors flex items-center gap-1.5"
@@ -45,7 +45,7 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
             <span>{t.github}</span>
           </a>
           <a
-            href="https://github.com/jyeu/finder-menu/releases"
+            href="https://github.com/tdawn0-0/FinderActions/releases"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-white transition-colors"

@@ -1246,7 +1246,7 @@ struct AboutView: View {
                 .frame(maxWidth: 380)
 
             HStack(spacing: 12) {
-                Link("GitHub Repository", destination: URL(string: "https://github.com/finderactions/FinderActions")!)
+                Link("GitHub Repository", destination: URL(string: "https://github.com/tdawn0-0/FinderActions")!)
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
 

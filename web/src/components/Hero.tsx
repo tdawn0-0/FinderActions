@@ -57,7 +57,7 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
         {/* Primary Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center gap-3.5 w-full sm:w-auto mb-8">
           <a
-            href="https://github.com/jyeu/finder-menu/releases"
+            href="https://github.com/tdawn0-0/FinderActions/releases"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 shadow-xl shadow-blue-600/30 hover:shadow-blue-500/40 transition-all duration-200 border border-blue-400/40 hover:-translate-y-0.5"
@@ -67,7 +67,7 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
           </a>
 
           <a
-            href="https://github.com/jyeu/finder-menu"
+            href="https://github.com/tdawn0-0/FinderActions"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-zinc-200 glass-panel hover:bg-white/10 hover:text-white transition-all duration-200 border border-white/10 hover:-translate-y-0.5"

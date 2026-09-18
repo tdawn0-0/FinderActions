@@ -53,7 +53,7 @@ killall Finder`;
             </div>
             <div className="mt-6">
               <a
-                href="https://github.com/jyeu/finder-menu/releases"
+                href="https://github.com/tdawn0-0/FinderActions/releases"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300"
