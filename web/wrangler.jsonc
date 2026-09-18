@@ -4,9 +4,12 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "web",
+	"name": "finderactions",
 	"main": "worker/index.ts",
 	"compatibility_date": "2026-09-16",
+	"routes": [
+		{ "pattern": "finderactions.jyeu.xyz", "custom_domain": true }
+	],
 	"assets": {
 		"not_found_handling": "single-page-application"
 	},

@@ -1,3 +1,4 @@
+// FinderActions Web v1.0.1
 import { useState, useEffect } from 'react';
 import type { Language } from './types';
 import { Navbar } from './components/Navbar';
@@ -30,7 +31,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090a0f] text-zinc-100 flex flex-col selection:bg-blue-600 selection:text-white font-sans antialiased">
+    <div className="min-h-screen bg-[#090a0f] text-zinc-100 flex flex-col selection:bg-blue-600 selection:text-white font-sans antialiased" data-version="1.0.1">
       {/* Background ambient lighting */}
       <div 
         className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] pointer-events-none opacity-25 overflow-hidden -z-10"

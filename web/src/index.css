@@ -9,6 +9,7 @@
     --mac-border-hover: rgba(255, 255, 255, 0.18);
     --mac-accent: #0071e3;
     --mac-accent-glow: rgba(0, 113, 227, 0.25);
+    --app-version: 1.0.1;
   }
 
   html {
@@ -75,3 +76,4 @@
   opacity: 0.45;
 }
 
+/* build 1.0.1 */
