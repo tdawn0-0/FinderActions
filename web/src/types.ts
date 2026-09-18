@@ -22,3 +22,9 @@ export interface FinderFile {
   dateModified: string;
   matchedActions: string[];
 }
+
+export interface CorePillar {
+  icon: string;
+  title: string;
+  desc: string;
+}

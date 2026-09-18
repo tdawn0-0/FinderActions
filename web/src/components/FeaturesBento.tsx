@@ -1,10 +1,10 @@
 import React from 'react';
 import { 
   Cpu, 
-  Filter, 
-  TerminalSquare, 
-  ShieldCheck, 
-  GitBranch, 
+  Copy, 
+  Terminal, 
+  Code2, 
+  FileCode, 
   Lock, 
   Sparkles,
   Zap
@@ -21,16 +21,16 @@ export const FeaturesBento: React.FC<FeaturesBentoProps> = ({ lang }) => {
 
   const getIcon = (id: string) => {
     switch (id) {
+      case 'paths':
+        return <Copy className="w-5 h-5 text-purple-400" />;
+      case 'terminals':
+        return <Terminal className="w-5 h-5 text-emerald-400" />;
+      case 'editors':
+        return <Code2 className="w-5 h-5 text-blue-400" />;
+      case 'scripts':
+        return <FileCode className="w-5 h-5 text-amber-400" />;
       case 'lightweight':
-        return <Cpu className="w-5 h-5 text-blue-400" />;
-      case 'showWhen':
-        return <Filter className="w-5 h-5 text-amber-400" />;
-      case 'launchers':
-        return <TerminalSquare className="w-5 h-5 text-emerald-400" />;
-      case 'safeArgv':
-        return <ShieldCheck className="w-5 h-5 text-indigo-400" />;
-      case 'git':
-        return <GitBranch className="w-5 h-5 text-purple-400" />;
+        return <Cpu className="w-5 h-5 text-sky-400" />;
       case 'privacy':
         return <Lock className="w-5 h-5 text-teal-400" />;
       default:

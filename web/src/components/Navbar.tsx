@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Globe, Download, Menu, X } from 'lucide-react';
+import { Globe, ArrowRight, Menu, X } from 'lucide-react';
 import { GithubIcon } from './GithubIcon';
 import type { Language } from '../types';
 import { translations } from '../i18n';
@@ -78,13 +78,13 @@ export const Navbar: React.FC<NavbarProps> = ({ lang, onToggleLang }) => {
             <span className="whitespace-nowrap">{t.github}</span>
           </a>
 
-          {/* Download CTA */}
+          {/* Get Started CTA */}
           <a
             href="#guide"
             className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 shadow-md shadow-blue-500/25 transition-all duration-200 border border-blue-400/30 whitespace-nowrap shrink-0"
           >
-            <Download className="w-3.5 h-3.5 shrink-0" />
-            <span className="whitespace-nowrap">{t.download}</span>
+            <span>{t.download}</span>
+            <ArrowRight className="w-3.5 h-3.5 shrink-0" />
           </a>
 
           {/* Mobile hamburger */}
