@@ -48,3 +48,12 @@ Package.resolved
 
 # Signed release artifacts
 build/releases/
+
+# Credentials / signing keys
+*.pem
+*.p12
+*.pfx
+*.mobileprovision
+AuthKey_*.p8
+credentials.json
+
