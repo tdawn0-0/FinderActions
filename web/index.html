@@ -1,12 +1,15 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/app-icon.png" />
+    <link rel="apple-touch-icon" href="/app-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>web</title>
+    <meta name="theme-color" content="#090a0f" />
+    <title>FinderActions — Native & Scriptable macOS Finder Context Menu</title>
+    <meta name="description" content="Open-source macOS Finder right-click actions. Zero bloat, no runner daemons, 100% private. Write scripts as plugins, track in git, and automate workflows effortlessly." />
   </head>
-  <body>
+  <body class="bg-[#090a0f] text-zinc-100 min-h-screen selection:bg-blue-600 selection:text-white">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

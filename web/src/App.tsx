@@ -1,148 +1,63 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import cloudflareLogo from './assets/cloudflare.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from 'react';
+import type { Language } from './types';
+import { Navbar } from './components/Navbar';
+import { Hero } from './components/Hero';
+import { FinderInteractiveMockup } from './components/FinderInteractiveMockup';
+import { ScriptShowcase } from './components/ScriptShowcase';
+import { FeaturesBento } from './components/FeaturesBento';
+import { ArchitectureView } from './components/ArchitectureView';
+import { GettingStarted } from './components/GettingStarted';
+import { FaqSection } from './components/FaqSection';
+import { Footer } from './components/Footer';
 
-function App() {
-  const [count, setCount] = useState(0)
-  const [name, setName] = useState('unknown')
+export function App() {
+  const [lang, setLang] = useState<Language>(() => {
+    if (typeof window !== 'undefined' && window.navigator) {
+      const userLang = window.navigator.language || '';
+      if (userLang.toLowerCase().includes('zh')) {
+        return 'zh';
+      }
+    }
+    return 'zh';
+  });
+
+  useEffect(() => {
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  }, [lang]);
+
+  const toggleLanguage = () => {
+    setLang((prev) => (prev === 'en' ? 'zh' : 'en'));
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started with Cloudflare</h1>
-          <p>
-            Edit <code>src/App.tsx</code> or <code>worker/index.ts</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <ul style={{ display: 'flex', gap: '1rem', listStyle: 'none', padding: 0 }}>
-          <li>
-            <button
-              className="counter"
-              onClick={() => setCount((count) => count + 1)}
-            >
-              Count is {count}
-            </button>
-          </li>
-          <li>
-          <button
-            className="counter"
-            onClick={() => {
-              fetch('/api/')
-                .then((res) => res.json())
-                .then((data) => setName(data.name))
-            }}
-            aria-label='get name'
-          >
-            Name from API is: {name}
-          </button>
-          </li>
-        </ul>
+    <div className="min-h-screen bg-[#090a0f] text-zinc-100 flex flex-col selection:bg-blue-600 selection:text-white font-sans antialiased">
+      {/* Background ambient lighting */}
+      <div 
+        className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] pointer-events-none opacity-25 overflow-hidden -z-10"
+        aria-hidden="true"
+      >
+        <div className="absolute top-[-20%] left-[20%] w-[600px] h-[500px] rounded-full bg-gradient-to-br from-blue-600/30 to-purple-600/20 blur-[130px]" />
+        <div className="absolute top-[10%] right-[15%] w-[450px] h-[400px] rounded-full bg-gradient-to-bl from-indigo-600/20 to-sky-500/10 blur-[120px]" />
+      </div>
 
+      {/* Floating Glass Navbar */}
+      <Navbar lang={lang} onToggleLang={toggleLanguage} />
 
-      </section>
+      {/* Main Content Sections */}
+      <main className="flex-1 flex flex-col">
+        <Hero lang={lang} />
+        <FinderInteractiveMockup lang={lang} />
+        <ScriptShowcase lang={lang} />
+        <FeaturesBento lang={lang} />
+        <ArchitectureView lang={lang} />
+        <GettingStarted lang={lang} />
+        <FaqSection lang={lang} />
+      </main>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-            <li>
-              <a href="https://workers.cloudflare.com/" target="_blank">
-                <img className="button-icon" src={cloudflareLogo} alt="" />
-                Workers Docs
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {/* Footer */}
+      <Footer lang={lang} />
+    </div>
+  );
 }
 
-export default App
+export default App;
