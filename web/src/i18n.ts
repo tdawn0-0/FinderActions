@@ -14,7 +14,7 @@ export const translations = {
       badge: "Engineered for macOS 15+ Sequoia • Pure Swift 6 & SwiftUI",
       titleStart: "Your Finder. ",
       titleHighlight: "Supercharged Context Actions.",
-      subtitle: "The missing right-click power tool for macOS Finder. Copy absolute paths in one click, open folders directly in any terminal or code editor, and run custom shell scripts with zero background bloat.",
+      subtitle: "The missing right-click power tool for macOS Finder. Copy absolute paths in one click, open folders directly in any terminal or code editor, and run custom shell scripts with a featherweight background (<10MB RAM).",
       ctaPrimary: "View on GitHub",
       ctaSecondary: "Quick Start Guide",
       metaNotice: "Requires macOS 15.0 or later • Free & Open Source (MIT)",
@@ -133,7 +133,7 @@ export const translations = {
           id: "lightweight",
           badge: "< 10 MB RAM",
           title: "Pure Swift Native, Zero Idle CPU",
-          desc: "No bloated Electron, no persistent runner daemon eating battery. A featherweight resident host that consumes <10MB memory, paired with an on-demand SwiftUI settings helper.",
+          desc: "No bloated Electron runtime. A featherweight resident host that consumes <10MB memory with a very thin background, paired with an on-demand SwiftUI settings helper.",
         },
         {
           id: "privacy",
@@ -146,7 +146,7 @@ export const translations = {
     architecture: {
       tag: "Under The Hood",
       title: "Three-tier architecture without the legacy drag",
-      subtitle: "Traditional Mac App Store sandbox apps require a separate runner daemon and complex security-scoped bookmark relays. FinderActions takes a cleaner, modern path.",
+      subtitle: "Traditional Mac App Store sandbox apps require complex security-scoped bookmark relays and heavyweight helpers. FinderActions takes a cleaner, modern path with a featherweight background.",
       hostTitle: "Host (Resident Core)",
       hostDesc: "Non-sandboxed, lightweight menu bar controller and execution engine. Spawns processes, manages logs, and publishes menu snapshots via DistributedNotification.",
       settingsTitle: "Settings Helper (SwiftUI)",
@@ -225,7 +225,7 @@ export const translations = {
       badge: "专为 macOS 15+ Sequoia 打造 • 纯原生 Swift 6 与 SwiftUI",
       titleStart: "让访达右键，",
       titleHighlight: "随心调用，得心应手。",
-      subtitle: "macOS 访达右键必备效率利器。右键一键复制文件绝对路径，在各类终端中瞬间打开文件夹，使用任意编辑器直接打开工程，并支持编写任意自定义脚本。轻量纯原生、零后台负担、100% 本地隐私。",
+      subtitle: "macOS 访达右键必备效率利器。右键一键复制文件绝对路径，在各类终端中瞬间打开文件夹，使用任意编辑器直接打开工程，并支持编写任意自定义脚本。轻量纯原生、极薄后台（<10MB 内存）、100% 本地隐私。",
       ctaPrimary: "在 GitHub 上查看",
       ctaSecondary: "快速上手指南",
       metaNotice: "兼容 macOS 15.0 及以上 • 自由开源 (MIT 许可)",
@@ -344,7 +344,7 @@ export const translations = {
           id: "lightweight",
           badge: "< 10 MB 内存",
           title: "原生极简架构，闲置零 CPU",
-          desc: "告别笨重臃肿的 Electron 包装器或耗电的常驻服务。仅占用极低系统内存，闲置 CPU 恒定为 0%，SwiftUI 设置窗口关闭即彻底退出释放资源。",
+          desc: "告别笨重臃肿的 Electron 包装器。仅有很薄的原生后台与微小内存占用（<10MB），闲置 CPU 恒定为 0%，SwiftUI 设置窗口关闭即彻底退出释放资源。",
         },
         {
           id: "privacy",
@@ -357,7 +357,7 @@ export const translations = {
     architecture: {
       tag: "技术底座",
       title: "三层精简架构，彻底摆脱历史包袱",
-      subtitle: "传统 Mac App Store 沙盒应用依赖繁琐的 Runner 辅助进程与安全书签（Bookmark）中继链路。FinderActions 采用更纯粹现代的技术路径。",
+      subtitle: "传统 Mac App Store 沙盒应用依赖繁琐的辅助进程与安全书签（Bookmark）中继链路。FinderActions 采用更纯粹现代的技术路径，保持极薄后台与极低内存占用。",
       hostTitle: "Host（轻量常驻核心）",
       hostDesc: "非沙盒、轻量级菜单栏与执行控制器。负责拉起子进程、管理日志，并通过 DistributedNotification 发布右键菜单快照。",
       settingsTitle: "Settings Helper（SwiftUI 设置助手）",
