@@ -84,6 +84,9 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         if resizable {
             styleMask.insert(.resizable)
         }
+        if kind == .settings {
+            styleMask.insert(.fullSizeContentView)
+        }
 
         let hostingController = NSHostingController(rootView: rootView)
         let window = NSWindow(
@@ -96,6 +99,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         window.title = title
         if kind == .settings {
             window.titleVisibility = .hidden
+            window.titlebarAppearsTransparent = true
             window.toolbarStyle = .unified
         }
         window.contentViewController = hostingController

@@ -89,7 +89,6 @@ struct SettingsRootView: View {
                     AboutView()
                 }
             }
-            .safeAreaPadding(.top, 52)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .navigationSplitViewStyle(.balanced)
