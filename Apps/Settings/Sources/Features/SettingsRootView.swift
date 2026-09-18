@@ -1,5 +1,4 @@
 import SwiftUI
-import AppKit
 import UniformTypeIdentifiers
 import FinderActionsCore
 
@@ -138,7 +137,7 @@ struct ActionsSettingsView: View {
                     }
                 }
                 .padding(6)
-                .background(Color(nsColor: .controlBackgroundColor))
+                .background(Color.secondary.opacity(0.08))
                 .clipShape(RoundedRectangle(cornerRadius: 6))
                 .padding(8)
 
@@ -203,7 +202,7 @@ struct ActionsSettingsView: View {
                 .buttonStyle(.borderless)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 6)
-                .background(Color(nsColor: .windowBackgroundColor))
+                .background(.bar)
             }
             .frame(width: 240)
 
@@ -369,7 +368,7 @@ private struct ActionDetailInspectorView: View {
                     }
                 }
                 .padding(12)
-                .background(Color(nsColor: .controlBackgroundColor))
+                .background(Color.secondary.opacity(0.08))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
                 // Basic Properties
@@ -530,7 +529,7 @@ private struct ActionDetailInspectorView: View {
                                 }
                             }
                             .padding(6)
-                            .background(Color(nsColor: .controlBackgroundColor))
+                            .background(Color.secondary.opacity(0.06))
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
                     }
@@ -555,7 +554,7 @@ private struct ActionDetailInspectorView: View {
                         Image(systemName: sym)
                             .font(.system(size: 14))
                             .frame(width: 32, height: 32)
-                            .background(Color(nsColor: .controlBackgroundColor))
+                            .background(Color.secondary.opacity(0.08))
                             .clipShape(RoundedRectangle(cornerRadius: 6))
                     }
                     .buttonStyle(.plain)
@@ -619,7 +618,7 @@ private struct ActionDetailInspectorView: View {
             .font(.system(size: 11, design: .monospaced))
             .frame(minHeight: 60, maxHeight: 110)
             .padding(4)
-            .background(Color(nsColor: .textBackgroundColor))
+            .background(Color.secondary.opacity(0.06))
             .clipShape(RoundedRectangle(cornerRadius: 6))
             .overlay(
                 RoundedRectangle(cornerRadius: 6)
@@ -699,7 +698,7 @@ private struct ActionDetailInspectorView: View {
             .font(.system(size: 11, design: .monospaced))
             .frame(minHeight: 60, maxHeight: 110)
             .padding(4)
-            .background(Color(nsColor: .textBackgroundColor))
+            .background(Color.secondary.opacity(0.06))
             .clipShape(RoundedRectangle(cornerRadius: 6))
         }
     }
@@ -708,12 +707,13 @@ private struct ActionDetailInspectorView: View {
         isRunningTest = true
         let currentAction = action
         let executor = state.executor
+        let homePath = FileManager.default.homeDirectoryForCurrentUser.path
         Task {
             let res = await Task.detached {
                 executor.execute(
                     action: currentAction,
-                    paths: [NSHomeDirectory()],
-                    containerPath: NSHomeDirectory()
+                    paths: [homePath],
+                    containerPath: homePath
                 )
             }.value
             await MainActor.run {
@@ -721,7 +721,7 @@ private struct ActionDetailInspectorView: View {
                     actionId: currentAction.id,
                     success: res.success,
                     summary: "Test Run: \(res.summary)",
-                    paths: [NSHomeDirectory()]
+                    paths: [homePath]
                 ))
                 testResult = res
                 isRunningTest = false
@@ -758,7 +758,7 @@ struct ApplicationsSettingsView: View {
                                 .font(.headline)
                             Spacer()
                             Button("Choose Other Terminal…") {
-                                chooseApplications(kind: .terminal)
+                                state.chooseApplications(kind: .terminal)
                             }
                             .controlSize(.small)
                         }
@@ -790,7 +790,7 @@ struct ApplicationsSettingsView: View {
                                 .font(.headline)
                             Spacer()
                             Button("Add Custom Editor…") {
-                                chooseApplications(kind: .editor)
+                                state.chooseApplications(kind: .editor)
                             }
                             .controlSize(.small)
                         }
@@ -830,46 +830,6 @@ struct ApplicationsSettingsView: View {
             set: { state.setEditor(application, enabled: $0) }
         )
     }
-
-    private func chooseApplications(kind: ExternalApplicationKind) {
-        let panel = NSOpenPanel()
-        panel.title = kind == .terminal ? "Choose a Terminal" : "Choose Editor Applications"
-        panel.prompt = "Choose"
-        panel.directoryURL = URL(fileURLWithPath: "/Applications", isDirectory: true)
-        panel.allowedContentTypes = [.applicationBundle]
-        panel.canChooseFiles = true
-        panel.canChooseDirectories = false
-        panel.allowsMultipleSelection = kind == .editor
-
-        guard panel.runModal() == .OK else { return }
-        let applications = panel.urls.compactMap { externalApplication(at: $0, kind: kind) }
-        if kind == .terminal, let application = applications.first {
-            state.selectTerminal(application)
-        } else {
-            for application in applications {
-                state.setEditor(application, enabled: true)
-            }
-        }
-    }
-
-    private func externalApplication(at url: URL, kind: ExternalApplicationKind) -> ExternalApplication? {
-        guard let bundle = Bundle(url: url), let bundleId = bundle.bundleIdentifier else { return nil }
-        if let known = ExternalApplicationCatalog.knownApplication(bundleId: bundleId, kind: kind) {
-            return known
-        }
-        let name = (bundle.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String)
-            ?? (bundle.object(forInfoDictionaryKey: "CFBundleName") as? String)
-            ?? url.deletingPathExtension().lastPathComponent
-        return ExternalApplication(
-            id: "custom.\(bundleId)",
-            name: name,
-            bundleId: bundleId,
-            pathFallback: url.path,
-            sfSymbol: kind == .terminal ? "terminal" : "app",
-            kind: kind,
-            terminalLaunchMethod: kind == .terminal ? .openDirectory : nil
-        )
-    }
 }
 
 private struct TerminalCard: View {
@@ -906,7 +866,7 @@ private struct TerminalCard: View {
                 }
             }
             .padding(6)
-            .background(isSelected ? Color.accentColor.opacity(0.12) : Color(nsColor: .controlBackgroundColor))
+            .background(isSelected ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.06))
             .overlay(
                 RoundedRectangle(cornerRadius: 6)
                     .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 1.5)
@@ -947,7 +907,7 @@ private struct EditorCard: View {
                 .controlSize(.mini)
         }
         .padding(6)
-        .background(Color(nsColor: .controlBackgroundColor))
+        .background(Color.secondary.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }
 }
@@ -1095,7 +1055,7 @@ struct LogsSettingsView: View {
                         .textFieldStyle(.plain)
                 }
                 .padding(5)
-                .background(Color(nsColor: .controlBackgroundColor))
+                .background(Color.secondary.opacity(0.08))
                 .clipShape(RoundedRectangle(cornerRadius: 6))
 
                 Picker("", selection: $filterStatus) {
@@ -1161,6 +1121,7 @@ struct LogsSettingsView: View {
 
 struct GeneralSettingsView: View {
     @Environment(AppState.self) private var state
+    @Environment(\.openURL) private var openURL
     @State private var showResetConfirm = false
 
     var body: some View {
@@ -1188,7 +1149,7 @@ struct GeneralSettingsView: View {
                             }
                             Spacer()
                             Button("Reveal in Finder") {
-                                NSWorkspace.shared.open(state.store.fileURL.deletingLastPathComponent())
+                                openURL(state.store.fileURL.deletingLastPathComponent())
                             }
                             .controlSize(.small)
                         }
@@ -1206,7 +1167,7 @@ struct GeneralSettingsView: View {
                             }
                             Spacer()
                             Button("Open Folder") {
-                                state.openActionsDirectory()
+                                openURL(state.store.actionsDirectoryURL)
                             }
                             .controlSize(.small)
                         }

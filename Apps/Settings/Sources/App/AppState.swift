@@ -199,7 +199,7 @@ final class AppState {
     }
 
     func executeForTesting(action: ActionDefinition, paths: [String] = []) -> ExecResult {
-        let testPaths = paths.isEmpty ? [NSHomeDirectory()] : paths
+        let testPaths = paths.isEmpty ? [FileManager.default.homeDirectoryForCurrentUser.path] : paths
         let result = executor.execute(
             action: action,
             paths: testPaths,
@@ -273,6 +273,46 @@ final class AppState {
     func persistSettings() {
         AppPreferences.set(notificationsEnabled, forKey: "notificationsEnabled")
         onManifestChanged?()
+    }
+
+    func chooseApplications(kind: ExternalApplicationKind) {
+        let panel = NSOpenPanel()
+        panel.title = kind == .terminal ? "Choose a Terminal" : "Choose Editor Applications"
+        panel.prompt = "Choose"
+        panel.directoryURL = URL(fileURLWithPath: "/Applications", isDirectory: true)
+        panel.allowedContentTypes = [.applicationBundle]
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = kind == .editor
+
+        guard panel.runModal() == .OK else { return }
+        let applications = panel.urls.compactMap { externalApplication(at: $0, kind: kind) }
+        if kind == .terminal, let application = applications.first {
+            selectTerminal(application)
+        } else {
+            for application in applications {
+                setEditor(application, enabled: true)
+            }
+        }
+    }
+
+    private func externalApplication(at url: URL, kind: ExternalApplicationKind) -> ExternalApplication? {
+        guard let bundle = Bundle(url: url), let bundleId = bundle.bundleIdentifier else { return nil }
+        if let known = ExternalApplicationCatalog.knownApplication(bundleId: bundleId, kind: kind) {
+            return known
+        }
+        let name = (bundle.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String)
+            ?? (bundle.object(forInfoDictionaryKey: "CFBundleName") as? String)
+            ?? url.deletingPathExtension().lastPathComponent
+        return ExternalApplication(
+            id: "custom.\(bundleId)",
+            name: name,
+            bundleId: bundleId,
+            pathFallback: url.path,
+            sfSymbol: kind == .terminal ? "terminal" : "app",
+            kind: kind,
+            terminalLaunchMethod: kind == .terminal ? .openDirectory : nil
+        )
     }
 
     private func canonicalApplication(
