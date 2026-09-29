@@ -42,7 +42,7 @@ public enum DefaultActions {
             #!/bin/zsh
             set -euo pipefail
             # "$@" = selected paths; also available as FA_PATHS (newline-separated)
-            print -r -- "$@" | pbcopy
+            printf '%s\\n' "$@" | /usr/bin/pbcopy
             print -r -- "Copied ${FA_PATH_COUNT:-$#} path(s)"
             """,
             "copy-name.zsh": """
@@ -52,7 +52,7 @@ public enum DefaultActions {
             for p in "$@"; do
               names+=("${p:t}")
             done
-            print -r -- "${(j:\\n:)names}" | pbcopy
+            printf '%s\\n' "${names[@]}" | /usr/bin/pbcopy
             print -r -- "Copied ${#names} name(s)"
             """,
         ]

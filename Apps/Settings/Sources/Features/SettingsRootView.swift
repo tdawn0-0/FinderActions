@@ -1047,26 +1047,37 @@ struct LogsSettingsView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Filter Toolbar
-            HStack(spacing: 8) {
+            HStack(spacing: 12) {
                 HStack(spacing: 6) {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(Color.secondary)
                     TextField("Search logs…", text: $searchText)
                         .textFieldStyle(.plain)
+                    if !searchText.isEmpty {
+                        Button {
+                            searchText = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(Color.secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
-                .padding(5)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
                 .background(Color.secondary.opacity(0.08))
                 .clipShape(RoundedRectangle(cornerRadius: 6))
+                .frame(minWidth: 160, idealWidth: 220, maxWidth: 260)
 
-                Picker("", selection: $filterStatus) {
+                Picker("Status Filter", selection: $filterStatus) {
                     Text("All").tag(0)
                     Text("Success").tag(1)
                     Text("Failed").tag(2)
                 }
                 .pickerStyle(.segmented)
-                .frame(width: 180)
+                .labelsHidden()
 
-                Spacer(minLength: 4)
+                Spacer()
 
                 Button("Clear", role: .destructive) {
                     state.clearLogs()
@@ -1074,7 +1085,8 @@ struct LogsSettingsView: View {
                 .controlSize(.small)
                 .disabled(state.logs.isEmpty)
             }
-            .padding(10)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
 
             Divider()
 

@@ -17,6 +17,11 @@ public enum ShellEnvironment {
         base: [String: String] = ProcessInfo.processInfo.environment
     ) -> [String: String] {
         var env = base
+        // Finder-launched apps may not inherit a UTF-8 locale. Keep the shell's
+        // character handling aligned with macOS paths, which are passed as UTF-8.
+        if env["LC_ALL"] == nil || env["LC_ALL"]?.isEmpty == true {
+            env["LC_CTYPE"] = "en_US.UTF-8"
+        }
         let cwd = resolvedWorkingDirectory(paths: paths, containerPath: containerPath)
         env[faCwd] = cwd
         env[faContainer] = containerPath ?? cwd
