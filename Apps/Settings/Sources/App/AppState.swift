@@ -24,6 +24,8 @@ final class AppState {
 
     /// Guards one-time bootstrap / IPC start.
     private(set) var didStart = false
+    /// Pending debounced save from continuous edits (typing in the inspector).
+    private var pendingSave: Task<Void, Never>?
     private let openWithDefaultsKey = "openWithSettings.v2"
 
     var effectiveManifest: ActionManifest {
@@ -102,9 +104,28 @@ final class AppState {
     }
 
     func saveManifest() {
+        pendingSave?.cancel()
+        pendingSave = nil
         manifest = OpenWithActions.baseManifest(from: manifest)
         try? store.save(manifest)
         onManifestChanged?()
+    }
+
+    /// Persist after edits settle so typing does not rewrite the manifest and
+    /// wake the Host on every keystroke.
+    func scheduleManifestSave() {
+        pendingSave?.cancel()
+        pendingSave = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(400))
+            guard !Task.isCancelled else { return }
+            self?.saveManifest()
+        }
+    }
+
+    /// Write any pending debounced edit now (e.g. before the process exits).
+    func flushPendingManifestSave() {
+        guard pendingSave != nil else { return }
+        saveManifest()
     }
 
     func selectTerminal(_ application: ExternalApplication) {

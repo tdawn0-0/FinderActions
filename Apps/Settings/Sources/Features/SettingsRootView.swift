@@ -216,7 +216,7 @@ struct ActionsSettingsView: View {
                         get: { state.manifest.actions[idx] },
                         set: {
                             state.manifest.actions[idx] = $0
-                            state.saveManifest()
+                            state.scheduleManifestSave()
                         }
                     )
                 )
