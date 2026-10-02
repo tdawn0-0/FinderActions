@@ -21,7 +21,7 @@ Working directory of the process is `FA_CWD`.
 2. Prefer looping `"$@"` over splitting `FA_PATHS` unless you need multiline-safe iteration in pure env form.  
 3. No implicit `sudo`.  
 4. Exit `0` on success; first stdout line may show in the notification.  
-5. Non-zero exit → failure notification; stderr is logged.
+5. Non-zero exit → failure notification; the last 4,000 characters of stderr are kept in Settings → Logs.
 
 ## Examples
 

@@ -722,7 +722,8 @@ private struct ActionDetailInspectorView: View {
                     actionId: currentAction.id,
                     success: res.success,
                     summary: "Test Run: \(res.summary)",
-                    paths: [homePath]
+                    paths: [homePath],
+                    stderrTail: OutputTail.tail(res.stderr)
                 ))
                 testResult = res
                 isRunningTest = false
@@ -1039,6 +1040,7 @@ struct LogsSettingsView: View {
             if !searchText.isEmpty {
                 return log.actionId.localizedCaseInsensitiveContains(searchText)
                     || log.summary.localizedCaseInsensitiveContains(searchText)
+                    || (log.stderrTail?.localizedCaseInsensitiveContains(searchText) ?? false)
                     || log.paths.contains(where: { $0.localizedCaseInsensitiveContains(searchText) })
             }
             return true
@@ -1114,6 +1116,14 @@ struct LogsSettingsView: View {
                         Text(log.summary)
                             .font(.system(size: 11))
                             .foregroundStyle(Color.primary)
+
+                        if let stderrTail = log.stderrTail {
+                            Text(stderrTail)
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundStyle(Color.red.opacity(0.85))
+                                .lineLimit(6)
+                                .textSelection(.enabled)
+                        }
 
                         if !log.paths.isEmpty {
                             Text(log.paths.joined(separator: "\n"))

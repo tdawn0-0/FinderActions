@@ -146,7 +146,7 @@ Add a manifest entry:
 
 Save → Host republishes the menu snapshot. Use **Open Scripts Folder** from Settings or the menu bar menu.
 
-Exit code `0` = success (first stdout line can appear in the notification). Non-zero = failure (stderr in logs).
+Exit code `0` = success (first stdout line can appear in the notification). Non-zero = failure (the end of stderr is kept in Settings → Logs).
 
 ## Architecture
 

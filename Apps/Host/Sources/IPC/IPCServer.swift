@@ -101,7 +101,8 @@ final class IPCServer {
             actionId: request.actionId,
             success: result.success,
             summary: result.summary,
-            paths: request.paths
+            paths: request.paths,
+            stderrTail: OutputTail.tail(result.stderr)
         ))
         notify(result: result, actionId: request.actionId)
     }

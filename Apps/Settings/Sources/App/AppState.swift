@@ -230,7 +230,8 @@ final class AppState {
             actionId: action.id,
             success: result.success,
             summary: "Test Run: \(result.summary)",
-            paths: testPaths
+            paths: testPaths,
+            stderrTail: OutputTail.tail(result.stderr)
         ))
         return result
     }

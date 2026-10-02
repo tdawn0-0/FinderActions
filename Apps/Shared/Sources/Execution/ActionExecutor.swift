@@ -42,14 +42,16 @@ public struct ExecLogEntry: Codable, Identifiable, Sendable, Equatable {
     public var success: Bool
     public var summary: String
     public var paths: [String]
+    public var stderrTail: String?
 
-    public init(id: String = UUID().uuidString, timestamp: String = ISO8601DateFormatter().string(from: Date()), actionId: String, success: Bool, summary: String, paths: [String]) {
+    public init(id: String = UUID().uuidString, timestamp: String = ISO8601DateFormatter().string(from: Date()), actionId: String, success: Bool, summary: String, paths: [String], stderrTail: String? = nil) {
         self.id = id
         self.timestamp = timestamp
         self.actionId = actionId
         self.success = success
         self.summary = summary
         self.paths = paths
+        self.stderrTail = stderrTail
     }
 }
 
