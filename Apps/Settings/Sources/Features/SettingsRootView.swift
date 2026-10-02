@@ -432,9 +432,10 @@ private struct ActionDetailInspectorView: View {
                             Picker("", selection: $action.type) {
                                 Text("Shell Script").tag(ActionType.shell)
                                 Text("Application").tag(ActionType.application)
-                                Text("Terminal").tag(ActionType.terminal)
                                 Text("AppleScript").tag(ActionType.appleScript)
-                                Text("Built-in").tag(ActionType.builtin)
+                                if action.type == .builtin {
+                                    Text("Built-in").tag(ActionType.builtin)
+                                }
                             }
                             .pickerStyle(.menu)
                             .labelsHidden()
