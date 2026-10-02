@@ -20,7 +20,7 @@ final class StatusMenuController: NSObject, NSMenuDelegate {
     }
 
     func menuWillOpen(_ menu: NSMenu) {
-        let enabledCount = Int64(appState.manifest.actions.lazy.filter(\.enabled).count)
+        let enabledCount = Int64(appState.effectiveManifest.actions.lazy.filter(\.enabled).count)
         summaryItem.title = String.localizedStringWithFormat(
             NSLocalizedString("%lld actions ready in Finder", comment: "Enabled action count"),
             enabledCount
