@@ -64,6 +64,14 @@ Host ignores duplicate `requestId`s within a short window (`RequestIdDedupe`) so
 
 Execution is fire-and-forget; results surface as Host notifications + log.
 
+## Request validation
+
+Distributed notifications do not identify the sender, so the Host re-checks every
+`ExecuteRequest` before running it (`ExecuteRequestValidator`): version 1, at most
+10,000 paths, every selection path and each non-empty `containerPath` absolute and
+existing, the action enabled, and its `showWhen` / `extRules` accepting the selection.
+Rejected requests are logged, not executed, and produce no notification.
+
 ## Cold-start cache
 
 The extension caches the last live snapshot in its own sandbox container and, on start, posts `com.finderactions.extension.snapshot-request` so a running Host republishes. There is no shared file between Host and extension.

@@ -80,6 +80,15 @@ final class IPCServer {
 
         let executor = appState.executor
         let manifest = appState.effectiveManifest
+        if case .failure(let rejection) = ExecuteRequestValidator.validate(request, manifest: manifest) {
+            appState.recordLog(ExecLogEntry(
+                actionId: request.actionId,
+                success: false,
+                summary: rejection.summary,
+                paths: request.paths
+            ))
+            return
+        }
         // A user script can run for minutes; never block the resident main thread.
         Task.detached(priority: .userInitiated) { [weak self] in
             let result = executor.execute(request: request, manifest: manifest)
