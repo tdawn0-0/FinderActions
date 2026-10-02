@@ -122,11 +122,9 @@ final class IPCServer {
 }
 
 enum SnapshotPublisher {
-    /// Publish menu snapshot via DistributedNotification (chunk if needed) + Application Support file.
+    /// Publish menu snapshot via DistributedNotification (chunk if needed).
     static func publish(_ snapshot: MenuSnapshot) {
         guard let json = try? JSONCoding.encodeToString(snapshot) else { return }
-
-        writeFallback(json: json)
 
         let center = DistributedNotificationCenter.default()
         let maxChunk = 40_000
@@ -154,19 +152,6 @@ enum SnapshotPublisher {
                 ] as [String: Any],
                 deliverImmediately: true
             )
-        }
-    }
-
-    private static func writeFallback(json: String) {
-        let support = ManifestStore.applicationSupportLayout().root
-            .appendingPathComponent(IPCConstants.snapshotFileName)
-        try? json.write(to: support, atomically: true, encoding: .utf8)
-
-        if let container = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: IPCConstants.appGroupId
-        ) {
-            let url = container.appendingPathComponent(IPCConstants.snapshotFileName)
-            try? json.write(to: url, atomically: true, encoding: .utf8)
         }
     }
 

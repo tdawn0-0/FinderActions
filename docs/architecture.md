@@ -35,7 +35,6 @@ Sandbox App Store apps needed a separate helper + bookmark relay. With a Develop
 ```
 Settings save → manifest.json / shared preferences → configuration-change notification
              → Host reloads → SnapshotBuilder → DistributedNotification
-                                               (+ Application Support cache)
 
 Right-click → Extension filters snapshot by selection → user picks item
            → ExecuteRequest { actionId, paths, containerPath }
@@ -49,7 +48,6 @@ Right-click → Extension filters snapshot by selection → user picks item
   manifest.json
   Actions/*.zsh
   logs/exec.jsonl
-  menu-snapshot.json   # cold-start fallback for extension
 ```
 
 ## Targets

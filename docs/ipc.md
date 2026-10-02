@@ -7,6 +7,7 @@ Local-only communication between Host and FinderSync.
 | Name | Direction | Payload |
 |------|-----------|---------|
 | `com.finderactions.host.snapshot` | Host → Ext | JSON `MenuSnapshot` as notification `object` (chunked if large) |
+| `com.finderactions.extension.snapshot-request` | Ext → Host | empty (ask Host to republish) |
 | `com.finderactions.extension.execute` | Ext → Host | JSON `ExecuteRequest` as notification `object` |
 | `com.finderactions.host.ready` | Host → Ext | empty (Host finished launch) |
 
@@ -65,4 +66,4 @@ Execution is fire-and-forget; results surface as Host notifications + log.
 
 ## Cold-start cache
 
-Host also writes `menu-snapshot.json` under Application Support (and App Group if available). Extension reads this when no live snapshot has arrived yet.
+The extension caches the last live snapshot in its own sandbox container and, on start, posts `com.finderactions.extension.snapshot-request` so a running Host republishes. There is no shared file between Host and extension.

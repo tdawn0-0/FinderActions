@@ -57,27 +57,10 @@ final class IPCClient: @unchecked Sendable {
         }
     }
 
+    /// Last live snapshot, cached in this sandboxed extension's own container.
     func loadCachedSnapshot() -> MenuSnapshot? {
-        if let data = try? Data(contentsOf: cacheURL),
-           let snap = try? JSONCoding.decode(MenuSnapshot.self, from: data) {
-            return snap
-        }
-        let hostPath = ManifestStore.applicationSupportLayout().root
-            .appendingPathComponent(IPCConstants.snapshotFileName)
-        if let data = try? Data(contentsOf: hostPath),
-           let snap = try? JSONCoding.decode(MenuSnapshot.self, from: data) {
-            return snap
-        }
-        if let container = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: IPCConstants.appGroupId
-        ) {
-            let url = container.appendingPathComponent(IPCConstants.snapshotFileName)
-            if let data = try? Data(contentsOf: url),
-               let snap = try? JSONCoding.decode(MenuSnapshot.self, from: data) {
-                return snap
-            }
-        }
-        return nil
+        guard let data = try? Data(contentsOf: cacheURL) else { return nil }
+        return try? JSONCoding.decode(MenuSnapshot.self, from: data)
     }
 
     func isHostRunning() -> Bool {

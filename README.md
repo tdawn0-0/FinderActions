@@ -160,7 +160,7 @@ Host (AppKit, not sandboxed)    FinderSync (sandboxed, thin)
   publish menu snapshot           no Process / no script run
 ```
 
-IPC uses `DistributedNotificationCenter` (JSON v1 payloads). Optional App Group / Application Support file caches the last snapshot for cold start.
+IPC uses `DistributedNotificationCenter` (JSON v1 payloads). The extension keeps its own cached copy of the last snapshot.
 
 See [docs/architecture.md](docs/architecture.md), [docs/ipc.md](docs/ipc.md), [docs/scripting.md](docs/scripting.md), [docs/troubleshooting.md](docs/troubleshooting.md), and [docs/releasing.md](docs/releasing.md) (App release & Web deployment).
 

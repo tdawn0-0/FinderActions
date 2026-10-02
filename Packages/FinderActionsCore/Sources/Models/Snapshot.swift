@@ -104,8 +104,6 @@ public enum IPCConstants {
     public static let hostReadyNotification = "com.finderactions.host.ready"
     /// DistributedNotification name: Settings helper → Host configuration reload
     public static let configurationChangedNotification = "com.finderactions.settings.configuration-changed"
-    /// UserDefaults / App Group suite (optional cold-start fallback)
-    public static let appGroupId = "group.com.finderactions.shared"
     public static let snapshotFileName = "menu-snapshot.json"
     /// Host bundle id
     public static let hostBundleId = "com.finderactions.host"
