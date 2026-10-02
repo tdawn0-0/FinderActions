@@ -26,6 +26,7 @@
 		A0A4DA8F40454491A34A0BD0 /* FullDiskAccessSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F3FF1F91F6CAB781C5B33E2 /* FullDiskAccessSettings.swift */; };
 		A190E8F22F59DA0033B3267D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1365BEA5F34DC51401B1C5BC /* Assets.xcassets */; };
 		A38A61E39C9F1F418ED4B120 /* BundledActions in Resources */ = {isa = PBXBuildFile; fileRef = F414D005950D759ED9F3E9C7 /* BundledActions */; };
+		A9873971211D3FEA7EFD195F /* SharedConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA49EDCE7FC57A1EF8BEE17E /* SharedConfiguration.swift */; };
 		AD7B8E9F07E21D8743255DBA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFDAA1CBBCD8945B4A3E0FF /* Cocoa.framework */; };
 		AE4013674045AAD367BCE30D /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41B8FBA0CA7319CEB69B3DE /* AppState.swift */; };
 		B7123785A9C9AD95800B5D44 /* BundledActions in Resources */ = {isa = PBXBuildFile; fileRef = F414D005950D759ED9F3E9C7 /* BundledActions */; };
@@ -33,6 +34,7 @@
 		CD6AD28EAB69338F55C93119 /* FinderActionsCore in Frameworks */ = {isa = PBXBuildFile; productRef = A11D449A768675EF447F82DC /* FinderActionsCore */; };
 		D401C9755F6F6A24A23081CD /* FinderActionsSettings.app in Embed Dependencies */ = {isa = PBXBuildFile; fileRef = 4B7272FDFC4D7C9030BA26CF /* FinderActionsSettings.app */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DBCE7CD6EF9009A1F7F93422 /* HostRuntimeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68390FB08D84B31124DE28E1 /* HostRuntimeState.swift */; };
+		DE328CD58536B44650F34E55 /* SharedConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA49EDCE7FC57A1EF8BEE17E /* SharedConfiguration.swift */; };
 		DED3A02B80BEA8EBEA1848C2 /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF596A31B37E7E28454817F /* AppPreferences.swift */; };
 		ED5C0D9E7BAFEEF73965B593 /* IPCServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6015524AE62846F51B5C88A9 /* IPCServer.swift */; };
 		ED60589A61F340B490EFF61A /* ActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FF0FD93DEE2B6A9585FB016 /* ActionExecutor.swift */; };
@@ -101,6 +103,7 @@
 		8FF0FD93DEE2B6A9585FB016 /* ActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionExecutor.swift; sourceTree = "<group>"; };
 		925A248CD571687760497699 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		A363F7D86EBE5062E90EB7B6 /* FAFinderSync.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FAFinderSync.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA49EDCE7FC57A1EF8BEE17E /* SharedConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedConfiguration.swift; sourceTree = "<group>"; };
 		AC1F60E61AE5FD20AB46098A /* MenuRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuRenderer.swift; sourceTree = "<group>"; };
 		B61E3A2EE69E471A126A2BDE /* FinderSync.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FinderSync.entitlements; sourceTree = "<group>"; };
 		B7E853D77FA333F44C3B7EA3 /* IPCClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPCClient.swift; sourceTree = "<group>"; };
@@ -319,6 +322,7 @@
 			isa = PBXGroup;
 			children = (
 				FBF596A31B37E7E28454817F /* AppPreferences.swift */,
+				AA49EDCE7FC57A1EF8BEE17E /* SharedConfiguration.swift */,
 			);
 			path = Configuration;
 			sourceTree = "<group>";
@@ -479,6 +483,7 @@
 				DBCE7CD6EF9009A1F7F93422 /* HostRuntimeState.swift in Sources */,
 				ED5C0D9E7BAFEEF73965B593 /* IPCServer.swift in Sources */,
 				40C439D7B4E3ED45BB70C86B /* SettingsHelperLauncher.swift in Sources */,
+				A9873971211D3FEA7EFD195F /* SharedConfiguration.swift in Sources */,
 				2F3DF8CAF4FF9C379E722A5D /* StatusMenuController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -495,6 +500,7 @@
 				0A23AB501544D9100D3740F2 /* SettingsAppDelegate.swift in Sources */,
 				95F3C579F5E95EB7B06851A0 /* SettingsRootView.swift in Sources */,
 				2DD4357AA5AD33A359A6C9FB /* SettingsWindowController.swift in Sources */,
+				DE328CD58536B44650F34E55 /* SharedConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

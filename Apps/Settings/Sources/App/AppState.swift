@@ -26,7 +26,6 @@ final class AppState {
     private(set) var didStart = false
     /// Pending debounced save from continuous edits (typing in the inspector).
     private var pendingSave: Task<Void, Never>?
-    private let openWithDefaultsKey = "openWithSettings.v2"
 
     var effectiveManifest: ActionManifest {
         OpenWithActions.compose(baseManifest: manifest, settings: openWithSettings)
@@ -42,21 +41,7 @@ final class AppState {
     }
 
     func bootstrap() {
-        try? store.ensureDirectories()
-        openWithSettings = loadOpenWithSettings()
-
-        if FileManager.default.fileExists(atPath: store.fileURL.path) {
-            manifest = store.loadOrEmpty()
-            let base = OpenWithActions.baseManifest(from: manifest)
-            if base != manifest {
-                manifest = base
-                try? store.save(manifest)
-            }
-        } else {
-            seedDefaults()
-        }
-
-        seedMissingScripts()
+        (manifest, openWithSettings) = SharedConfiguration.bootstrap(store: store)
         logs = logStore.recent(limit: 200)
         refreshExtensionStatus()
 
@@ -67,40 +52,9 @@ final class AppState {
     }
 
     func seedDefaults() {
-        manifest = DefaultActions.manifest()
-        openWithSettings = .defaults
-        try? store.save(manifest)
-        saveOpenWithSettings()
-        seedMissingScripts()
+        (manifest, openWithSettings) = SharedConfiguration.resetToDefaults(store: store)
+        SharedConfiguration.seedMissingScripts(store: store)
         onManifestChanged?()
-    }
-
-    func seedMissingScripts() {
-        try? store.ensureDirectories()
-        for (name, body) in DefaultActions.bundledScripts() {
-            let url = store.actionsDirectoryURL.appendingPathComponent(name)
-            guard !FileManager.default.fileExists(atPath: url.path) else { continue }
-            try? body.write(to: url, atomically: true, encoding: .utf8)
-            try? FileManager.default.setAttributes(
-                [.posixPermissions: 0o755],
-                ofItemAtPath: url.path
-            )
-        }
-        if let resourceURL = Bundle.main.resourceURL?.appendingPathComponent("BundledActions"),
-           let files = try? FileManager.default.contentsOfDirectory(atPath: resourceURL.path) {
-            for file in files where file.hasSuffix(".zsh") {
-                let dest = store.actionsDirectoryURL.appendingPathComponent(file)
-                guard !FileManager.default.fileExists(atPath: dest.path) else { continue }
-                try? FileManager.default.copyItem(
-                    at: resourceURL.appendingPathComponent(file),
-                    to: dest
-                )
-                try? FileManager.default.setAttributes(
-                    [.posixPermissions: 0o755],
-                    ofItemAtPath: dest.path
-                )
-            }
-        }
     }
 
     func saveManifest() {
@@ -345,18 +299,8 @@ final class AppState {
             ?? application
     }
 
-    private func loadOpenWithSettings() -> OpenWithSettings {
-        guard let data = AppPreferences.data(forKey: openWithDefaultsKey),
-              let settings = try? JSONDecoder().decode(OpenWithSettings.self, from: data) else {
-            return .defaults
-        }
-        return settings
-    }
-
     private func saveOpenWithSettings() {
-        if let data = try? JSONEncoder().encode(openWithSettings) {
-            AppPreferences.set(data, forKey: openWithDefaultsKey)
-        }
+        SharedConfiguration.saveOpenWithSettings(openWithSettings)
         onManifestChanged?()
     }
 

@@ -6,8 +6,6 @@ import FinderActionsCore
 /// has no Observation or SwiftUI dependency.
 @MainActor
 final class HostRuntimeState {
-    private let openWithDefaultsKey = "openWithSettings.v2"
-
     private(set) var manifest = ActionManifest()
     private(set) var openWithSettings: OpenWithSettings = .defaults
     private(set) var notificationsEnabled = true
@@ -35,21 +33,7 @@ final class HostRuntimeState {
     }
 
     func bootstrap() {
-        try? store.ensureDirectories()
-        if FileManager.default.fileExists(atPath: store.fileURL.path) {
-            let storedManifest = store.loadOrEmpty()
-            manifest = OpenWithActions.baseManifest(from: storedManifest)
-            if manifest != storedManifest {
-                try? store.save(manifest)
-            }
-            openWithSettings = loadOpenWithSettings()
-        } else {
-            manifest = DefaultActions.manifest()
-            openWithSettings = .defaults
-            try? store.save(manifest)
-            saveOpenWithSettings()
-        }
-        seedMissingScripts()
+        (manifest, openWithSettings) = SharedConfiguration.bootstrap(store: store)
         loadPreferences()
     }
 
@@ -57,7 +41,7 @@ final class HostRuntimeState {
     /// remain alive so a Settings save does not churn the resident process.
     func reloadConfiguration() {
         manifest = OpenWithActions.baseManifest(from: store.loadOrEmpty())
-        openWithSettings = loadOpenWithSettings()
+        openWithSettings = SharedConfiguration.loadOpenWithSettings()
         loadPreferences()
     }
 
@@ -86,37 +70,4 @@ final class HostRuntimeState {
         notificationsEnabled = AppPreferences.object(forKey: "notificationsEnabled") as? Bool ?? true
     }
 
-    private func loadOpenWithSettings() -> OpenWithSettings {
-        guard let data = AppPreferences.data(forKey: openWithDefaultsKey),
-              let settings = try? JSONDecoder().decode(OpenWithSettings.self, from: data) else {
-            return .defaults
-        }
-        return settings
-    }
-
-    private func saveOpenWithSettings() {
-        guard let data = try? JSONEncoder().encode(openWithSettings) else { return }
-        AppPreferences.set(data, forKey: openWithDefaultsKey)
-    }
-
-    private func seedMissingScripts() {
-        try? store.ensureDirectories()
-        for (name, body) in DefaultActions.bundledScripts() {
-            let destination = store.actionsDirectoryURL.appendingPathComponent(name)
-            guard !FileManager.default.fileExists(atPath: destination.path) else { continue }
-            try? body.write(to: destination, atomically: true, encoding: .utf8)
-            try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: destination.path)
-        }
-
-        guard let resourceURL = Bundle.main.resourceURL?.appendingPathComponent("BundledActions"),
-              let files = try? FileManager.default.contentsOfDirectory(atPath: resourceURL.path) else {
-            return
-        }
-        for file in files where file.hasSuffix(".zsh") {
-            let destination = store.actionsDirectoryURL.appendingPathComponent(file)
-            guard !FileManager.default.fileExists(atPath: destination.path) else { continue }
-            try? FileManager.default.copyItem(at: resourceURL.appendingPathComponent(file), to: destination)
-            try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: destination.path)
-        }
-    }
 }
