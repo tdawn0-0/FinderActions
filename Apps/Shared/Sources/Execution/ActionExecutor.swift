@@ -312,7 +312,7 @@ public final class ActionExecutor: @unchecked Sendable {
 
     private func runOsascript(_ source: String) -> ExecResult {
         let argv = ["/usr/bin/osascript", "-e", source]
-        return runProcess(argv: argv, env: ProcessInfo.processInfo.environment, cwd: FileManager.default.currentDirectoryPath)
+        return runProcess(argv: argv, env: ProcessInfo.processInfo.environment, cwd: FileManager.default.currentDirectoryPath, timeout: 120)
     }
 
     private func appleScriptString(_ value: String) -> String {
@@ -325,36 +325,34 @@ public final class ActionExecutor: @unchecked Sendable {
     // MARK: - Process
 
     /// Shared Process runner — argv is already split (no shell string concat of paths).
-    public func runProcess(argv: [String], env: [String: String], cwd: String) -> ExecResult {
-        guard let exe = argv.first else {
-            return ExecResult(success: false, summary: "Empty argv", exitCode: 1)
-        }
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: exe)
-        process.arguments = Array(argv.dropFirst())
-        process.environment = env
-        process.currentDirectoryURL = URL(fileURLWithPath: cwd)
-
-        let outPipe = Pipe()
-        let errPipe = Pipe()
-        process.standardOutput = outPipe
-        process.standardError = errPipe
-
+    public func runProcess(
+        argv: [String],
+        env: [String: String],
+        cwd: String,
+        timeout: TimeInterval? = nil
+    ) -> ExecResult {
+        let output: ProcessOutput
         do {
-            try process.run()
-            process.waitUntilExit()
+            output = try ProcessRunner.run(argv: argv, environment: env, workingDirectory: cwd, timeout: timeout)
+        } catch ProcessRunnerError.emptyArgv {
+            return ExecResult(success: false, summary: "Empty argv", exitCode: 1)
         } catch {
             return ExecResult(success: false, summary: error.localizedDescription, exitCode: 1)
         }
-
-        let stdout = String(data: outPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
-        let stderr = String(data: errPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
-        let code = process.terminationStatus
-        let success = code == 0
-        let firstLine = stdout.split(separator: "\n", omittingEmptySubsequences: true).first.map(String.init)
+        if output.timedOut {
+            return ExecResult(
+                success: false,
+                summary: "Timed out after \(Int(timeout ?? 0))s",
+                exitCode: output.exitCode,
+                stdout: output.stdout,
+                stderr: output.stderr
+            )
+        }
+        let success = output.exitCode == 0
+        let firstLine = output.stdout.split(separator: "\n", omittingEmptySubsequences: true).first.map(String.init)
         let summary = success
             ? (firstLine ?? "OK")
-            : (stderr.split(separator: "\n").first.map(String.init) ?? "Exit \(code)")
-        return ExecResult(success: success, summary: summary, exitCode: code, stdout: stdout, stderr: stderr)
+            : (output.stderr.split(separator: "\n").first.map(String.init) ?? "Exit \(output.exitCode)")
+        return ExecResult(success: success, summary: summary, exitCode: output.exitCode, stdout: output.stdout, stderr: output.stderr)
     }
 }

@@ -64,27 +64,37 @@ final class IPCServer {
     }
 
     private func processJSON(_ json: String) {
+        let request: ExecuteRequest
         do {
-            let request = try JSONCoding.decode(ExecuteRequest.self, from: json)
-            guard requestDedupe.accept(request.requestId) else { return }
-            let result = appState.executor.execute(request: request, manifest: appState.effectiveManifest)
-            let entry = ExecLogEntry(
-                actionId: request.actionId,
-                success: result.success,
-                summary: result.summary,
-                paths: request.paths
-            )
-            appState.recordLog(entry)
-            notify(result: result, actionId: request.actionId)
+            request = try JSONCoding.decode(ExecuteRequest.self, from: json)
         } catch {
-            let entry = ExecLogEntry(
+            appState.recordLog(ExecLogEntry(
                 actionId: "?",
                 success: false,
                 summary: "Bad execute payload: \(error.localizedDescription)",
                 paths: []
-            )
-            appState.recordLog(entry)
+            ))
+            return
         }
+        guard requestDedupe.accept(request.requestId) else { return }
+
+        let executor = appState.executor
+        let manifest = appState.effectiveManifest
+        // A user script can run for minutes; never block the resident main thread.
+        Task.detached(priority: .userInitiated) { [weak self] in
+            let result = executor.execute(request: request, manifest: manifest)
+            await self?.finish(request: request, result: result)
+        }
+    }
+
+    private func finish(request: ExecuteRequest, result: ExecResult) {
+        appState.recordLog(ExecLogEntry(
+            actionId: request.actionId,
+            success: result.success,
+            summary: result.summary,
+            paths: request.paths
+        ))
+        notify(result: result, actionId: request.actionId)
     }
 
     private func notify(result: ExecResult, actionId: String) {
