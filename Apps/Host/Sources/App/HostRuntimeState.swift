@@ -9,7 +9,6 @@ final class HostRuntimeState {
     private(set) var manifest = ActionManifest()
     private(set) var openWithSettings: OpenWithSettings = .defaults
     private(set) var notificationsEnabled = true
-    private(set) var lastSnapshot: MenuSnapshot?
 
     let store: ManifestStore
     let logStore: ExecLogStore
@@ -60,10 +59,6 @@ final class HostRuntimeState {
             process.arguments = ["Finder"]
             try? process.run()
         }
-    }
-
-    func setLastSnapshot(_ snapshot: MenuSnapshot) {
-        lastSnapshot = snapshot
     }
 
     private func loadPreferences() {

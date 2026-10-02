@@ -88,6 +88,5 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             hostRunning: true
         )
         SnapshotPublisher.publish(snapshot)
-        appState.setLastSnapshot(snapshot)
     }
 }

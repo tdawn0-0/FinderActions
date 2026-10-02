@@ -8,7 +8,6 @@ import FinderActionsCore
 final class AppState {
     var manifest: ActionManifest = ActionManifest()
     var logs: [ExecLogEntry] = []
-    var lastSnapshot: MenuSnapshot?
     var extensionEnabledHint: String = "Unknown"
     var showOnboarding: Bool = false
 
@@ -16,14 +15,11 @@ final class AppState {
     let logStore: ExecLogStore
     let executor: ActionExecutor
 
-    var launchAtLogin: Bool = false
     var notificationsEnabled: Bool = true
     var openWithSettings: OpenWithSettings = .defaults
 
     var onManifestChanged: (() -> Void)?
 
-    /// Guards one-time bootstrap / IPC start.
-    private(set) var didStart = false
     /// Pending debounced save from continuous edits (typing in the inspector).
     private var pendingSave: Task<Void, Never>?
 
@@ -171,23 +167,6 @@ final class AppState {
         manifest.actions.append(copy)
         saveManifest()
         return copy
-    }
-
-    func executeForTesting(action: ActionDefinition, paths: [String] = []) -> ExecResult {
-        let testPaths = paths.isEmpty ? [FileManager.default.homeDirectoryForCurrentUser.path] : paths
-        let result = executor.execute(
-            action: action,
-            paths: testPaths,
-            containerPath: testPaths.first
-        )
-        recordLog(ExecLogEntry(
-            actionId: action.id,
-            success: result.success,
-            summary: "Test Run: \(result.summary)",
-            paths: testPaths,
-            stderrTail: OutputTail.tail(result.stderr)
-        ))
-        return result
     }
 
     func deleteAction(id: String) {
