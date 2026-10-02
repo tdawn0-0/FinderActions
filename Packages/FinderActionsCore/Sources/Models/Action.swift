@@ -10,6 +10,13 @@ public enum ActionType: String, Codable, Sendable, CaseIterable {
     case builtin
 }
 
+public extension ActionType {
+    /// Types a user may assign to a manifest action in Settings.
+    /// `.terminal` actions are generated from Open With settings and are stripped
+    /// from the manifest on save; `.builtin` has no executor yet.
+    static let userAssignable: [ActionType] = [.shell, .application, .appleScript]
+}
+
 public enum ShowWhen: String, Codable, Sendable, CaseIterable {
     case always
     case filesOnly

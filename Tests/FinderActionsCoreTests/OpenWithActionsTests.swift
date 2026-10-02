@@ -56,6 +56,16 @@ struct OpenWithActionsTests {
         #expect(base.actions.map(\.id) == ["my-script"])
     }
 
+    @Test func baseManifestKeepsEveryUserAssignableType() {
+        let actions = ActionType.userAssignable.enumerated().map { index, type in
+            ActionDefinition(id: "user.action.\(index)", name: "A\(index)", type: type)
+        }
+        let result = OpenWithActions.baseManifest(from: ActionManifest(actions: actions))
+        #expect(result.actions.map(\.id) == actions.map(\.id))
+        #expect(!ActionType.userAssignable.contains(.terminal))
+        #expect(!ActionType.userAssignable.contains(.builtin))
+    }
+
     @Test func settingsRoundTripIncludesCustomApplications() throws {
         let custom = ExternalApplication(
             id: "custom.dev.example.Editor",
