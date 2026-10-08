@@ -9,13 +9,20 @@
 /* Begin PBXBuildFile section */
 		047A61D80D45D4B1E51ADC9F /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF596A31B37E7E28454817F /* AppPreferences.swift */; };
 		0A23AB501544D9100D3740F2 /* SettingsAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A67F7BEFBF44E55CDB0E9A /* SettingsAppDelegate.swift */; };
+		148903A24E990E8CA768E871 /* ActionsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E4DE01F1815B1970780D836 /* ActionsSettingsView.swift */; };
 		1B197EF3F7B3C06C9FA875D4 /* ActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FF0FD93DEE2B6A9585FB016 /* ActionExecutor.swift */; };
+		1DA684E639B5538D3EEC44CD /* ActionInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07471C0DEDE11C6EBA7BB6B7 /* ActionInspectorView.swift */; };
+		22C8A2D44CCF79CC85141793 /* ApplicationsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6DB46C96DB07BC236E723B /* ApplicationsSettingsView.swift */; };
 		2DD4357AA5AD33A359A6C9FB /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D62117BF63C6480DA2365C /* SettingsWindowController.swift */; };
 		2F3DF8CAF4FF9C379E722A5D /* StatusMenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3603FD712481486FC01F45 /* StatusMenuController.swift */; };
 		309B6E685BC1EFDF40A36F0F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC554E3AB2D3655752F79BE9 /* AppDelegate.swift */; };
 		3587CAFDC9EB561519931903 /* MenuRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1F60E61AE5FD20AB46098A /* MenuRenderer.swift */; };
+		3CE57C81187196DA43AB6864 /* PermissionsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90E0D9614DFEA2AE28DB51D /* PermissionsSettingsView.swift */; };
+		3EB70A329830FA350085369B /* FullDiskAccessGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C7516855D1FB185B5BE78BC /* FullDiskAccessGuideView.swift */; };
 		40C439D7B4E3ED45BB70C86B /* SettingsHelperLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4872A5DDB6A1673B1067DE /* SettingsHelperLauncher.swift */; };
 		50F60BB409EB2ED7825984C9 /* FinderActionsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 66A55974A1F677927C32FED0 /* FinderActionsCore */; };
+		5A66E61484BFB30FDAFCC46B /* LogsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B69A57E9058E53CFC3B5075 /* LogsSettingsView.swift */; };
+		5F5830F88CC534E31DF8D074 /* ActionType+Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = E580C3D1C61A3552ACAD20C0 /* ActionType+Display.swift */; };
 		63437717695A4854C13B9E54 /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A12202D707B18FECD7B488 /* FinderSync.swift */; };
 		665AAD726D2562A6A373800B /* IPCClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E853D77FA333F44C3B7EA3 /* IPCClient.swift */; };
 		6BCA8CFD73B8E4045AB43441 /* ExecLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC848CFB654E30C158C09CCE /* ExecLogStore.swift */; };
@@ -32,10 +39,13 @@
 		B7123785A9C9AD95800B5D44 /* BundledActions in Resources */ = {isa = PBXBuildFile; fileRef = F414D005950D759ED9F3E9C7 /* BundledActions */; };
 		BA9DF81A35E6E1E78BE1077C /* FinderActionsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 1C567E8C0115EAD1B54919C2 /* FinderActionsCore */; };
 		CD6AD28EAB69338F55C93119 /* FinderActionsCore in Frameworks */ = {isa = PBXBuildFile; productRef = A11D449A768675EF447F82DC /* FinderActionsCore */; };
+		D3D84729D1E8055DC7013713 /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36488ADF7113F067ED64522A /* GeneralSettingsView.swift */; };
 		D401C9755F6F6A24A23081CD /* FinderActionsSettings.app in Embed Dependencies */ = {isa = PBXBuildFile; fileRef = 4B7272FDFC4D7C9030BA26CF /* FinderActionsSettings.app */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DBCE7CD6EF9009A1F7F93422 /* HostRuntimeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68390FB08D84B31124DE28E1 /* HostRuntimeState.swift */; };
 		DE328CD58536B44650F34E55 /* SharedConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA49EDCE7FC57A1EF8BEE17E /* SharedConfiguration.swift */; };
 		DED3A02B80BEA8EBEA1848C2 /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF596A31B37E7E28454817F /* AppPreferences.swift */; };
+		E256A35FBD6AE356DA047B94 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E288A1F1B95A2C4A99DF207 /* AboutView.swift */; };
+		EB583EAB5D7C2E85056AF708 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7048E35AB8E6782282D90C /* OnboardingView.swift */; };
 		ED5C0D9E7BAFEEF73965B593 /* IPCServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6015524AE62846F51B5C88A9 /* IPCServer.swift */; };
 		ED60589A61F340B490EFF61A /* ActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FF0FD93DEE2B6A9585FB016 /* ActionExecutor.swift */; };
 		EDB956066B821160D18F73F7 /* FinderSync.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C28DE75EA01B130D0307790 /* FinderSync.framework */; };
@@ -86,32 +96,42 @@
 
 /* Begin PBXFileReference section */
 		0201D3A1060B9BF8BE1D2D8B /* FinderActions.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinderActions.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		07471C0DEDE11C6EBA7BB6B7 /* ActionInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionInspectorView.swift; sourceTree = "<group>"; };
 		1365BEA5F34DC51401B1C5BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1C28DE75EA01B130D0307790 /* FinderSync.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FinderSync.framework; path = System/Library/Frameworks/FinderSync.framework; sourceTree = SDKROOT; };
+		36488ADF7113F067ED64522A /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
 		3C0CA36B23AB76C0A0A2602A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		3E288A1F1B95A2C4A99DF207 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		3E4DE01F1815B1970780D836 /* ActionsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionsSettingsView.swift; sourceTree = "<group>"; };
 		4980120D49FC6D3CEF90EF33 /* finder-menu */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "finder-menu"; path = .; sourceTree = SOURCE_ROOT; };
 		4B4872A5DDB6A1673B1067DE /* SettingsHelperLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHelperLauncher.swift; sourceTree = "<group>"; };
 		4B7272FDFC4D7C9030BA26CF /* FinderActionsSettings.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinderActionsSettings.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C3603FD712481486FC01F45 /* StatusMenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMenuController.swift; sourceTree = "<group>"; };
+		4D6DB46C96DB07BC236E723B /* ApplicationsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationsSettingsView.swift; sourceTree = "<group>"; };
 		59D62117BF63C6480DA2365C /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
 		6015524AE62846F51B5C88A9 /* IPCServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPCServer.swift; sourceTree = "<group>"; };
 		67A67F7BEFBF44E55CDB0E9A /* SettingsAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAppDelegate.swift; sourceTree = "<group>"; };
 		68390FB08D84B31124DE28E1 /* HostRuntimeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostRuntimeState.swift; sourceTree = "<group>"; };
 		6FFDAA1CBBCD8945B4A3E0FF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		88110F323E758AF168E9C2F3 /* SettingsRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRootView.swift; sourceTree = "<group>"; };
+		8C7516855D1FB185B5BE78BC /* FullDiskAccessGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullDiskAccessGuideView.swift; sourceTree = "<group>"; };
 		8F3FF1F91F6CAB781C5B33E2 /* FullDiskAccessSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullDiskAccessSettings.swift; sourceTree = "<group>"; };
 		8FF0FD93DEE2B6A9585FB016 /* ActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionExecutor.swift; sourceTree = "<group>"; };
 		925A248CD571687760497699 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		9B69A57E9058E53CFC3B5075 /* LogsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsSettingsView.swift; sourceTree = "<group>"; };
 		A363F7D86EBE5062E90EB7B6 /* FAFinderSync.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FAFinderSync.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA49EDCE7FC57A1EF8BEE17E /* SharedConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedConfiguration.swift; sourceTree = "<group>"; };
 		AC1F60E61AE5FD20AB46098A /* MenuRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuRenderer.swift; sourceTree = "<group>"; };
 		B61E3A2EE69E471A126A2BDE /* FinderSync.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FinderSync.entitlements; sourceTree = "<group>"; };
 		B7E853D77FA333F44C3B7EA3 /* IPCClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPCClient.swift; sourceTree = "<group>"; };
 		BC554E3AB2D3655752F79BE9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		CA7048E35AB8E6782282D90C /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		E0A12202D707B18FECD7B488 /* FinderSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinderSync.swift; sourceTree = "<group>"; };
+		E580C3D1C61A3552ACAD20C0 /* ActionType+Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActionType+Display.swift"; sourceTree = "<group>"; };
 		EC848CFB654E30C158C09CCE /* ExecLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecLogStore.swift; sourceTree = "<group>"; };
 		F414D005950D759ED9F3E9C7 /* BundledActions */ = {isa = PBXFileReference; lastKnownFileType = folder; path = BundledActions; sourceTree = SOURCE_ROOT; };
 		F41B8FBA0CA7319CEB69B3DE /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		F90E0D9614DFEA2AE28DB51D /* PermissionsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsSettingsView.swift; sourceTree = "<group>"; };
 		FBF596A31B37E7E28454817F /* AppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferences.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -154,6 +174,15 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
+		0AD2F185526F04B9C3C9E438 /* Permissions */ = {
+			isa = PBXGroup;
+			children = (
+				8C7516855D1FB185B5BE78BC /* FullDiskAccessGuideView.swift */,
+				F90E0D9614DFEA2AE28DB51D /* PermissionsSettingsView.swift */,
+			);
+			path = Permissions;
+			sourceTree = "<group>";
+		};
 		1BFB2B1C8568FA617714CD6B /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -181,9 +210,24 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
+		2C9FE2820DEF919E55B1EE9D /* About */ = {
+			isa = PBXGroup;
+			children = (
+				3E288A1F1B95A2C4A99DF207 /* AboutView.swift */,
+			);
+			path = About;
+			sourceTree = "<group>";
+		};
 		33DCEC3E39B4EBD2549865E5 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				2C9FE2820DEF919E55B1EE9D /* About */,
+				DD33FAD7A1697439A5F75BC4 /* Actions */,
+				CDA8EC683881E1120C29CF6C /* Applications */,
+				B867F504ABCBEF580D6825FA /* General */,
+				A063DAE7358866FD3C6FD3B9 /* Logs */,
+				C99DA64076FA388DFDE38469 /* Onboarding */,
+				0AD2F185526F04B9C3C9E438 /* Permissions */,
 				88110F323E758AF168E9C2F3 /* SettingsRootView.swift */,
 			);
 			path = Features;
@@ -298,6 +342,14 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
+		A063DAE7358866FD3C6FD3B9 /* Logs */ = {
+			isa = PBXGroup;
+			children = (
+				9B69A57E9058E53CFC3B5075 /* LogsSettingsView.swift */,
+			);
+			path = Logs;
+			sourceTree = "<group>";
+		};
 		A53D8C59F203417A8DE68AAA = {
 			isa = PBXGroup;
 			children = (
@@ -310,12 +362,46 @@
 			);
 			sourceTree = "<group>";
 		};
+		B867F504ABCBEF580D6825FA /* General */ = {
+			isa = PBXGroup;
+			children = (
+				36488ADF7113F067ED64522A /* GeneralSettingsView.swift */,
+			);
+			path = General;
+			sourceTree = "<group>";
+		};
+		C99DA64076FA388DFDE38469 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				CA7048E35AB8E6782282D90C /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 		CCDBB5ABA96D3C1452210E77 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
 				4980120D49FC6D3CEF90EF33 /* finder-menu */,
 			);
 			path = Packages;
+			sourceTree = "<group>";
+		};
+		CDA8EC683881E1120C29CF6C /* Applications */ = {
+			isa = PBXGroup;
+			children = (
+				4D6DB46C96DB07BC236E723B /* ApplicationsSettingsView.swift */,
+			);
+			path = Applications;
+			sourceTree = "<group>";
+		};
+		DD33FAD7A1697439A5F75BC4 /* Actions */ = {
+			isa = PBXGroup;
+			children = (
+				07471C0DEDE11C6EBA7BB6B7 /* ActionInspectorView.swift */,
+				3E4DE01F1815B1970780D836 /* ActionsSettingsView.swift */,
+				E580C3D1C61A3552ACAD20C0 /* ActionType+Display.swift */,
+			);
+			path = Actions;
 			sourceTree = "<group>";
 		};
 		DF66318CBF12F49BB708801C /* Configuration */ = {
@@ -492,11 +578,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E256A35FBD6AE356DA047B94 /* AboutView.swift in Sources */,
 				ED60589A61F340B490EFF61A /* ActionExecutor.swift in Sources */,
+				1DA684E639B5538D3EEC44CD /* ActionInspectorView.swift in Sources */,
+				5F5830F88CC534E31DF8D074 /* ActionType+Display.swift in Sources */,
+				148903A24E990E8CA768E871 /* ActionsSettingsView.swift in Sources */,
 				DED3A02B80BEA8EBEA1848C2 /* AppPreferences.swift in Sources */,
 				AE4013674045AAD367BCE30D /* AppState.swift in Sources */,
+				22C8A2D44CCF79CC85141793 /* ApplicationsSettingsView.swift in Sources */,
 				95836D976504824DC4EC4FB4 /* ExecLogStore.swift in Sources */,
+				3EB70A329830FA350085369B /* FullDiskAccessGuideView.swift in Sources */,
 				A0A4DA8F40454491A34A0BD0 /* FullDiskAccessSettings.swift in Sources */,
+				D3D84729D1E8055DC7013713 /* GeneralSettingsView.swift in Sources */,
+				5A66E61484BFB30FDAFCC46B /* LogsSettingsView.swift in Sources */,
+				EB583EAB5D7C2E85056AF708 /* OnboardingView.swift in Sources */,
+				3CE57C81187196DA43AB6864 /* PermissionsSettingsView.swift in Sources */,
 				0A23AB501544D9100D3740F2 /* SettingsAppDelegate.swift in Sources */,
 				95F3C579F5E95EB7B06851A0 /* SettingsRootView.swift in Sources */,
 				2DD4357AA5AD33A359A6C9FB /* SettingsWindowController.swift in Sources */,

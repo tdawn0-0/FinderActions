@@ -27,7 +27,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         let controller = makeWindowController(
             kind: .settings,
             title: NSLocalizedString("FinderActions Settings", comment: "Settings window title"),
-            contentSize: NSSize(width: 940, height: 600),
+            contentSize: NSSize(width: 1000, height: 640),
             resizable: true,
             rootView: rootView
         )
@@ -48,7 +48,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         let controller = makeWindowController(
             kind: .onboarding,
             title: NSLocalizedString("Set Up FinderActions", comment: "Onboarding window title"),
-            contentSize: NSSize(width: 540, height: 500),
+            contentSize: NSSize(width: 540, height: 540),
             resizable: false,
             rootView: rootView
         )
@@ -84,9 +84,6 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         if resizable {
             styleMask.insert(.resizable)
         }
-        if kind == .settings {
-            styleMask.insert(.fullSizeContentView)
-        }
 
         let hostingController = NSHostingController(rootView: rootView)
         let window = NSWindow(
@@ -98,8 +95,6 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         window.identifier = NSUserInterfaceItemIdentifier(kind.rawValue)
         window.title = title
         if kind == .settings {
-            window.titleVisibility = .hidden
-            window.titlebarAppearsTransparent = true
             window.toolbarStyle = .unified
         }
         window.contentViewController = hostingController

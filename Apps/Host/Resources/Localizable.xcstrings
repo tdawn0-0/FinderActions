@@ -154,23 +154,6 @@
         }
       }
     },
-    "Action Type:" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Action Type:"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "动作类型："
-          }
-        }
-      }
-    },
     "Actions" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -375,36 +358,36 @@
         }
       }
     },
-    "Built-in Identifier: %@" : {
+    "Built-in Identifier" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Built-in Identifier: %@"
+            "value" : "Built-in Identifier"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "内置标识符：%@"
+            "value" : "内置标识符"
           }
         }
       }
     },
-    "Bundle ID:" : {
+    "Bundle ID" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bundle ID:"
+            "value" : "Bundle ID"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bundle 标识符："
+            "value" : "Bundle 标识符"
           }
         }
       }
@@ -511,6 +494,23 @@
         }
       }
     },
+    "Delete" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除"
+          }
+        }
+      }
+    },
     "Delete Selected Action" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -596,6 +596,23 @@
         }
       }
     },
+    "e.g. Develop, Quick Actions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e.g. Develop, Quick Actions"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "例如：开发、快捷操作"
+          }
+        }
+      }
+    },
     "Each enabled editor creates its own dedicated menu entry in Finder." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -643,23 +660,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "执行逻辑"
-          }
-        }
-      }
-    },
-    "Execution history stays strictly on this Mac." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Execution history stays strictly on this Mac."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "所有执行历史仅保留在本地设备上。"
           }
         }
       }
@@ -732,6 +732,23 @@
         }
       }
     },
+    "Failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "失败"
+          }
+        }
+      }
+    },
     "Failed (%@)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -749,19 +766,19 @@
         }
       }
     },
-    "Fallback Path:" : {
+    "Fallback Path" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fallback Path:"
+            "value" : "Fallback Path"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "回退路径："
+            "value" : "回退路径"
           }
         }
       }
@@ -1004,6 +1021,23 @@
         }
       }
     },
+    "Inspector" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspector"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "检查器"
+          }
+        }
+      }
+    },
     "Installed" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1021,19 +1055,19 @@
         }
       }
     },
-    "Interpreter:" : {
+    "Interpreter" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Interpreter:"
+            "value" : "Interpreter"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "解释器："
+            "value" : "解释器"
           }
         }
       }
@@ -1089,19 +1123,19 @@
         }
       }
     },
-    "Menu Group:" : {
+    "Menu Group" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Menu Group:"
+            "value" : "Menu Group"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "菜单分组："
+            "value" : "菜单分组"
           }
         }
       }
@@ -1157,23 +1191,6 @@
         }
       }
     },
-    "No Logs Found" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No Logs Found"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "暂无日志记录"
-          }
-        }
-      }
-    },
     "No actions found" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1204,23 +1221,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "暂无执行日志"
-          }
-        }
-      }
-    },
-    "Not Found" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Not Found"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未找到"
           }
         }
       }
@@ -1667,19 +1667,19 @@
         }
       }
     },
-    "Script File:" : {
+    "Script File" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Script File:"
+            "value" : "Script File"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "脚本文件："
+            "value" : "脚本文件"
           }
         }
       }
@@ -1769,19 +1769,19 @@
         }
       }
     },
-    "SF Symbol:" : {
+    "SF Symbol" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "SF Symbol:"
+            "value" : "SF Symbol"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "SF 符号图标："
+            "value" : "SF 符号图标"
           }
         }
       }
@@ -1837,19 +1837,19 @@
         }
       }
     },
-    "Show When:" : {
+    "Show When" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show When:"
+            "value" : "Show When"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "显示时机："
+            "value" : "显示时机"
           }
         }
       }
@@ -1884,6 +1884,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "稍后再说"
+          }
+        }
+      }
+    },
+    "Status Filter" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status Filter"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "状态筛选"
           }
         }
       }
@@ -2041,19 +2058,19 @@
         }
       }
     },
-    "Version 1.0.0 (Native)" : {
+    "Version %@" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Version 1.0.0 (Native)"
+            "value" : "Version %@"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "版本 1.0.0 (原生开发)"
+            "value" : "版本 %@"
           }
         }
       }
