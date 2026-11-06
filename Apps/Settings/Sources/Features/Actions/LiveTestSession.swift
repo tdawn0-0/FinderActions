@@ -48,29 +48,29 @@ final class LiveTestSession {
 
     nonisolated static func buildPreview(action: ActionDefinition, paths: [String], container: String?, store: ManifestStore) throws -> LiveTestPreview {
         func fail(_ text: String) -> NSError { NSError(domain: "LiveTest", code: 1, userInfo: [NSLocalizedDescriptionKey: text]) }
-        if let error = ActionAuthoring.validationError(action) { throw fail(error) }
+        if let error = ActionAuthoring.validationError(action) { throw fail(String(localized: String.LocalizationValue(error))) }
         let fm = FileManager.default
         if let container {
             var directory: ObjCBool = false
-            guard fm.fileExists(atPath: container, isDirectory: &directory), directory.boolValue else { throw fail("Choose an existing working directory.") }
+            guard fm.fileExists(atPath: container, isDirectory: &directory), directory.boolValue else { throw fail(String(localized: "Choose an existing working directory.")) }
         }
-        guard !paths.isEmpty || container != nil else { throw fail("Choose files, folders, or a working directory.") }
+        guard !paths.isEmpty || container != nil else { throw fail(String(localized: "Choose files, folders, or a working directory.")) }
         let resolved = paths.isEmpty ? [container!] : paths
         var folders: [Bool] = []
         for path in resolved {
             var directory: ObjCBool = false
-            guard fm.fileExists(atPath: path, isDirectory: &directory), fm.isReadableFile(atPath: path) else { throw fail("Input is missing or unreadable: \(path)") }
+            guard fm.fileExists(atPath: path, isDirectory: &directory), fm.isReadableFile(atPath: path) else { throw fail(String(localized: "Input is missing or unreadable: \(path)")) }
             folders.append(directory.boolValue)
         }
         let cwd = ShellEnvironment.resolvedWorkingDirectory(paths: resolved, containerPath: container)
         var description = ""
         if action.type == .shell, let shell = action.shell {
             let interpreter = shell.interpreter.isEmpty ? "/bin/zsh" : shell.interpreter
-            guard fm.isExecutableFile(atPath: interpreter) else { throw fail("Interpreter is missing or not executable: \(interpreter)") }
+            guard fm.isExecutableFile(atPath: interpreter) else { throw fail(String(localized: "Interpreter is missing or not executable: \(interpreter)")) }
             let argv: [String]
             if let file = shell.scriptFile, !file.isEmpty {
                 let script = store.resolveScriptPath(file).path
-                guard fm.isReadableFile(atPath: script) else { throw fail("Script not found or unreadable: \(script)") }
+                guard fm.isReadableFile(atPath: script) else { throw fail(String(localized: "Script not found or unreadable: \(script)")) }
                 argv = ShellEnvironment.argvForScriptFile(interpreter: interpreter, scriptPath: script, paths: resolved)
             } else {
                 argv = ShellEnvironment.argvForInlineScript(interpreter: interpreter, script: shell.scriptInline ?? "", paths: resolved)
@@ -79,7 +79,7 @@ final class LiveTestSession {
             description = "argv (JSON):\n" + String(data: try JSONEncoder().encode(argv), encoding: .utf8)!
                 + "\n\n" + env.keys.filter { $0.hasPrefix("FA_") }.sorted().map { "\($0)=\(env[$0]!)" }.joined(separator: "\n")
         } else if action.type == .appleScript {
-            if let file = action.appleScript?.scriptFile, !file.isEmpty, !fm.isReadableFile(atPath: store.resolveScriptPath(file).path) { throw fail("Script not found or unreadable: \(file)") }
+            if let file = action.appleScript?.scriptFile, !file.isEmpty, !fm.isReadableFile(atPath: store.resolveScriptPath(file).path) { throw fail(String(localized: "Script not found or unreadable: \(file)")) }
             description = "/usr/bin/osascript — faPaths, faContainer, faActionId are supplied."
         } else if action.type == .application {
             description = "Launch application: \(action.application?.bundleId ?? action.application?.pathFallback ?? "")"

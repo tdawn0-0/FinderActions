@@ -135,7 +135,7 @@ final class IPCServer {
 
     private func notify(result: ExecResult, actionId: String, actionName: String) {
         guard appState.notificationsEnabled && appState.notificationMode.shouldNotify(success: result.success) else { return }
-        let title = result.success ? "FinderActions" : "FinderActions failed"
+        let title = result.success ? "FinderActions" : String(localized: "FinderActions failed")
         let body = "\(actionName): \(result.summary)"
         let playFailureSound = !result.success
 

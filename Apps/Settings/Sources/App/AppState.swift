@@ -217,6 +217,7 @@ final class AppState {
     func duplicateAction(id: String) -> ActionDefinition? {
         guard let original = manifest.actions.first(where: { $0.id == id }) else { return nil }
         var copy = original
+        copy.enabled = false
         copy.id = "user.action.\(UUID().uuidString.prefix(8).lowercased())"
         copy.name = "\(original.name) (Copy)"
         let maxIndex = manifest.actions.map(\.sortIndex).max() ?? 0

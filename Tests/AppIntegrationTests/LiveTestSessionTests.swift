@@ -47,6 +47,9 @@ struct LiveTestSessionTests {
         for template in ActionTemplate.allCases {
             let action = state.addAction(template: template); #expect(!action.enabled)
         }
+        let original = state.manifest.actions.first!
+        let copy = state.duplicateAction(id: original.id)
+        #expect(copy?.enabled == false)
         let application = state.manifest.actions.last { $0.type == .application }!
         state.setEnabled(actionId: application.id, enabled: true)
         #expect(state.manifest.actions.first { $0.id == application.id }?.enabled == false)

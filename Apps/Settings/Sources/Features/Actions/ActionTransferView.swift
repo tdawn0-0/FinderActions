@@ -66,7 +66,7 @@ struct ActionTransferView: View {
     private func load(_ url: URL) {
         do {
             preview = ImportPreview(package: try PortableActionPackage.read(from: url))
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = String(localized: String.LocalizationValue(error.localizedDescription)) }
     }
 
     private func export() {
@@ -80,7 +80,7 @@ struct ActionTransferView: View {
             guard panel.runModal() == .OK, let url = panel.url else { return }
             try data.write(to: url, options: .atomic)
             showExport = false
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = String(localized: String.LocalizationValue(error.localizedDescription)) }
     }
 }
 
@@ -119,7 +119,7 @@ private struct ActionImportPreview: View {
                 Button("Cancel") { dismiss() }
                 Spacer()
                 Button("Import Disabled Action") {
-                    do { try onImport() } catch { self.error = error.localizedDescription }
+                    do { try onImport() } catch { self.error = String(localized: String.LocalizationValue(error.localizedDescription)) }
                 }
                 .keyboardShortcut(.defaultAction)
             }
