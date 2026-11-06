@@ -29,12 +29,14 @@ let package = Package(
             sources: [
                 "Apps/Settings/Sources/App/AppState.swift",
                 "Apps/Host/Sources/App/HostRuntimeState.swift",
+                "Apps/Host/Sources/IPC/IPCServer.swift",
                 "Apps/Shared/Sources/Configuration/SharedConfiguration.swift",
                 "Apps/Shared/Sources/Configuration/AppPreferences.swift",
                 "Apps/Shared/Sources/Execution/ActionExecutor.swift",
                 "Apps/Shared/Sources/Execution/ExecLogStore.swift",
                 "Tests/AppIntegrationTests/ConfigurationPersistenceTests.swift",
                 "Tests/AppIntegrationTests/LogsRefreshTests.swift",
+                "Tests/AppIntegrationTests/IPCResponsivenessTests.swift",
             ]
         ),
         .executableTarget(

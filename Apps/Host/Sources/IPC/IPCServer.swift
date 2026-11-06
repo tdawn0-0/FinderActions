@@ -14,8 +14,18 @@ final class IPCServer {
     /// Ignore duplicate requestIds (e.g. launch-and-retry posts both landing).
     private let requestDedupe = RequestIdDedupe(windowSeconds: 5)
 
-    init(appState: HostRuntimeState) {
+    typealias Validator = @Sendable (ExecuteRequest, ActionManifest) -> Result<ActionDefinition, ExecuteRejection>
+    typealias Execution = @Sendable (ExecuteRequest, ActionManifest) -> ExecResult
+    private let validate: Validator
+    private let execute: Execution
+
+    init(appState: HostRuntimeState,
+         validate: @escaping Validator = { ExecuteRequestValidator.validate($0, manifest: $1) },
+         execute: Execution? = nil) {
         self.appState = appState
+        self.validate = validate
+        let executor = appState.executor
+        self.execute = execute ?? { executor.execute(request: $0, manifest: $1) }
     }
 
     func start() {
@@ -63,7 +73,7 @@ final class IPCServer {
         }
     }
 
-    private func processJSON(_ json: String) {
+    func processJSON(_ json: String) {
         let request: ExecuteRequest
         do {
             request = try JSONCoding.decode(ExecuteRequest.self, from: json)
@@ -78,22 +88,22 @@ final class IPCServer {
         }
         guard requestDedupe.accept(request.requestId) else { return }
 
-        let executor = appState.executor
         let manifest = appState.effectiveManifest
-        if case .failure(let rejection) = ExecuteRequestValidator.validate(request, manifest: manifest) {
-            appState.recordLog(ExecLogEntry(
-                actionId: request.actionId,
-                success: false,
-                summary: rejection.summary,
-                paths: request.paths
-            ))
-            return
-        }
-        // A user script can run for minutes; never block the resident main thread.
+        let validate = self.validate
+        let execute = self.execute
         Task.detached(priority: .userInitiated) { [weak self] in
-            let result = executor.execute(request: request, manifest: manifest)
+            if case .failure(let rejection) = validate(request, manifest) {
+                await self?.reject(request: request, rejection: rejection)
+                return
+            }
+            let result = execute(request, manifest)
             await self?.finish(request: request, result: result)
         }
+    }
+
+    private func reject(request: ExecuteRequest, rejection: ExecuteRejection) {
+        appState.recordLog(ExecLogEntry(actionId: request.actionId, success: false,
+                                       summary: rejection.summary, paths: request.paths))
     }
 
     private func finish(request: ExecuteRequest, result: ExecResult) {

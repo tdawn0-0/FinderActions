@@ -16,6 +16,18 @@ struct ExecuteRequestValidationTests {
         ExecuteRequestValidator.validate(request, manifest: manifest, fileInfo: { files[$0] })
     }
 
+    @Test func inspectsEachUniquePathOnce() {
+        var calls: [String: Int] = [:]
+        let request = ExecuteRequest(actionId: "always", paths: ["/d", "/d/a.txt", "/d/a.txt"], containerPath: "/d")
+        let result = ExecuteRequestValidator.validate(request, manifest: manifest) { path in
+            calls[path, default: 0] += 1
+            return files[path]
+        }
+        #expect(result == .success(manifest.actions[0]))
+        #expect(calls == ["/d": 1, "/d/a.txt": 1])
+        #expect(request.paths.count == 3)
+    }
+
     @Test func acceptsGenuineClick() {
         #expect(validate(ExecuteRequest(actionId: "always", paths: ["/d/a.txt"], containerPath: "/d")) == .success(manifest.actions[0]))
     }

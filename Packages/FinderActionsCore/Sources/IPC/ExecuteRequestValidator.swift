@@ -41,9 +41,13 @@ public enum ExecuteRequestValidator {
         if let container = request.containerPath, !container.isEmpty {
             pathsToCheck.append(container)
         }
+        var metadata: [String: Bool] = [:]
         for path in pathsToCheck {
             guard path.hasPrefix("/") else { return .failure(.pathNotAbsolute(path)) }
-            guard fileInfo(path) != nil else { return .failure(.pathMissing(path)) }
+            if metadata[path] == nil {
+                guard let isDirectory = fileInfo(path) else { return .failure(.pathMissing(path)) }
+                metadata[path] = isDirectory
+            }
         }
 
         guard let action = manifest.actions.first(where: { $0.id == request.actionId }) else {
@@ -52,7 +56,7 @@ public enum ExecuteRequestValidator {
         guard action.enabled else { return .failure(.actionDisabled(action.id)) }
         let context = SelectionContext(
             paths: request.paths,
-            isDirectory: request.paths.map { fileInfo($0) ?? false }
+            isDirectory: request.paths.map { metadata[$0] ?? false }
         )
         guard ShowWhenMatcher.shouldShow(showWhen: action.showWhen, extRules: action.extRules, context: context) else {
             return .failure(.selectionNotAllowed(action.id))
