@@ -22,7 +22,8 @@ private struct SnapshotNotePayload: Sendable {
 final class IPCClient: @unchecked Sendable {
     var onSnapshot: ((MenuSnapshot) -> Void)?
     private var snapshotObserver: NSObjectProtocol?
-    private var chunkBuffer: [String: (total: Int, parts: [Int: String])] = [:]
+    private var assembler = SnapshotAssembler()
+    private var cleanup: DispatchWorkItem?
     private let cacheURL: URL
     private let lock = NSLock()
 
@@ -52,6 +53,7 @@ final class IPCClient: @unchecked Sendable {
     }
 
     deinit {
+        cleanup?.cancel()
         if let snapshotObserver {
             DistributedNotificationCenter.default().removeObserver(snapshotObserver)
         }
@@ -117,21 +119,34 @@ final class IPCClient: @unchecked Sendable {
         lock.lock()
         defer { lock.unlock() }
 
-        if let total = payload.total, total > 1,
-           let index = payload.index,
-           let batchId = payload.batchId {
-            var entry = chunkBuffer[batchId] ?? (total: total, parts: [:])
-            entry.parts[index] = body
-            entry.total = total
-            chunkBuffer[batchId] = entry
-            if entry.parts.count == total {
-                let merged = (0..<total).compactMap { entry.parts[$0] }.joined()
-                chunkBuffer[batchId] = nil
+        if let total = payload.total, let index = payload.index, let batchId = payload.batchId {
+            if let merged = assembler.accept(body: body, batchID: batchId, index: index,
+                                              total: total, now: ProcessInfo.processInfo.systemUptime) {
                 applySnapshotJSONUnlocked(merged)
             }
+            scheduleCleanupUnlocked()
             return
         }
+        // A partial envelope is malformed, never reinterpret it as a complete message.
+        guard payload.total == nil, payload.index == nil, payload.batchId == nil,
+              body.utf8.count <= SnapshotTransport.partBytes else { return }
         applySnapshotJSONUnlocked(body)
+    }
+
+    private func scheduleCleanupUnlocked() {
+        guard assembler.batchCount > 0 else { cleanup?.cancel(); cleanup = nil; return }
+        guard cleanup == nil else { return }
+        let item = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            self.lock.lock()
+            defer { self.lock.unlock() }
+            self.cleanup = nil
+            self.assembler.expire(now: ProcessInfo.processInfo.systemUptime)
+            self.scheduleCleanupUnlocked()
+        }
+        cleanup = item
+        let delay = max(0.001, (assembler.nextExpiration ?? ProcessInfo.processInfo.systemUptime) - ProcessInfo.processInfo.systemUptime)
+        DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + delay, execute: item)
     }
 
     private func applySnapshotJSONUnlocked(_ json: String) {

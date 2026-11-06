@@ -158,7 +158,10 @@ enum SnapshotPublisher {
             return
         }
 
-        let chunks = chunk(json, size: maxChunk)
+        guard let chunks = SnapshotTransport.chunks(json) else {
+            NSLog("FinderActions snapshot exceeds supported transport budget")
+            return
+        }
         let batchId = UUID().uuidString
         for (i, part) in chunks.enumerated() {
             center.postNotificationName(
@@ -175,14 +178,4 @@ enum SnapshotPublisher {
         }
     }
 
-    private static func chunk(_ s: String, size: Int) -> [String] {
-        var result: [String] = []
-        var start = s.startIndex
-        while start < s.endIndex {
-            let end = s.index(start, offsetBy: size, limitedBy: s.endIndex) ?? s.endIndex
-            result.append(String(s[start..<end]))
-            start = end
-        }
-        return result
-    }
 }

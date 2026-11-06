@@ -75,3 +75,19 @@ Rejected requests are logged, not executed, and produce no notification.
 ## Cold-start cache
 
 The extension caches the last live snapshot in its own sandbox container and, on start, posts `com.finderactions.extension.snapshot-request` so a running Host republishes. There is no shared file between Host and extension.
+
+## Snapshot transport budgets
+
+Snapshot bodies are split at Unicode-scalar boundaries into valid UTF-8 strings
+of at most 40,000 bytes. This is an application body budget, not a measured macOS
+notification ceiling. A message supports at most 128 parts and 5,120,000 bytes;
+unsupported snapshots are rejected before any partial publication.
+
+The extension validates indices, totals, duplicate contents and body size. It
+retains at most four incomplete batches and 8 MiB of body data; older incomplete
+batches are evicted under pressure. Batch identifiers are limited to 128 UTF-8
+bytes. A scheduled cleanup expires batches after 30 seconds without a new part,
+even when no further messages arrive. Identical duplicate parts are idempotent;
+conflicting duplicates discard their batch. Invalid/incomplete JSON never replaces
+the last valid menu/cache. Single-part v1 messages remain compatible. These bounds
+do not authenticate peers or introduce ordering between complete snapshots.
