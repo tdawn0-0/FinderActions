@@ -17,10 +17,10 @@ Working directory of the process is `FA_CWD`.
 
 ## Rules
 
-1. Always quote: `"$f"`, `"$@"`.  
-2. Loop over `"$@"` instead of splitting `FA_PATHS`. macOS filenames can contain newlines, so newline-separated `FA_PATHS` is a convenience format, not a lossless path list.  
-3. No implicit `sudo`.  
-4. Exit `0` on success; first stdout line may show in the notification.  
+1. Always quote: `"$f"`, `"$@"`.
+2. Loop over `"$@"` instead of splitting `FA_PATHS`. macOS filenames can contain newlines, so newline-separated `FA_PATHS` is a convenience format, not a lossless path list.
+3. No implicit `sudo`.
+4. Exit `0` on success; first stdout line may show in the notification.
 5. Non-zero exit → failure notification; the last 4,000 characters of stderr are kept in Settings → Logs.
 
 ## Examples

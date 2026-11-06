@@ -2,9 +2,9 @@
 
 ## Right-click menu missing
 
-1. Confirm Host is running (menu bar icon).  
-2. System Settings → enable the FinderActions Finder extension.  
-3. `pluginkit -m -i com.finderactions.host.FinderSync` — is it listed?  
+1. Confirm Host is running (menu bar icon).
+2. System Settings → enable the FinderActions Finder extension.
+3. `pluginkit -m -i com.finderactions.host.FinderSync` — is it listed?
 4. Re-register:
 
 ```bash
@@ -22,8 +22,8 @@ Launch FinderActions. On action click the extension also tries to launch Host on
 
 ## Action does nothing
 
-- Check **Logs** in Host settings.  
-- For shell actions, ensure the chosen script file exists and is readable. The selected interpreter executes it; the script itself does not need its executable bit set.  
+- Check **Logs** in Host settings.
+- For shell actions, ensure the chosen script file exists and is readable. The selected interpreter executes it; the script itself does not need its executable bit set.
 - Paths with spaces must use `"$@"` in your script (the Host already passes them as separate argv entries).
 
 ## Terminal / app permissions
