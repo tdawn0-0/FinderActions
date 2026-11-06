@@ -168,3 +168,12 @@ security find-identity -v -p codesigning
 export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890
 ./Scripts/deploy-web.sh
 ```
+
+### DMG 校验模式
+
+`release.sh` 调用 `build-dmg.sh --release`。签名、公证 Accepted 状态、
+票据装订和 Gatekeeper 校验必须全部成功。凭据缺失、状态解析失败或
+`SKIP_NOTARIZATION=true` 都会使发布失败。残留的半成品不代表成功。
+本地打包使用 `build-dmg.sh --local <app> <output.dmg>`，输出明确标记为
+未验证，不能作为正式发布产物。两种模式均不自动上传。
+运行 `bash Scripts/test-dmg-release.sh` 可在不访问凭据的情况下验证失败分支。

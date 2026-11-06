@@ -194,7 +194,7 @@ ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$FINAL_ZIP"
 FINAL_DMG="$RELEASE_DIR/FinderActions-$VERSION.dmg"
 if command -v create-dmg >/dev/null 2>&1; then
   echo "[8/8] Building, signing, and notarizing the DMG package"
-  bash "$SCRIPT_DIR/build-dmg.sh" "$APP_PATH" "$FINAL_DMG"
+  bash "$SCRIPT_DIR/build-dmg.sh" --release "$APP_PATH" "$FINAL_DMG"
 else
   echo "[8/8] create-dmg not found. Skipping DMG creation (install with 'brew install create-dmg')."
 fi

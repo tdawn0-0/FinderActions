@@ -26,6 +26,9 @@ jobs:
           xcodebuild -version
           swift --version
 
+      - name: Hermetic DMG release gates
+        run: bash Scripts/test-dmg-release.sh
+
       - name: Swift package tests
         run: ./Scripts/test.sh
 

@@ -13,13 +13,22 @@ if [[ -f "$RELEASE_CONFIG" ]]; then
   set +a
 fi
 
+MODE=local
+if [[ "${1:-}" == "--release" || "${1:-}" == "--local" ]]; then
+  MODE="${1#--}"
+  shift
+fi
+if [[ "${1:-}" == --* ]]; then
+  echo "Usage: $0 [--release|--local] [app] [output.dmg]" >&2
+  exit 1
+fi
 NOTARY_PROFILE="${NOTARY_PROFILE:-FinderActions-notary}"
 APP_PATH="${1:-}"
 OUTPUT_DMG="${2:-}"
 SKIP_NOTARIZATION="${SKIP_NOTARIZATION:-false}"
 
 # Check required tools
-for tool in create-dmg codesign xcrun shasum; do
+for tool in create-dmg codesign xcrun shasum security plutil spctl; do
   if ! command -v "$tool" >/dev/null 2>&1; then
     echo "Error: Required tool '$tool' not found." >&2
     if [[ "$tool" == "create-dmg" ]]; then
@@ -85,8 +94,14 @@ else
 fi
 echo "=========================================="
 
+if [[ "$MODE" == release ]]; then
+  [[ "$SKIP_NOTARIZATION" != true ]] || { echo "Release mode forbids SKIP_NOTARIZATION." >&2; exit 1; }
+  [[ -n "$SIGN_IDENTITY" ]] || { echo "Release mode requires a Developer ID identity." >&2; exit 1; }
+  xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" --output-format json >/dev/null
+fi
+
 # Remove existing DMG if present (create-dmg fails if output exists)
-rm -f "$OUTPUT_DMG"
+rm -f "$OUTPUT_DMG" "$OUTPUT_DMG.sha256"
 
 echo "[1/4] Creating DMG with Applications shortcut..."
 create-dmg \
@@ -99,7 +114,7 @@ create-dmg \
   --app-drop-link 480 170 \
   --no-internet-enable \
   "$OUTPUT_DMG" \
-  "$APP_PATH" || true
+  "$APP_PATH"
 
 if [[ ! -f "$OUTPUT_DMG" ]]; then
   echo "Error: DMG creation failed." >&2
@@ -115,34 +130,23 @@ else
   echo "[2/4] Skipping DMG signing (no Developer ID certificate)."
 fi
 
-# Notarize DMG if profile is available
-if [[ "$SKIP_NOTARIZATION" != "true" && -n "$SIGN_IDENTITY" ]]; then
-  if xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" --output-format json >/dev/null 2>&1; then
-    echo "[3/4] Submitting DMG to Apple Notary Service..."
-    DMG_NOTARY_JSON="$OUTPUT_DIR/notarization-dmg.json"
-    if xcrun notarytool submit "$OUTPUT_DMG" \
-      --keychain-profile "$NOTARY_PROFILE" \
-      --wait \
-      --timeout 30m \
-      --output-format json >"$DMG_NOTARY_JSON"; then
-      
-      NOTARY_STATUS="$(plutil -extract status raw -o - "$DMG_NOTARY_JSON" 2>/dev/null || echo "Accepted")"
-      if [[ "$NOTARY_STATUS" == "Accepted" ]]; then
-        echo "Stapling notarization ticket to DMG..."
-        xcrun stapler staple -v "$OUTPUT_DMG"
-        xcrun stapler validate -v "$OUTPUT_DMG"
-        spctl --assess --type open --context context:primary-signature --verbose=4 "$OUTPUT_DMG" || true
-      else
-        echo "Warning: DMG notarization status: $NOTARY_STATUS" >&2
-      fi
-    else
-      echo "Warning: DMG notarization submission failed. DMG is signed but not stapled." >&2
-    fi
-  else
-    echo "[3/4] Keychain profile '$NOTARY_PROFILE' not found. Skipping DMG notarization."
+# Local packaging is deliberately unverified; production always notarizes.
+if [[ "$MODE" == release ]]; then
+  echo "[3/4] Submitting DMG to Apple Notary Service..."
+  DMG_NOTARY_JSON="$OUTPUT_DIR/notarization-dmg.json"
+  xcrun notarytool submit "$OUTPUT_DMG" \
+    --keychain-profile "$NOTARY_PROFILE" --wait --timeout 30m \
+    --output-format json >"$DMG_NOTARY_JSON"
+  NOTARY_STATUS="$(plutil -extract status raw -o - "$DMG_NOTARY_JSON")"
+  if [[ "$NOTARY_STATUS" != Accepted ]]; then
+    echo "DMG notarization was not Accepted: $NOTARY_STATUS" >&2
+    exit 1
   fi
+  xcrun stapler staple -v "$OUTPUT_DMG"
+  xcrun stapler validate -v "$OUTPUT_DMG"
+  spctl --assess --type open --context context:primary-signature --verbose=4 "$OUTPUT_DMG"
 else
-  echo "[3/4] Skipping notarization."
+  echo "[3/4] Local packaging: notarization and Gatekeeper validation not performed."
 fi
 
 echo "[4/4] Calculating SHA-256 checksum..."
@@ -152,7 +156,11 @@ echo "[4/4] Calculating SHA-256 checksum..."
 )
 
 echo
-echo "✓ DMG Packaging Complete!"
+if [[ "$MODE" == release ]]; then
+  echo "✓ DMG Packaging Complete!"
+else
+  echo "Local DMG created — UNVERIFIED, not release-ready."
+fi
 echo "DMG:      $OUTPUT_DMG"
 echo "Checksum: $OUTPUT_DMG.sha256"
 echo "SHA256:   $(cat "$OUTPUT_DMG.sha256" | awk '{print $1}')"

@@ -169,3 +169,12 @@ If using a proxy or VPN in China, ensure terminal proxy environment variables (`
 export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890
 cd web && npm run deploy
 ```
+
+### DMG verification modes
+
+`release.sh` calls `build-dmg.sh --release`: signing, Accepted notarization,
+stapling and Gatekeeper assessment must all succeed. Missing credentials, malformed
+status, or `SKIP_NOTARIZATION=true` fail the release. A partially created DMG is
+never success. Use `build-dmg.sh --local <app> <output.dmg>` for local packaging;
+its output is explicitly unverified and not release-ready. Neither mode publishes.
+Run `bash Scripts/test-dmg-release.sh` for the credential-free failure matrix.
