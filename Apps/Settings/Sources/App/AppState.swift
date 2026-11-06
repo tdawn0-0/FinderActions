@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import Observation
+import SwiftUI
 import FinderActionsCore
 
 @Observable
@@ -10,6 +11,11 @@ final class AppState {
     var logs: [ExecLogEntry] = []
     var extensionEnabledHint: String = "Unknown"
     var showOnboarding: Bool = false
+
+    let preferences: PreferencesStore
+    var configurationError: String?
+    var isDirty = false
+    var writesBlocked = false
 
     let store: ManifestStore
     let logStore: ExecLogStore
@@ -27,7 +33,8 @@ final class AppState {
         OpenWithActions.compose(baseManifest: manifest, settings: openWithSettings)
     }
 
-    init(store: ManifestStore = .makeDefault(), logStore: ExecLogStore? = nil) {
+    init(store: ManifestStore = .makeDefault(), logStore: ExecLogStore? = nil, preferences: PreferencesStore = .live) {
+        self.preferences = preferences
         self.store = store
         let logsDir = store.fileURL
             .deletingLastPathComponent()
@@ -37,33 +44,67 @@ final class AppState {
     }
 
     func bootstrap() {
-        (manifest, openWithSettings) = SharedConfiguration.bootstrap(store: store)
+        reloadManifest()
         logs = logStore.recent(limit: 200)
         refreshExtensionStatus()
 
-        if !AppPreferences.bool(forKey: "didCompleteOnboarding") {
+        if !preferences.bool(forKey: "didCompleteOnboarding") {
             showOnboarding = true
         }
-        notificationsEnabled = AppPreferences.object(forKey: "notificationsEnabled") as? Bool ?? true
+        notificationsEnabled = preferences.object(forKey: "notificationsEnabled") as? Bool ?? true
+    }
+
+    func reloadManifest() {
+        pendingSave?.cancel()
+        pendingSave = nil
+        do {
+            (manifest, openWithSettings) = try SharedConfiguration.bootstrap(store: store, preferences: preferences)
+            configurationError = nil
+            writesBlocked = false
+            isDirty = false
+        } catch {
+            configurationError = error.localizedDescription
+            writesBlocked = true
+        }
     }
 
     func seedDefaults() {
-        (manifest, openWithSettings) = SharedConfiguration.resetToDefaults(store: store)
-        SharedConfiguration.seedMissingScripts(store: store)
-        onManifestChanged?()
-    }
-
-    func saveManifest() {
         pendingSave?.cancel()
         pendingSave = nil
-        manifest = OpenWithActions.baseManifest(from: manifest)
-        try? store.save(manifest)
-        onManifestChanged?()
+        do {
+            (manifest, openWithSettings) = try SharedConfiguration.resetToDefaults(store: store, preferences: preferences)
+            SharedConfiguration.seedMissingScripts(store: store)
+            configurationError = nil
+            writesBlocked = false
+            isDirty = false
+            onManifestChanged?()
+        } catch { configurationError = error.localizedDescription }
+    }
+
+    @discardableResult
+    func saveManifest() -> Bool {
+        pendingSave?.cancel()
+        pendingSave = nil
+        isDirty = true
+        guard !writesBlocked else { return false }
+        let base = OpenWithActions.baseManifest(from: manifest)
+        do {
+            try store.save(base)
+            manifest = base
+            isDirty = false
+            configurationError = nil
+            onManifestChanged?()
+            return true
+        } catch {
+            configurationError = error.localizedDescription
+            return false
+        }
     }
 
     /// Persist after edits settle so typing does not rewrite the manifest and
     /// wake the Host on every keystroke.
     func scheduleManifestSave() {
+        isDirty = true
         pendingSave?.cancel()
         pendingSave = Task { [weak self] in
             try? await Task.sleep(for: .milliseconds(400))
@@ -74,7 +115,7 @@ final class AppState {
 
     /// Write any pending debounced edit now (e.g. before the process exits).
     func flushPendingManifestSave() {
-        guard pendingSave != nil else { return }
+        guard pendingSave != nil || isDirty else { return }
         saveManifest()
     }
 
@@ -221,12 +262,12 @@ final class AppState {
     }
 
     func completeOnboarding() {
-        AppPreferences.set(true, forKey: "didCompleteOnboarding")
+        preferences.set(true, forKey: "didCompleteOnboarding")
         showOnboarding = false
     }
 
     func persistSettings() {
-        AppPreferences.set(notificationsEnabled, forKey: "notificationsEnabled")
+        preferences.set(notificationsEnabled, forKey: "notificationsEnabled")
         onManifestChanged?()
     }
 
@@ -279,7 +320,7 @@ final class AppState {
     }
 
     private func saveOpenWithSettings() {
-        SharedConfiguration.saveOpenWithSettings(openWithSettings)
+        SharedConfiguration.saveOpenWithSettings(openWithSettings, preferences: preferences)
         onManifestChanged?()
     }
 

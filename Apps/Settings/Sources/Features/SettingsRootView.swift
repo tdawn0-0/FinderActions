@@ -45,6 +45,7 @@ enum SettingsSection: String, CaseIterable, Identifiable {
 
 /// Root view for the short-lived Settings helper process.
 struct SettingsRootView: View {
+    @Environment(AppState.self) private var state
     @State private var selection: SettingsSection? = .actions
 
     var body: some View {
@@ -68,6 +69,18 @@ struct SettingsRootView: View {
             case .logs: LogsSettingsView()
             case .general: GeneralSettingsView()
             case .about: AboutView()
+            }
+        }
+        .safeAreaInset(edge: .bottom) {
+            if let error = state.configurationError {
+                VStack(alignment: .leading) {
+                    Label("Configuration could not be saved or loaded", systemImage: "exclamationmark.triangle")
+                    Text(error).font(.caption).textSelection(.enabled)
+                    HStack {
+                        Button("Reload from Disk") { state.reloadManifest() }
+                        if !state.writesBlocked { Button("Retry Save") { state.saveManifest() } }
+                    }
+                }.padding().frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .frame(minWidth: 900, minHeight: 540)

@@ -21,6 +21,21 @@ let package = Package(
             dependencies: ["FinderActionsCore"],
             path: "Tests/FinderActionsCoreTests"
         ),
+        .testTarget(
+            name: "FinderActionsAppTests",
+            dependencies: ["FinderActionsCore"],
+            path: ".",
+            exclude: ["Apps/Host/Resources", "Apps/Settings/Resources", "Extensions", "web", "BundledActions", "build", "FinderActions.xcodeproj"],
+            sources: [
+                "Apps/Settings/Sources/App/AppState.swift",
+                "Apps/Host/Sources/App/HostRuntimeState.swift",
+                "Apps/Shared/Sources/Configuration/SharedConfiguration.swift",
+                "Apps/Shared/Sources/Configuration/AppPreferences.swift",
+                "Apps/Shared/Sources/Execution/ActionExecutor.swift",
+                "Apps/Shared/Sources/Execution/ExecLogStore.swift",
+                "Tests/AppIntegrationTests/ConfigurationPersistenceTests.swift",
+            ]
+        ),
         .executableTarget(
             name: "ShellExecHarness",
             dependencies: ["FinderActionsCore"],

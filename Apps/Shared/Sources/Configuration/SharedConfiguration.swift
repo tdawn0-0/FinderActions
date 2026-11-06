@@ -10,18 +10,18 @@ enum SharedConfiguration {
     /// Seeds defaults on first launch; otherwise migrates the stored manifest to
     /// its base form (Open With actions are generated, never stored). Always
     /// restores missing bundled scripts.
-    static func bootstrap(store: ManifestStore) -> (manifest: ActionManifest, openWith: OpenWithSettings) {
-        try? store.ensureDirectories()
+    static func bootstrap(store: ManifestStore, preferences: PreferencesStore = .live) throws -> (manifest: ActionManifest, openWith: OpenWithSettings) {
+        try store.ensureDirectories()
         let result: (manifest: ActionManifest, openWith: OpenWithSettings)
         if FileManager.default.fileExists(atPath: store.fileURL.path) {
-            let stored = store.loadOrEmpty()
+            let stored = try store.load()
             let base = OpenWithActions.baseManifest(from: stored)
             if base != stored {
-                try? store.save(base)
+                try store.save(base)
             }
-            result = (base, loadOpenWithSettings())
+            result = (base, loadOpenWithSettings(preferences: preferences))
         } else {
-            result = resetToDefaults(store: store)
+            result = try resetToDefaults(store: store, preferences: preferences)
         }
         seedMissingScripts(store: store)
         return result
@@ -29,24 +29,24 @@ enum SharedConfiguration {
 
     /// Writes factory defaults for both the manifest and Open With settings.
     @discardableResult
-    static func resetToDefaults(store: ManifestStore) -> (manifest: ActionManifest, openWith: OpenWithSettings) {
+    static func resetToDefaults(store: ManifestStore, preferences: PreferencesStore = .live) throws -> (manifest: ActionManifest, openWith: OpenWithSettings) {
         let manifest = DefaultActions.manifest()
-        try? store.save(manifest)
-        saveOpenWithSettings(.defaults)
+        try store.save(manifest)
+        saveOpenWithSettings(.defaults, preferences: preferences)
         return (manifest, .defaults)
     }
 
-    static func loadOpenWithSettings() -> OpenWithSettings {
-        guard let data = AppPreferences.data(forKey: openWithDefaultsKey),
+    static func loadOpenWithSettings(preferences: PreferencesStore = .live) -> OpenWithSettings {
+        guard let data = preferences.data(forKey: openWithDefaultsKey),
               let settings = try? JSONDecoder().decode(OpenWithSettings.self, from: data) else {
             return .defaults
         }
         return settings
     }
 
-    static func saveOpenWithSettings(_ settings: OpenWithSettings) {
+    static func saveOpenWithSettings(_ settings: OpenWithSettings, preferences: PreferencesStore = .live) {
         guard let data = try? JSONEncoder().encode(settings) else { return }
-        AppPreferences.set(data, forKey: openWithDefaultsKey)
+        preferences.set(data, forKey: openWithDefaultsKey)
     }
 
     static func seedMissingScripts(store: ManifestStore) {

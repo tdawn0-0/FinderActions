@@ -47,7 +47,23 @@ final class SettingsAppDelegate: NSObject, NSApplicationDelegate {
         true
     }
 
-    func applicationWillTerminate(_ notification: Notification) {
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         appState.flushPendingManifestSave()
+        guard appState.isDirty else { return .terminateNow }
+        let alert = NSAlert()
+        alert.messageText = String(localized: "Changes could not be saved")
+        alert.informativeText = appState.configurationError ?? String(localized: "Retry saving, discard changes, or cancel closing.")
+        alert.addButton(withTitle: String(localized: "Retry"))
+        alert.addButton(withTitle: String(localized: "Discard Changes"))
+        alert.addButton(withTitle: String(localized: "Cancel"))
+        switch alert.runModal() {
+        case .alertFirstButtonReturn: return appState.saveManifest() ? .terminateNow : .terminateCancel
+        case .alertSecondButtonReturn: return .terminateNow
+        default: return .terminateCancel
+        }
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        // Termination was resolved by applicationShouldTerminate.
     }
 }

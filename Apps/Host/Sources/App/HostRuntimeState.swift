@@ -10,6 +10,8 @@ final class HostRuntimeState {
     private(set) var openWithSettings: OpenWithSettings = .defaults
     private(set) var notificationsEnabled = true
 
+    let preferences: PreferencesStore
+
     let store: ManifestStore
     let logStore: ExecLogStore
     let executor: ActionExecutor
@@ -19,10 +21,11 @@ final class HostRuntimeState {
     }
 
     var needsOnboarding: Bool {
-        !AppPreferences.bool(forKey: "didCompleteOnboarding")
+        !preferences.bool(forKey: "didCompleteOnboarding")
     }
 
-    init(store: ManifestStore = .makeDefault(), logStore: ExecLogStore? = nil) {
+    init(store: ManifestStore = .makeDefault(), logStore: ExecLogStore? = nil, preferences: PreferencesStore = .live) {
+        self.preferences = preferences
         self.store = store
         let logsDirectory = store.fileURL
             .deletingLastPathComponent()
@@ -32,16 +35,24 @@ final class HostRuntimeState {
     }
 
     func bootstrap() {
-        (manifest, openWithSettings) = SharedConfiguration.bootstrap(store: store)
+        do {
+            (manifest, openWithSettings) = try SharedConfiguration.bootstrap(store: store, preferences: preferences)
+        } catch { recordConfigurationFailure() }
         loadPreferences()
     }
 
     /// Reload only externally editable configuration. Execution objects and IPC
     /// remain alive so a Settings save does not churn the resident process.
     func reloadConfiguration() {
-        manifest = OpenWithActions.baseManifest(from: store.loadOrEmpty())
-        openWithSettings = SharedConfiguration.loadOpenWithSettings()
+        do { manifest = OpenWithActions.baseManifest(from: try store.load()) }
+        catch { recordConfigurationFailure() }
+        openWithSettings = SharedConfiguration.loadOpenWithSettings(preferences: preferences)
         loadPreferences()
+    }
+
+    private func recordConfigurationFailure() {
+        recordLog(ExecLogEntry(actionId: "configuration", success: false,
+                               summary: "Could not load configuration; previous actions retained", paths: []))
     }
 
     func recordLog(_ entry: ExecLogEntry) {
@@ -62,7 +73,7 @@ final class HostRuntimeState {
     }
 
     private func loadPreferences() {
-        notificationsEnabled = AppPreferences.object(forKey: "notificationsEnabled") as? Bool ?? true
+        notificationsEnabled = preferences.object(forKey: "notificationsEnabled") as? Bool ?? true
     }
 
 }
