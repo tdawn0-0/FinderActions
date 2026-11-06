@@ -1,3 +1,4 @@
+import { latestReleaseURL } from '../release';
 import React, { useState } from 'react';
 import { Download, ToggleLeft, MousePointerClick, Terminal, Check, Copy, AlertCircle } from 'lucide-react';
 import type { Language } from '../types';
@@ -53,18 +54,18 @@ killall Finder`;
             </div>
             <div className="mt-6 flex flex-col gap-1.5">
               <a
-                href="https://github.com/tdawn0-0/FinderActions/releases/download/v1.0.0/FinderActions-1.0.0.dmg"
+                href={latestReleaseURL}
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300"
               >
-                <span>FinderActions-1.0.0.dmg ›</span>
+                <span>{lang === 'zh' ? '前往最新版本下载页 ›' : 'Open latest release downloads ›'}</span>
               </a>
               <a
-                href="https://github.com/tdawn0-0/FinderActions/releases/tag/v1.0.0"
+                href={latestReleaseURL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[11px] text-zinc-500 hover:text-zinc-300"
               >
-                Release Notes & Checksums ›
+                {lang === 'zh' ? '发布说明与校验和 ›' : 'Release Notes & Checksums ›'}
               </a>
             </div>
           </div>

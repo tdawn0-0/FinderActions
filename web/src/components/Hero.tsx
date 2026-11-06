@@ -1,3 +1,4 @@
+import { latestReleaseURL } from '../release';
 import React from 'react';
 import { 
   Sparkles, 
@@ -98,15 +99,15 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
         {/* Direct DMG link & Release page */}
         <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-zinc-400 mb-10">
           <a
-            href="https://github.com/tdawn0-0/FinderActions/releases/download/v1.0.0/FinderActions-1.0.0.dmg"
+            href={latestReleaseURL}
             className="hover:text-blue-400 transition-colors flex items-center gap-1.5 font-medium text-zinc-300 hover:underline"
           >
             <Download className="w-3.5 h-3.5 text-blue-400" />
-            <span>{lang === 'zh' ? '直接下载 FinderActions-1.0.0.dmg' : 'Download FinderActions-1.0.0.dmg'}</span>
+            <span>{lang === 'zh' ? '前往最新版本下载页' : 'Open latest release downloads'}</span>
           </a>
           <span className="text-zinc-600">•</span>
           <a
-            href="https://github.com/tdawn0-0/FinderActions/releases/tag/v1.0.0"
+            href={latestReleaseURL}
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-zinc-200 transition-colors"
