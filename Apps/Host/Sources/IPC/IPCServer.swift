@@ -90,7 +90,14 @@ final class IPCServer {
 
         let manifest = appState.effectiveManifest
         let actionName = manifest.actions.first { $0.id == request.actionId }?.name ?? request.actionId
-        appState.beginExecution(request: request, actionName: actionName)
+        guard appState.beginExecution(request: request, actionName: actionName) else {
+            let summary = String(localized: "Too many actions are running. Wait for a task to finish, then try again.")
+            appState.recordLog(ExecLogEntry(actionId: request.actionId, success: false,
+                summary: summary, paths: request.paths, actionName: actionName,
+                durationSeconds: 0, source: .finder))
+            notify(result: ExecResult(success: false, summary: summary), actionId: request.actionId, actionName: actionName)
+            return
+        }
         let validate = self.validate
         let execute = self.execute
         Task.detached(priority: .userInitiated) { [weak self] in

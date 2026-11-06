@@ -84,6 +84,50 @@ struct ExecutionFeedbackTests {
         #expect(app.finderSetupVerified && !prefs.bool(forKey: "onboardingSkipped"))
     }
 
+    @Test func saturationRejectsBeforeDispatchAndReleasedSlotAcceptsAgain() async throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let host = HostRuntimeState(store: ManifestStore(fileURL: root.appendingPathComponent("manifest.json"), actionsDirectoryURL: root.appendingPathComponent("Actions")), preferences: .memory(["notificationsEnabled": false]))
+        host.bootstrap()
+        var requests: [ExecuteRequest] = []
+        for _ in 0..<HostRuntimeState.maximumConcurrentExecutions {
+            let request = ExecuteRequest(actionId: "copy-path", paths: [root.path])
+            requests.append(request)
+            #expect(host.beginExecution(request: request, actionName: "Copy Path"))
+        }
+        #expect(host.activeExecutions.count == HostRuntimeState.maximumConcurrentExecutions)
+        let server = IPCServer(appState: host, validate: { _, _ in
+            Issue.record("Saturated requests must not dispatch validation")
+            return .failure(.unknownAction("must-not-run"))
+        }, execute: { _, _ in
+            Issue.record("Saturated requests must not execute")
+            return ExecResult(success: true, summary: "must not run")
+        })
+        server.processJSON(try JSONCoding.encodeToString(ExecuteRequest(actionId: "copy-path", paths: [root.path])))
+        let rejected = try #require(host.logStore.recent().first)
+        #expect(!rejected.success && rejected.durationSeconds == 0)
+        #expect(host.activeExecutions.count == HostRuntimeState.maximumConcurrentExecutions)
+        #expect(!host.preferences.bool(forKey: "finderSetupVerified"))
+        host.endExecution(requestID: requests[0].requestId)
+        let accepted = ExecuteRequest(actionId: "copy-path", paths: [root.path])
+        #expect(host.beginExecution(request: accepted, actionName: "Copy Path"))
+        #expect(host.activeExecutions.count == HostRuntimeState.maximumConcurrentExecutions)
+        // Reusing an active ID never overwrites the original immutable run.
+        #expect(!host.beginExecution(request: accepted, actionName: "Changed"))
+        #expect(host.activeExecutions[accepted.requestId]?.actionName == "Copy Path")
+        host.endExecution(requestID: accepted.requestId)
+        let action = try #require(host.effectiveManifest.actions.first { $0.id == "copy-path" })
+        let resumedServer = IPCServer(appState: host, validate: { _, _ in .success(action) }, execute: { _, _ in
+            ExecResult(success: true, summary: "completed after slot released")
+        })
+        resumedServer.processJSON(try JSONCoding.encodeToString(ExecuteRequest(actionId: action.id, paths: [root.path])))
+        #expect(host.activeExecutions.count == HostRuntimeState.maximumConcurrentExecutions)
+        let deadline = ContinuousClock.now.advanced(by: .seconds(10))
+        while host.logStore.recent().count < 2 && ContinuousClock.now < deadline { try? await Task.sleep(for: .milliseconds(10)) }
+        #expect(host.activeExecutions.count == HostRuntimeState.maximumConcurrentExecutions - 1)
+        #expect(host.logStore.recent().first?.summary == "completed after slot released")
+    }
+
     @Test func rejectedIPCCompletesActivityAndWritesReadableFailure() async throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }

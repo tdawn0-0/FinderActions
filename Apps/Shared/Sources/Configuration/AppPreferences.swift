@@ -16,7 +16,10 @@ enum AppPreferences {
     }
 
     static func object(forKey key: String) -> Any? {
-        CFPreferencesCopyAppValue(key as CFString, applicationID)
+        // Host and Settings are separate processes; refresh this domain before reading
+        // completion/navigation values written by the other process.
+        CFPreferencesAppSynchronize(applicationID)
+        return CFPreferencesCopyAppValue(key as CFString, applicationID)
     }
 
     static func set(_ value: Any, forKey key: String) {

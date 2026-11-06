@@ -10,6 +10,7 @@ final class HostRuntimeState {
     private(set) var openWithSettings: OpenWithSettings = .defaults
     private(set) var notificationsEnabled = true
     private(set) var notificationMode: ExecutionNotificationMode = .all
+    static let maximumConcurrentExecutions = 16
     private(set) var activeExecutions: [String: ActiveExecution] = [:]
     var onActivityChanged: (() -> Void)?
 
@@ -73,10 +74,14 @@ final class HostRuntimeState {
         }
     }
 
-    func beginExecution(request: ExecuteRequest, actionName: String, now: Date = Date()) {
+    @discardableResult
+    func beginExecution(request: ExecuteRequest, actionName: String, now: Date = Date()) -> Bool {
+        guard activeExecutions.count < Self.maximumConcurrentExecutions,
+              activeExecutions[request.requestId] == nil else { return false }
         activeExecutions[request.requestId] = ActiveExecution(id: request.requestId,
             actionID: request.actionId, actionName: actionName, paths: request.paths, startedAt: now)
         onActivityChanged?()
+        return true
     }
 
     @discardableResult
