@@ -29,32 +29,48 @@ struct ProcessRunnerTests {
         #expect(output.stdout == "a b|/usr/bin\n")
     }
 
-    @Test func timeoutTerminatesProcess() throws {
-        let start = Date()
+    @Test(.timeLimit(.minutes(1))) func timeoutTerminatesProcess() throws {
         let output = try ProcessRunner.run(
             argv: ["/bin/sleep", "10"], environment: environment,
             workingDirectory: "/", timeout: 0.5
         )
         #expect(output.timedOut)
-        #expect(Date().timeIntervalSince(start) < 5)
+        #expect(output.exitCode != 0)
     }
 
-    @Test func timeoutEscalatesWhenTerminationIsIgnored() throws {
-        let start = Date()
+    @Test(.timeLimit(.minutes(1))) func timeoutEscalatesWhenTerminationIsIgnored() throws {
         let output = try ProcessRunner.run(
-            argv: ["/bin/sh", "-c", "trap '' TERM; echo ready; while :; do :; done"],
+            argv: ["/bin/sh", "-c", #"trap '' TERM; echo ready; i=0; while [ "$i" -lt 30 ]; do sleep 1; i=$((i + 1)); done"#],
             environment: environment, workingDirectory: "/", timeout: 0.5
         )
         #expect(output.timedOut)
         #expect(output.stdout == "ready\n")
         #expect(output.exitCode != 0)
-        #expect(Date().timeIntervalSince(start) < 5)
+        #expect(output.exitCode == SIGKILL)
     }
 
-    @Test func backgroundChildHoldingPipeDoesNotHang() throws {
-        let start = Date()
-        let output = try run("sleep 5 & echo started")
-        #expect(Date().timeIntervalSince(start) < 4.5)
+    @Test(.timeLimit(.minutes(1))) func backgroundChildHoldingPipeDoesNotHang() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let pidFile = root.appendingPathComponent("child.pid")
+        // The parent exits immediately. Its child keeps both output pipes open.
+        // The PID fixture also lets failure cleanup run if output capture regresses.
+        defer {
+            if let text = try? String(contentsOf: pidFile, encoding: .utf8),
+               let pid = Int32(text.trimmingCharacters(in: .whitespacesAndNewlines)) {
+                kill(pid, SIGKILL)
+            }
+        }
+        let output = try ProcessRunner.run(
+            argv: ["/bin/sh", "-c", "sleep 30 & echo $! > \"$1\"; echo started", "fixture", pidFile.path],
+            environment: environment, workingDirectory: root.path
+        )
+        let text = try String(contentsOf: pidFile, encoding: .utf8)
+        let pid = try #require(Int32(text.trimmingCharacters(in: .whitespacesAndNewlines)))
+        // Returning while the pipe-owning child is alive proves post-exit draining
+        // is bounded without comparing CI scheduling latency to a tight clock limit.
+        #expect(kill(pid, 0) == 0)
         #expect(output.stdout.hasPrefix("started"))
     }
 
