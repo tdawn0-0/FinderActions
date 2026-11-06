@@ -21,7 +21,16 @@ FinderActions 支持通过官方开发者签名与公证的拖拽安装 DMG 镜�
   *(脚本会自动在 `.release.env` 中保存 `DEVELOPMENT_TEAM` 与 `NOTARY_PROFILE=FinderActions-notary`)*。
 
 ### 宣传网站部署环境
-- **Node.js** (v20+) 与 **npm**。
+- **Node.js 24** 与 **npm**。
+- 使用项目指定的 Node 版本，并在部署前验证网站：
+  ```bash
+  cd web
+  nvm use
+  npm ci
+  npm run lint
+  npm run check:release-links
+  npm run build
+  ```
 - 在本地终端完成 Cloudflare 授权登录：
   ```bash
   cd web

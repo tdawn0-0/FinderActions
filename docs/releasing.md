@@ -21,7 +21,16 @@ FinderActions is distributed outside the Mac App Store as a notarized drag-and-d
   This creates the ignored `.release.env` file with `DEVELOPMENT_TEAM` and `NOTARY_PROFILE=FinderActions-notary`.
 
 ### For Promotional Web Deployment
-- **Node.js** (v20+) and **npm**.
+- **Node.js 24** and **npm**.
+- Use the project runtime and verify the site before deployment:
+  ```bash
+  cd web
+  nvm use
+  npm ci
+  npm run lint
+  npm run check:release-links
+  npm run build
+  ```
 - Log in to Cloudflare with Wrangler once in your terminal:
   ```bash
   cd web

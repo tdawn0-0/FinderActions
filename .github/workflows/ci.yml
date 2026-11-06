@@ -37,3 +37,27 @@ jobs:
 
       - name: Debug app build + Host dependency boundary
         run: ./Scripts/dev.sh
+
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: web/.nvmrc
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Lint website
+        run: npm run lint
+      - name: Check release links
+        run: npm run check:release-links
+      - name: Typecheck and build website
+        run: npm run build
