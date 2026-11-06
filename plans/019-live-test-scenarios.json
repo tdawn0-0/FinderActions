@@ -1,0 +1,313 @@
+[
+  {
+    "id": "home-preset",
+    "inputs": {
+      "paths": [
+        "/tmp/test-home"
+      ],
+      "container": "/tmp/test-home",
+      "action_id": "synthetic-test",
+      "script": "/tmp/actions/test.zsh",
+      "interpreter": "/bin/zsh",
+      "valid": true,
+      "state": "ready"
+    },
+    "expected_preview": {
+      "paths": [
+        "/tmp/test-home"
+      ],
+      "argv": [
+        "/bin/zsh",
+        "/tmp/actions/test.zsh",
+        "/tmp/test-home"
+      ],
+      "FA_PATH_COUNT": "1",
+      "FA_CWD": "/tmp/test-home"
+    },
+    "allowed_controls": [
+      "Run",
+      "Choose inputs"
+    ],
+    "execution_side_effects": "Only explicit Run executes; preview and input selection never execute. Running capture remains bound to synthetic-test."
+  },
+  {
+    "id": "one-file",
+    "inputs": {
+      "paths": [
+        "/tmp/test/a.txt"
+      ],
+      "container": "/tmp/test",
+      "action_id": "synthetic-test",
+      "script": "/tmp/actions/test.zsh",
+      "interpreter": "/bin/zsh",
+      "valid": true,
+      "state": "ready"
+    },
+    "expected_preview": {
+      "paths": [
+        "/tmp/test/a.txt"
+      ],
+      "argv": [
+        "/bin/zsh",
+        "/tmp/actions/test.zsh",
+        "/tmp/test/a.txt"
+      ],
+      "FA_PATH_COUNT": "1",
+      "FA_CWD": "/tmp/test"
+    },
+    "allowed_controls": [
+      "Run",
+      "Choose inputs"
+    ],
+    "execution_side_effects": "Only explicit Run executes; preview and input selection never execute. Running capture remains bound to synthetic-test."
+  },
+  {
+    "id": "one-folder",
+    "inputs": {
+      "paths": [
+        "/tmp/test/folder"
+      ],
+      "container": "/tmp/test",
+      "action_id": "synthetic-test",
+      "script": "/tmp/actions/test.zsh",
+      "interpreter": "/bin/zsh",
+      "valid": true,
+      "state": "ready"
+    },
+    "expected_preview": {
+      "paths": [
+        "/tmp/test/folder"
+      ],
+      "argv": [
+        "/bin/zsh",
+        "/tmp/actions/test.zsh",
+        "/tmp/test/folder"
+      ],
+      "FA_PATH_COUNT": "1",
+      "FA_CWD": "/tmp/test"
+    },
+    "allowed_controls": [
+      "Run",
+      "Choose inputs"
+    ],
+    "execution_side_effects": "Only explicit Run executes; preview and input selection never execute. Running capture remains bound to synthetic-test."
+  },
+  {
+    "id": "multi-select",
+    "inputs": {
+      "paths": [
+        "/tmp/test/a.txt",
+        "/tmp/test/b.txt"
+      ],
+      "container": "/tmp/test",
+      "action_id": "synthetic-test",
+      "script": "/tmp/actions/test.zsh",
+      "interpreter": "/bin/zsh",
+      "valid": true,
+      "state": "ready"
+    },
+    "expected_preview": {
+      "paths": [
+        "/tmp/test/a.txt",
+        "/tmp/test/b.txt"
+      ],
+      "argv": [
+        "/bin/zsh",
+        "/tmp/actions/test.zsh",
+        "/tmp/test/a.txt",
+        "/tmp/test/b.txt"
+      ],
+      "FA_PATH_COUNT": "2",
+      "FA_CWD": "/tmp/test"
+    },
+    "allowed_controls": [
+      "Run",
+      "Choose inputs"
+    ],
+    "execution_side_effects": "Only explicit Run executes; preview and input selection never execute. Running capture remains bound to synthetic-test."
+  },
+  {
+    "id": "explicit-container",
+    "inputs": {
+      "paths": [
+        "/tmp/test/a.txt"
+      ],
+      "container": "/tmp/work",
+      "action_id": "synthetic-test",
+      "script": "/tmp/actions/test.zsh",
+      "interpreter": "/bin/zsh",
+      "valid": true,
+      "state": "ready"
+    },
+    "expected_preview": {
+      "paths": [
+        "/tmp/test/a.txt"
+      ],
+      "argv": [
+        "/bin/zsh",
+        "/tmp/actions/test.zsh",
+        "/tmp/test/a.txt"
+      ],
+      "FA_PATH_COUNT": "1",
+      "FA_CWD": "/tmp/work"
+    },
+    "allowed_controls": [
+      "Run",
+      "Choose inputs"
+    ],
+    "execution_side_effects": "Only explicit Run executes; preview and input selection never execute. Running capture remains bound to synthetic-test."
+  },
+  {
+    "id": "empty-with-container",
+    "inputs": {
+      "paths": [],
+      "container": "/tmp/work",
+      "action_id": "synthetic-test",
+      "script": "/tmp/actions/test.zsh",
+      "interpreter": "/bin/zsh",
+      "valid": true,
+      "state": "ready"
+    },
+    "expected_preview": {
+      "paths": [
+        "/tmp/work"
+      ],
+      "argv": [
+        "/bin/zsh",
+        "/tmp/actions/test.zsh",
+        "/tmp/work"
+      ],
+      "FA_PATH_COUNT": "1",
+      "FA_CWD": "/tmp/work"
+    },
+    "allowed_controls": [
+      "Run",
+      "Choose inputs"
+    ],
+    "execution_side_effects": "Only explicit Run executes; preview and input selection never execute. Running capture remains bound to synthetic-test."
+  },
+  {
+    "id": "special-paths",
+    "inputs": {
+      "paths": [
+        "/tmp/test/a b.txt",
+        "/tmp/test/引号'文件.txt"
+      ],
+      "container": "/tmp/test",
+      "action_id": "synthetic-test",
+      "script": "/tmp/actions/test.zsh",
+      "interpreter": "/bin/zsh",
+      "valid": true,
+      "state": "ready"
+    },
+    "expected_preview": {
+      "paths": [
+        "/tmp/test/a b.txt",
+        "/tmp/test/引号'文件.txt"
+      ],
+      "argv": [
+        "/bin/zsh",
+        "/tmp/actions/test.zsh",
+        "/tmp/test/a b.txt",
+        "/tmp/test/引号'文件.txt"
+      ],
+      "FA_PATH_COUNT": "2",
+      "FA_CWD": "/tmp/test"
+    },
+    "allowed_controls": [
+      "Run",
+      "Choose inputs"
+    ],
+    "execution_side_effects": "Only explicit Run executes; preview and input selection never execute. Running capture remains bound to synthetic-test."
+  },
+  {
+    "id": "missing-path",
+    "inputs": {
+      "paths": [
+        "/tmp/test/missing"
+      ],
+      "container": "/tmp/test",
+      "action_id": "synthetic-test",
+      "script": "/tmp/actions/test.zsh",
+      "interpreter": "/bin/zsh",
+      "valid": false,
+      "state": "invalid"
+    },
+    "expected_preview": {
+      "paths": [
+        "/tmp/test/missing"
+      ],
+      "argv": [
+        "/bin/zsh",
+        "/tmp/actions/test.zsh",
+        "/tmp/test/missing"
+      ],
+      "FA_PATH_COUNT": "1",
+      "FA_CWD": "/tmp/test"
+    },
+    "allowed_controls": [
+      "Choose inputs"
+    ],
+    "execution_side_effects": "Only explicit Run executes; preview and input selection never execute. Running capture remains bound to synthetic-test."
+  },
+  {
+    "id": "action-changed-during-run",
+    "inputs": {
+      "paths": [
+        "/tmp/test/a.txt"
+      ],
+      "container": "/tmp/test",
+      "action_id": "synthetic-test",
+      "script": "/tmp/actions/test.zsh",
+      "interpreter": "/bin/zsh",
+      "valid": true,
+      "state": "running"
+    },
+    "expected_preview": {
+      "paths": [
+        "/tmp/test/a.txt"
+      ],
+      "argv": [
+        "/bin/zsh",
+        "/tmp/actions/test.zsh",
+        "/tmp/test/a.txt"
+      ],
+      "FA_PATH_COUNT": "1",
+      "FA_CWD": "/tmp/test"
+    },
+    "allowed_controls": [
+      "Keep Open"
+    ],
+    "execution_side_effects": "Only explicit Run executes; preview and input selection never execute. Running capture remains bound to synthetic-test."
+  },
+  {
+    "id": "close-during-run",
+    "inputs": {
+      "paths": [
+        "/tmp/test/a.txt"
+      ],
+      "container": "/tmp/test",
+      "action_id": "synthetic-test",
+      "script": "/tmp/actions/test.zsh",
+      "interpreter": "/bin/zsh",
+      "valid": true,
+      "state": "running"
+    },
+    "expected_preview": {
+      "paths": [
+        "/tmp/test/a.txt"
+      ],
+      "argv": [
+        "/bin/zsh",
+        "/tmp/actions/test.zsh",
+        "/tmp/test/a.txt"
+      ],
+      "FA_PATH_COUNT": "1",
+      "FA_CWD": "/tmp/test"
+    },
+    "allowed_controls": [
+      "Keep Open"
+    ],
+    "execution_side_effects": "Only explicit Run executes; preview and input selection never execute. Running capture remains bound to synthetic-test."
+  }
+]
