@@ -5,7 +5,8 @@ import FinderActionsCore
 @main
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    let appState = HostRuntimeState()
+    // Explicit arguments avoid a Swift 6.1 stored-property default-argument lowering crash.
+    let appState = HostRuntimeState(store: .makeDefault(), logStore: nil, preferences: .live)
 
     private var ipcServer: IPCServer?
     private var statusMenuController: StatusMenuController?

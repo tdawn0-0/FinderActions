@@ -6,7 +6,8 @@ import FinderActionsCore
 @main
 @MainActor
 final class SettingsAppDelegate: NSObject, NSApplicationDelegate {
-    private let appState = AppState()
+    // Explicit arguments avoid a Swift 6.1 stored-property default-argument lowering crash.
+    private let appState = AppState(store: .makeDefault(), logStore: nil, preferences: .live)
     private var windowController: SettingsWindowController?
 
     static func main() {
