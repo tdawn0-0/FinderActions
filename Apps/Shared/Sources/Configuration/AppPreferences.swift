@@ -30,6 +30,7 @@ enum AppPreferences {
 final class PreferencesStore {
     static let live = PreferencesStore()
     private var values: [String: Any]?
+    var isInMemory: Bool { values != nil }
     private init(values: [String: Any]? = nil) { self.values = values }
     static func memory(_ values: [String: Any] = [:]) -> PreferencesStore { PreferencesStore(values: values) }
     func object(forKey key: String) -> Any? {

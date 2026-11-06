@@ -89,6 +89,8 @@ final class IPCServer {
         guard requestDedupe.accept(request.requestId) else { return }
 
         let manifest = appState.effectiveManifest
+        let actionName = manifest.actions.first { $0.id == request.actionId }?.name ?? request.actionId
+        appState.beginExecution(request: request, actionName: actionName)
         let validate = self.validate
         let execute = self.execute
         Task.detached(priority: .userInitiated) { [weak self] in
@@ -102,25 +104,32 @@ final class IPCServer {
     }
 
     private func reject(request: ExecuteRequest, rejection: ExecuteRejection) {
+        let run = appState.endExecution(requestID: request.requestId)
         appState.recordLog(ExecLogEntry(actionId: request.actionId, success: false,
-                                       summary: rejection.summary, paths: request.paths))
+            summary: rejection.summary, paths: request.paths, actionName: run?.actionName,
+            durationSeconds: run.map { max(0, Date().timeIntervalSince($0.startedAt)) }, source: .finder))
+        notify(result: ExecResult(success: false, summary: rejection.summary), actionId: request.actionId,
+               actionName: run?.actionName ?? request.actionId)
     }
 
     private func finish(request: ExecuteRequest, result: ExecResult) {
+        let run = appState.endExecution(requestID: request.requestId)
         appState.recordLog(ExecLogEntry(
             actionId: request.actionId,
             success: result.success,
             summary: result.summary,
             paths: request.paths,
-            stderrTail: OutputTail.tail(result.stderr)
+            stderrTail: OutputTail.tail(result.stderr),
+            actionName: run?.actionName,
+            durationSeconds: run.map { max(0, Date().timeIntervalSince($0.startedAt)) }, source: .finder
         ))
-        notify(result: result, actionId: request.actionId)
+        notify(result: result, actionId: request.actionId, actionName: run?.actionName ?? request.actionId)
     }
 
-    private func notify(result: ExecResult, actionId: String) {
-        guard appState.notificationsEnabled else { return }
+    private func notify(result: ExecResult, actionId: String, actionName: String) {
+        guard appState.notificationsEnabled && appState.notificationMode.shouldNotify(success: result.success) else { return }
         let title = result.success ? "FinderActions" : "FinderActions failed"
-        let body = "\(actionId): \(result.summary)"
+        let body = "\(actionName): \(result.summary)"
         let playFailureSound = !result.success
 
         Task {
@@ -131,6 +140,7 @@ final class IPCServer {
             content.title = title
             content.body = body
             content.sound = playFailureSound ? .default : nil
+            content.userInfo = ["actionID": actionId, "destination": "logs"]
             let request = UNNotificationRequest(
                 identifier: UUID().uuidString,
                 content: content,

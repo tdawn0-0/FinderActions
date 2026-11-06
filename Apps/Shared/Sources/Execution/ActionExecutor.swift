@@ -35,6 +35,8 @@ public struct ExecResult: Sendable {
     }
 }
 
+public enum ExecutionSource: String, Codable, Sendable { case finder, test }
+
 public struct ExecLogEntry: Codable, Identifiable, Sendable, Equatable {
     public var id: String
     public var timestamp: String
@@ -43,8 +45,11 @@ public struct ExecLogEntry: Codable, Identifiable, Sendable, Equatable {
     public var summary: String
     public var paths: [String]
     public var stderrTail: String?
+    public var actionName: String?
+    public var durationSeconds: Double?
+    public var source: ExecutionSource?
 
-    public init(id: String = UUID().uuidString, timestamp: String = ISO8601DateFormatter().string(from: Date()), actionId: String, success: Bool, summary: String, paths: [String], stderrTail: String? = nil) {
+    public init(id: String = UUID().uuidString, timestamp: String = ISO8601DateFormatter().string(from: Date()), actionId: String, success: Bool, summary: String, paths: [String], stderrTail: String? = nil, actionName: String? = nil, durationSeconds: Double? = nil, source: ExecutionSource? = nil) {
         self.id = id
         self.timestamp = timestamp
         self.actionId = actionId
@@ -52,6 +57,9 @@ public struct ExecLogEntry: Codable, Identifiable, Sendable, Equatable {
         self.summary = summary
         self.paths = paths
         self.stderrTail = stderrTail
+        self.actionName = actionName
+        self.durationSeconds = durationSeconds
+        self.source = source
     }
 }
 

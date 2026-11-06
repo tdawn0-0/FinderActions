@@ -9,6 +9,9 @@ final class HostRuntimeState {
     private(set) var manifest = ActionManifest()
     private(set) var openWithSettings: OpenWithSettings = .defaults
     private(set) var notificationsEnabled = true
+    private(set) var notificationMode: ExecutionNotificationMode = .all
+    private(set) var activeExecutions: [String: ActiveExecution] = [:]
+    var onActivityChanged: (() -> Void)?
 
     let preferences: PreferencesStore
 
@@ -32,6 +35,7 @@ final class HostRuntimeState {
             .appendingPathComponent("logs", isDirectory: true)
         self.logStore = logStore ?? ExecLogStore(directory: logsDirectory)
         self.executor = ActionExecutor(store: store)
+        loadPreferences()
     }
 
     func bootstrap() {
@@ -60,6 +64,26 @@ final class HostRuntimeState {
 
     func recordLog(_ entry: ExecLogEntry) {
         logStore.append(entry)
+        if WorkflowFeedback.verifiesSetup(entry) {
+            preferences.set(true, forKey: "finderSetupVerified")
+        }
+        onActivityChanged?()
+        if !preferences.isInMemory {
+            DistributedNotificationCenter.default().postNotificationName(WorkflowFeedback.executionChanged, object: nil, deliverImmediately: true)
+        }
+    }
+
+    func beginExecution(request: ExecuteRequest, actionName: String, now: Date = Date()) {
+        activeExecutions[request.requestId] = ActiveExecution(id: request.requestId,
+            actionID: request.actionId, actionName: actionName, paths: request.paths, startedAt: now)
+        onActivityChanged?()
+    }
+
+    @discardableResult
+    func endExecution(requestID: String) -> ActiveExecution? {
+        let run = activeExecutions.removeValue(forKey: requestID)
+        onActivityChanged?()
+        return run
     }
 
     func openActionsDirectory() {
@@ -76,7 +100,8 @@ final class HostRuntimeState {
     }
 
     private func loadPreferences() {
-        notificationsEnabled = preferences.object(forKey: "notificationsEnabled") as? Bool ?? true
+        notificationMode = ExecutionNotificationMode.load(preferences: preferences)
+        notificationsEnabled = notificationMode != .off
     }
 
 }

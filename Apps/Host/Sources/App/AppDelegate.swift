@@ -1,10 +1,11 @@
 import AppKit
 import FinderActionsCore
+import UserNotifications
 
 /// Always-resident process lifecycle: native status menu, IPC, execution, and CLI dump.
 @main
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     // Explicit arguments avoid a Swift 6.1 stored-property default-argument lowering crash.
     let appState = HostRuntimeState(store: .makeDefault(), logStore: nil, preferences: .live)
 
@@ -26,6 +27,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         appState.bootstrap()
+        UNUserNotificationCenter.current().delegate = self
 
         let settingsLauncher = SettingsHelperLauncher()
         self.settingsLauncher = settingsLauncher
@@ -55,6 +57,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     ) -> Bool {
         settingsLauncher?.open(.settings)
         return true
+    }
+
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        let actionID = response.notification.request.content.userInfo["actionID"] as? String
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            WorkflowFeedback.requestNavigation(destination: "logs", actionID: actionID, preferences: self.appState.preferences)
+            self.settingsLauncher?.open(.settings)
+        }
+        completionHandler()
     }
 
     private func dumpActionsAndExit() {

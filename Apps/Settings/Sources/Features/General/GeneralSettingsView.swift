@@ -10,7 +10,11 @@ struct GeneralSettingsView: View {
 
         Form {
             Section("Preferences") {
-                Toggle("Show system notifications upon execution completion", isOn: $state.notificationsEnabled)
+                Picker("Execution Notifications", selection: $state.notificationMode) {
+                    ForEach(ExecutionNotificationMode.allCases, id: \.self) { mode in
+                        Text(mode.title).tag(mode)
+                    }
+                }
             }
 
             Section("Storage & Configurations") {
@@ -51,7 +55,7 @@ struct GeneralSettingsView: View {
         }
         .formStyle(.grouped)
         .navigationTitle("General")
-        .onChange(of: state.notificationsEnabled) { _, _ in state.persistSettings() }
+        .onChange(of: state.notificationMode) { _, _ in state.persistSettings() }
         .alert("Reset all actions to default?", isPresented: $showResetConfirm) {
             Button("Reset", role: .destructive) { state.seedDefaults() }
             Button("Cancel", role: .cancel) {}

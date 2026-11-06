@@ -26,7 +26,8 @@ struct LogsSettingsView: View {
             case .failed: if log.success { return false }
             }
             guard !searchText.isEmpty else { return true }
-            return log.actionId.localizedCaseInsensitiveContains(searchText)
+            return (log.actionName?.localizedCaseInsensitiveContains(searchText) ?? false)
+                || log.actionId.localizedCaseInsensitiveContains(searchText)
                 || log.summary.localizedCaseInsensitiveContains(searchText)
                 || (log.stderrTail?.localizedCaseInsensitiveContains(searchText) ?? false)
                 || log.paths.contains { $0.localizedCaseInsensitiveContains(searchText) }
@@ -37,7 +38,8 @@ struct LogsSettingsView: View {
         content
             .navigationTitle("Activity Logs")
             .searchable(text: $searchText, placement: .toolbar, prompt: "Search logs…")
-            .onAppear { state.refreshLogs() }
+            .onAppear { state.refreshLogs(); searchText = state.selectedActionID ?? "" }
+            .onChange(of: state.selectedActionID) { _, id in searchText = id ?? "" }
             .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
                 state.refreshLogs()
             }
@@ -80,6 +82,7 @@ struct LogsSettingsView: View {
 }
 
 private struct LogRow: View {
+    @Environment(AppState.self) private var state
     let log: ExecLogEntry
 
     var body: some View {
@@ -90,7 +93,7 @@ private struct LogRow: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(alignment: .firstTextBaseline) {
-                    Text(log.actionId).fontWeight(.medium)
+                    Text(log.actionName ?? log.actionId).fontWeight(.medium)
                     Spacer()
                     timestamp
                         .font(.caption)
@@ -99,6 +102,16 @@ private struct LogRow: View {
 
                 Text(log.summary)
                     .foregroundStyle(.secondary)
+                HStack {
+                    Text("\(log.paths.count) paths")
+                    if let duration = log.durationSeconds { Text("\(duration, specifier: "%.1f") s") }
+                    if log.source == .test { Text("Test Run") }
+                    Spacer()
+                    Button("Edit Action") {
+                        WorkflowFeedback.requestNavigation(destination: "actions", actionID: log.actionId, preferences: state.preferences)
+                    }
+                    .disabled(!state.effectiveManifest.actions.contains { $0.id == log.actionId })
+                }.font(.caption).foregroundStyle(.secondary)
 
                 if let stderrTail = log.stderrTail, !stderrTail.isEmpty {
                     Text(stderrTail)

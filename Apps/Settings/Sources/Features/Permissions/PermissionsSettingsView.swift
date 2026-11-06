@@ -17,13 +17,19 @@ struct PermissionsSettingsView: View {
         }
         .formStyle(.grouped)
         .navigationTitle("Extensions & Permissions")
-        .task { state.refreshExtensionStatus() }
+        .task { state.refreshExtensionStatus(); state.refreshLogs() }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            state.refreshExtensionStatus(); state.refreshLogs()
+        }
+        .onReceive(DistributedNotificationCenter.default().publisher(for: WorkflowFeedback.executionChanged)) { _ in
+            state.refreshLogs()
+        }
     }
 
     private var extensionSection: some View {
         Section {
             Label {
-                Text(state.extensionEnabledHint)
+                Text(state.finderSetupVerified ? String(localized: "Verified — Copy Path completed in Finder") : state.extensionRegistration.message)
                     .textSelection(.enabled)
             } icon: {
                 Image(systemName: isExtensionReady ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
@@ -49,7 +55,7 @@ struct PermissionsSettingsView: View {
         } header: {
             Text("Full Disk Access (FDA)")
         } footer: {
-            Text("Grants permission for scripts to access protected folders without prompts.")
+            Text("Full Disk Access is needed only for scripts that access protected folders. Enable it when your workflow needs that access.")
         }
     }
 
@@ -73,6 +79,6 @@ struct PermissionsSettingsView: View {
     }
 
     private var isExtensionReady: Bool {
-        state.extensionEnabledHint.contains("Registered") && !state.extensionEnabledHint.contains("Not")
+        state.finderSetupVerified
     }
 }
