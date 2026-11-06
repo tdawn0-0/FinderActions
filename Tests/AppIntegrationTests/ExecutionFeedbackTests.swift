@@ -1,5 +1,6 @@
 import Testing
 import Foundation
+import Synchronization
 import FinderActionsCore
 
 @Suite("Execution feedback and setup verification") @MainActor
@@ -23,6 +24,20 @@ struct ExecutionFeedbackTests {
         #expect(!ExecutionNotificationMode.failures.shouldNotify(success: true))
         #expect(ExecutionNotificationMode.failures.shouldNotify(success: false))
         #expect(!ExecutionNotificationMode.off.shouldNotify(success: false))
+    }
+
+    @Test func inMemoryNavigationStillNotifiesItsLocalSession() {
+        let count = Mutex(0)
+        let observer = NotificationCenter.default.addObserver(forName: WorkflowFeedback.settingsNavigation, object: nil, queue: nil) { _ in
+            count.withLock { $0 += 1 }
+        }
+        defer { NotificationCenter.default.removeObserver(observer) }
+        let prefs = PreferencesStore.memory()
+        WorkflowFeedback.requestNavigation(destination: "logs", actionID: "example", preferences: prefs)
+        #expect(count.withLock { $0 } == 1)
+        #expect(prefs.object(forKey: "settingsDestination") as? String == "logs")
+        WorkflowFeedback.requestNavigation(destination: "invalid", actionID: "example", preferences: prefs)
+        #expect(count.withLock { $0 } == 1)
     }
 
     @Test func oldLogsDecodeWithoutNewFields() throws {

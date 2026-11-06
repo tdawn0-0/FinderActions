@@ -51,7 +51,6 @@ enum WorkflowFeedback {
         guard destination == "logs" || destination == "actions" else { return }
         preferences.set(destination, forKey: "settingsDestination")
         preferences.set(actionID ?? "", forKey: "settingsActionID")
-        guard !preferences.isInMemory else { return }
         if !preferences.isInMemory {
             DistributedNotificationCenter.default().postNotificationName(settingsNavigation, object: nil, deliverImmediately: true)
         }
