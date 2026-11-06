@@ -1,5 +1,106 @@
 # Implementation Plans
 
+## Current planning batch — 2026-11-06
+
+Plans **011–020** were written against commit **`9898180`** after the maintainer
+selected all eight vetted findings and both direction options. Execution completed in isolated branch `codex/release-v1.0.3` (worktree
+`/tmp/finder-menu-all-integrated`); see the verification record below. The historical 001–010 plans and verification records below
+remain intact; no completed plan is being reopened or duplicated.
+
+Current audit verification: `./Scripts/test.sh` passed **66 tests in 10 suites**;
+`npm --prefix web run lint` passed. App builds, web builds, real Finder/GUI behavior,
+release signing/notarization and live release destinations were not verified in
+this audit. Future executor commands in the plans are requirements, not claimed results.
+
+### Recommended order and status
+
+| Plan | Title | Priority | Effort | Depends on | Status |
+|------|-------|----------|--------|------------|--------|
+| [011](011-preserve-invalid-configuration.md) | Preserve invalid configuration; retain application-state regression tests | P1 | M | — | DONE |
+| [012](012-validate-published-manifest.md) | Validate the website's published manifest through the real decoder | P1 | S | — | DONE |
+| [013](013-strict-dmg-release.md) | Fail production DMG packaging when verification fails | P1 | S | — | DONE |
+| [014](014-refresh-settings-logs.md) | Refresh logs on inspection and application activation | P2 | S | 011 | DONE |
+| [015](015-centralize-release-links.md) | Centralize latest-release links and remove stale versions | P2 | S | — | DONE |
+| [016](016-validate-requests-off-main.md) | Move filesystem validation off the Host main actor | P2 | M | 011 | DONE |
+| [017](017-bound-snapshot-transport.md) | Bound UTF-8 chunks and incomplete snapshot assemblies | P2 | M | 016 when both selected | DONE |
+| [018](018-verify-web-toolchain.md) | Align Node prerequisites and add web CI | P2 | S | — | DONE |
+| [019](019-design-live-test-inputs.md) | Design selectable test inputs and execution preview | P3 | M | — (design only) | DONE |
+| [020](020-design-authenticated-ipc-integration.md) | Specify production-shaped authenticated IPC integration gates | P3 | L | 006 already DONE (design only) | DONE |
+
+Status values: TODO | IN PROGRESS | DONE | BLOCKED (reason) | REJECTED (rationale).
+For 019/020, DONE means the **design/experiment specification** is complete; it
+must never mean the proposed feature or authenticated transport has shipped.
+
+### Execution verification — 2026-11-06
+
+All ten plans completed and reviewed. Final implementation base `d52c5c5` is
+v1.0.3 build 4. Combined suite: **76 Core tests + 12 application tests = 88 passed**.
+Reviewer independently reran the combined Swift suite, 14 DMG helper cases plus
+failed-release orchestration, and both design contract checkers. Website clean
+npm install, lint, release-link guard and production build passed. Universal Debug
+build and Host-no-SwiftUI check passed in executor runs; signed release verification
+is recorded separately below when complete. Real GUI/Finder behavior was not driven.
+
+011 recovery, migration, reset and debounce tests run against actual app sources
+using isolated files/preferences. Review found and corrected an independent OpenWith
+preference fallback during invalid-manifest startup. 016 tests prove MainActor
+responsiveness and deduplication; 017 tests cover Unicode, expiry and buffer bounds.
+019 is a finished Live Test design; 020 is a finished integration specification with
+42 NOT_RUN gates. Its adoption-readiness check correctly fails; production IPC
+remains distributed notifications and must not be described as authenticated.
+
+Source changes and release metadata live in the isolated integration branch; the
+original main checkout was not overwritten during execution. Build-generated Xcode
+project worktree-name churn was removed. Deployment/signing details are not stored
+as credential values in this index.
+
+### Dependencies and parallel work
+
+```mermaid
+flowchart LR
+  P011[011 Configuration + app test baseline] --> P014[014 Log refresh]
+  P011 --> P016[016 Off-main validation]
+  P016 --> P017[017 Bounded snapshots]
+  P006[006 Existing ADR] --> P020[020 Integration design]
+```
+
+- 011 introduces isolated `FinderActionsAppTests`; 014 and 016 reuse it. Keep
+  actual application sources under test and do not touch production preferences.
+- 017 follows 016 to avoid competing edits to `IPCServer.swift`; there is no
+  algorithmic dependency on off-main validation. Re-read the combined file.
+- 012, 013 and 015 can start independently of 011. 018 can also start independently,
+  but adding 015's optional CI guard is easiest after 015 exists.
+- Serialize integrations touching `Package.swift` (011/012/014/016),
+  `.github/workflows/ci.yml` (011/013/018), `web/package.json` (015/018), and both
+  release guides (013/018); preserve each plan's checks rather than replacing them.
+- 019/020 deliver only plans/ artifacts. A later implementation of 019 should build
+  on configuration/log improvements. Later IPC migration must preserve 016/017's
+  validation/transport lessons or replace them with equivalent tested guarantees.
+- Plan drift checks must distinguish declared prerequisite changes from unexplained
+  drift; record the actual baseline before proceeding. Never overwrite user edits.
+
+### Current batch boundaries and considered findings
+
+- Existing distributed-notification authentication limitations are already recorded
+  in ADR 0001 and plan 006. They are not a new duplicate defect; 020 specifies the
+  remaining integration experiment, without claiming maintainer adoption of option A.
+- The Settings test-coverage gap is folded into 011 rather than a separate broad
+  testing/architecture refactor. The current Core suite does not exercise AppState.
+- `npm audit` reported high-severity packages, but runtime/build reachability was not
+  established. No blind dependency upgrade plan or claim of resolved advisories.
+- Minor clipboard-success timing and locale-default observations are deferred; lower
+  leverage than the selected data integrity, release and execution-path work.
+- Core/runtime and Settings hotspots, website examples/downloads, release tooling,
+  dependency engine declarations and CI were inspected. This was not an exhaustive
+  audit of every UI/localization string or a live security/performance assessment.
+- Real Finder/AppKit behavior, minimum-OS runs, signing/DMG execution, transport
+  delivery limits, live website rendering/accessibility and advisory exploitability
+  remain unverified. Existing 001–010 GUI limitations are preserved below.
+
+---
+
+## Historical batch — 2026-10-02
+
 Generated by the improve skill on 2026-10-02 against commit `2e59370`. Execute in
 the order below unless dependencies say otherwise. Each executor: read the plan
 fully before starting, honor its STOP conditions, and update your row when done.
@@ -8,7 +109,7 @@ Verification commands used throughout: `./Scripts/test.sh` (SwiftPM tests, 35
 passing at planning time) and `./Scripts/dev.sh` (xcodegen + Debug build + Host
 SwiftUI-boundary check; it regenerates `FinderActions.xcodeproj/project.pbxproj`).
 
-## Execution order & status
+## Historical execution order & status (001–010)
 
 | Plan | Title | Priority | Effort | Depends on | Status |
 |------|-------|----------|--------|------------|--------|
@@ -87,7 +188,7 @@ No inspector edits, action executions, log edits or preference changes were
 performed. All four planned GUI checks remain unverified; no source code was
 changed during this follow-up.
 
-## Dependency notes
+## Historical dependency notes (001–010)
 
 - 002 after 001: both edit `SettingsRootView.swift` around the action inspector (picker at ~432, binding at ~212).
 - 004, 005, 007 after 003: 004's integration tests use `ProcessRunner`; 005 inserts validation into the rewritten `IPCServer.processJSON`; 007 extends `IPCServer.finish`, which 003 creates.
@@ -108,6 +209,6 @@ changed during this follow-up.
 - Drop-in scripts with header metadata (`# @name`, `# @showWhen`) so a script file alone registers an action — matches the README pitch "edit scripts as files, git them, share them".
 - Menu-bar "Run on Finder selection" — anticipated in `docs/troubleshooting.md` and `SnapshotBuilder.filter`'s doc comment; also a fallback when the extension isn't registered.
 
-## Not audited
+## Historical audit limits (2026-10-02)
 
 Web landing-page React components, release/DMG scripts beyond credential handling, localization catalogs, `npm audit`, and Settings view code outside the cited regions.
