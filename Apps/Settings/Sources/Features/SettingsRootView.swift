@@ -71,6 +71,10 @@ struct SettingsRootView: View {
             case .about: AboutView()
             }
         }
+        .onAppear { consumeNavigation() }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in consumeNavigation() }
+        .onReceive(NotificationCenter.default.publisher(for: WorkflowFeedback.settingsNavigation)) { _ in consumeNavigation() }
+        .onReceive(DistributedNotificationCenter.default().publisher(for: WorkflowFeedback.settingsNavigation)) { _ in consumeNavigation() }
         .safeAreaInset(edge: .bottom) {
             if let error = state.configurationError {
                 VStack(alignment: .leading) {
@@ -85,4 +89,14 @@ struct SettingsRootView: View {
         }
         .frame(minWidth: 900, minHeight: 540)
     }
+    private func consumeNavigation() {
+        guard let destination = state.preferences.object(forKey: "settingsDestination") as? String,
+              let section = SettingsSection(rawValue: destination), section == .logs || section == .actions else { return }
+        selection = section
+        if let id = state.preferences.object(forKey: "settingsActionID") as? String,
+           section == .logs || state.manifest.actions.contains(where: { $0.id == id }) { state.selectedActionID = id }
+        state.preferences.set("", forKey: "settingsDestination")
+        state.preferences.set("", forKey: "settingsActionID")
+    }
+
 }

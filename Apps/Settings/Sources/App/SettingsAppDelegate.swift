@@ -7,7 +7,13 @@ import FinderActionsCore
 @MainActor
 final class SettingsAppDelegate: NSObject, NSApplicationDelegate {
     // Explicit arguments avoid a Swift 6.1 stored-property default-argument lowering crash.
-    private let appState = AppState(store: .makeDefault(), logStore: nil, preferences: .live)
+    private let appState: AppState = {
+        if let index = CommandLine.arguments.firstIndex(of: "--qa-root"), CommandLine.arguments.indices.contains(index + 1) {
+            let root = URL(fileURLWithPath: CommandLine.arguments[index + 1], isDirectory: true)
+            return AppState(store: ManifestStore(fileURL: root.appendingPathComponent("manifest.json"), actionsDirectoryURL: root.appendingPathComponent("Actions")), logStore: nil, preferences: .memory())
+        }
+        return AppState(store: .makeDefault(), logStore: nil, preferences: .live)
+    }()
     private var windowController: SettingsWindowController?
 
     static func main() {
@@ -20,6 +26,7 @@ final class SettingsAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         appState.bootstrap()
         appState.onManifestChanged = {
+            guard !CommandLine.arguments.contains("--qa-root") else { return }
             DistributedNotificationCenter.default().postNotificationName(
                 Notification.Name(IPCConstants.configurationChangedNotification),
                 object: nil,
@@ -49,6 +56,7 @@ final class SettingsAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        guard !appState.liveTest.isRunning else { return .terminateCancel }
         appState.flushPendingManifestSave()
         guard appState.isDirty else { return .terminateNow }
         let alert = NSAlert()

@@ -6,8 +6,9 @@ struct ActionInspectorView: View {
     @Environment(AppState.self) private var state
     @Binding var action: ActionDefinition
     @State private var showSymbolPicker = false
-    @State private var isRunningTest = false
-    @State private var testResult: ExecResult?
+    @State private var extensionText = ""
+    @State private var shellFileMode = false
+    @State private var appleScriptFileMode = false
 
     private static let commonSymbols = [
         "bolt", "bolt.fill", "terminal", "terminal.fill",
@@ -27,9 +28,14 @@ struct ActionInspectorView: View {
             headerSection
             displaySection
             executionSection
-            testSection
+            LiveTestConsole(action: action)
         }
         .formStyle(.grouped)
+        .onAppear {
+            extensionText = action.extRules?.pathExtensions.joined(separator: ", ") ?? ""
+            shellFileMode = !(action.shell?.scriptFile ?? "").isEmpty
+            appleScriptFileMode = !(action.appleScript?.scriptFile ?? "").isEmpty
+        }
     }
 
     // MARK: Sections
@@ -59,7 +65,11 @@ struct ActionInspectorView: View {
             }
             .padding(.vertical, 2)
 
-            Toggle("Enabled", isOn: $action.enabled)
+            Toggle("Enabled", isOn: Binding(get: { action.enabled }, set: { enabled in
+                if !enabled || ActionAuthoring.validationError(action) == nil { action.enabled = enabled }
+            }))
+            if let error = ActionAuthoring.validationError(action) { Text(String(localized: String.LocalizationValue(error))).font(.caption).foregroundStyle(.orange) }
+            if !action.enabled { Text("Draft — enable when ready to use in Finder.").font(.caption).foregroundStyle(.secondary) }
         }
     }
 
@@ -69,10 +79,44 @@ struct ActionInspectorView: View {
                 ForEach(ShowWhen.allCases, id: \.self) { Text($0.displayName).tag($0) }
             }
 
+            TextField("File Extensions", text: Binding(
+                get: { extensionText },
+                set: { value in
+                    extensionText = value
+                    var rules = action.extRules ?? ExtRules()
+                    rules.pathExtensions = ActionAuthoring.normalizedExtensions(value)
+                    action.extRules = rules
+                }
+            ), prompt: Text("e.g. png, jpg"))
+            Picker("Input Kind", selection: Binding(
+                get: { action.extRules?.foldersOnly == true ? "folders" : action.extRules?.filesOnly == true ? "files" : "any" },
+                set: { value in
+                    var rules = action.extRules ?? ExtRules()
+                    rules.foldersOnly = value == "folders"; rules.filesOnly = value == "files"
+                    action.extRules = rules
+                }
+            )) {
+                Text("Files and Folders").tag("any")
+                Text("Files Only").tag("files")
+                Text("Folders Only").tag("folders")
+            }
+            LabeledContent("Rule Summary", value: ruleSummary)
+            Text("Every selected file must match. Show When controls selection count independently.")
+                .font(.caption).foregroundStyle(.secondary)
             TextField("Menu Group", text: optional(\.group), prompt: Text("e.g. Develop, Quick Actions"))
 
             TextField("SF Symbol", text: symbolBinding, prompt: Text(verbatim: "doc.on.clipboard"))
         }
+    }
+
+    private var ruleSummary: String {
+        var parts = [String(localized: action.showWhen.displayName)]
+        if let rules = action.extRules {
+            if rules.filesOnly { parts.append(String(localized: "Files Only")) }
+            if rules.foldersOnly { parts.append(String(localized: "Folders Only")) }
+            if !rules.pathExtensions.isEmpty { parts.append(rules.pathExtensions.map { "." + $0 }.joined(separator: ", ")) }
+        }
+        return parts.joined(separator: " · ")
     }
 
     private var executionSection: some View {
@@ -94,85 +138,37 @@ struct ActionInspectorView: View {
         }
     }
 
-    private var testSection: some View {
-        Section {
-            HStack(spacing: 10) {
-                Button {
-                    Task { await runLiveTest() }
-                } label: {
-                    Label(isRunningTest ? "Running…" : "Run Test", systemImage: "play.fill")
-                }
-                .disabled(isRunningTest)
-
-                if isRunningTest {
-                    ProgressView().controlSize(.small)
-                }
-
-                Spacer()
-
-                if let result = testResult {
-                    Label(
-                        result.success
-                            ? "Success (\(String(result.exitCode)))"
-                            : "Failed (\(String(result.exitCode)))",
-                        systemImage: result.success ? "checkmark.circle.fill" : "xmark.circle.fill"
-                    )
-                    .foregroundStyle(result.success ? .green : .red)
-                }
-            }
-
-            if let result = testResult {
-                Text(result.summary)
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                    .textSelection(.enabled)
-                if !result.stdout.isEmpty {
-                    OutputBlock(title: "STDOUT", text: result.stdout, tint: .secondary)
-                }
-                if !result.stderr.isEmpty {
-                    OutputBlock(title: "STDERR", text: result.stderr, tint: .red)
-                }
-            }
-        } header: {
-            Text("Live Test Console")
-        } footer: {
-            Text("Runs against user home directory.")
-        }
-    }
-
     // MARK: Type-specific editors
 
     @ViewBuilder
     private var shellEditor: some View {
-        TextField(
-            "Interpreter",
-            text: shellBinding(\.interpreter, default: "/bin/zsh"),
-            prompt: Text(verbatim: "/bin/zsh")
-        )
-        TextField(
-            "Script File",
-            text: shellBinding(\.scriptFile, default: ""),
-            prompt: Text(verbatim: "copy-path.zsh")
-        )
-        Button("Open Scripts Folder") { state.openActionsDirectory() }
-            .buttonStyle(.link)
-
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Or Inline Script:")
-                .font(.callout)
-                .foregroundStyle(.secondary)
+        TextField("Interpreter", text: shellBinding(\.interpreter, default: "/bin/zsh"))
+        Toggle("Use External Script File", isOn: $shellFileMode)
+            .onChange(of: shellFileMode) { _, file in
+                if !file { ActionAuthoring.useInline(&action) }
+                else if (action.shell?.scriptFile ?? "").isEmpty {
+                    chooseScript(appleScript: false)
+                    if (action.shell?.scriptFile ?? "").isEmpty { shellFileMode = false }
+                }
+            }
+        if shellFileMode {
+            Button("Choose Script File…") { chooseScript(appleScript: false) }
+            if let file = action.shell?.scriptFile, !file.isEmpty {
+                Text(state.store.resolveScriptPath(file).path).font(.caption).textSelection(.enabled)
+                Button("Open in Editor") { NSWorkspace.shared.open(state.store.resolveScriptPath(file)) }
+            }
+            Text("The external file takes priority. Your inline draft is preserved.").font(.caption)
+        } else {
             ScriptEditor(text: Binding(
                 get: { action.shell?.scriptInline ?? "" },
-                set: {
-                    if action.shell == nil { action.shell = ShellConfig() }
-                    action.shell?.scriptInline = $0.isEmpty ? nil : $0
-                }
+                set: { if action.shell == nil { action.shell = ShellConfig() }; action.shell?.scriptInline = $0 }
             ))
         }
     }
 
     @ViewBuilder
     private var applicationEditor: some View {
+        Button("Choose Application…") { chooseApplication() }
         TextField(
             "Bundle ID",
             text: Binding(
@@ -208,30 +204,45 @@ struct ActionInspectorView: View {
 
     @ViewBuilder
     private var appleScriptEditor: some View {
-        TextField(
-            "Script File",
-            text: Binding(
-                get: { action.appleScript?.scriptFile ?? "" },
-                set: {
-                    if action.appleScript == nil { action.appleScript = AppleScriptConfig() }
-                    action.appleScript?.scriptFile = $0
+        Toggle("Use External Script File", isOn: $appleScriptFileMode)
+            .onChange(of: appleScriptFileMode) { _, file in
+                if !file { ActionAuthoring.useInline(&action) }
+                else if (action.appleScript?.scriptFile ?? "").isEmpty {
+                    chooseScript(appleScript: true)
+                    if (action.appleScript?.scriptFile ?? "").isEmpty { appleScriptFileMode = false }
                 }
-            ),
-            prompt: Text(verbatim: "script.applescript")
-        )
-
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Or Inline Script:")
-                .font(.callout)
-                .foregroundStyle(.secondary)
-            ScriptEditor(text: Binding(
-                get: { action.appleScript?.scriptInline ?? "" },
-                set: {
-                    if action.appleScript == nil { action.appleScript = AppleScriptConfig() }
-                    action.appleScript?.scriptInline = $0.isEmpty ? nil : $0
-                }
-            ))
+            }
+        if appleScriptFileMode {
+            Button("Choose Script File…") { chooseScript(appleScript: true) }
+            if let file = action.appleScript?.scriptFile, !file.isEmpty {
+                Text(state.store.resolveScriptPath(file).path).font(.caption).textSelection(.enabled)
+                Button("Open in Editor") { NSWorkspace.shared.open(state.store.resolveScriptPath(file)) }
+            }
+            Text("The external file takes priority. Your inline draft is preserved.").font(.caption)
+        } else {
+            ScriptEditor(text: Binding(get: { action.appleScript?.scriptInline ?? "" }, set: {
+                if action.appleScript == nil { action.appleScript = AppleScriptConfig() }
+                action.appleScript?.scriptInline = $0
+            }))
         }
+    }
+
+    private func chooseScript(appleScript: Bool) {
+        let panel = NSOpenPanel(); panel.canChooseFiles = true; panel.canChooseDirectories = false
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        if appleScript {
+            if action.appleScript == nil { action.appleScript = AppleScriptConfig() }
+            action.appleScript?.scriptFile = url.path
+        } else {
+            if action.shell == nil { action.shell = ShellConfig() }
+            action.shell?.scriptFile = url.path
+        }
+    }
+
+    private func chooseApplication() {
+        let panel = NSOpenPanel(); panel.allowedContentTypes = [.applicationBundle]; panel.canChooseDirectories = false
+        guard panel.runModal() == .OK, let url = panel.url, let bundle = Bundle(url: url) else { return }
+        action.application = ApplicationConfig(bundleId: bundle.bundleIdentifier ?? "", pathFallback: url.path)
     }
 
     // MARK: Symbol picker
@@ -299,28 +310,7 @@ struct ActionInspectorView: View {
         )
     }
 
-    // MARK: Live test
 
-    private func runLiveTest() async {
-        isRunningTest = true
-        defer { isRunningTest = false }
-
-        let currentAction = action
-        let executor = state.executor
-        let homePath = FileManager.default.homeDirectoryForCurrentUser.path
-        let result = await Task.detached {
-            executor.execute(action: currentAction, paths: [homePath], containerPath: homePath)
-        }.value
-
-        state.recordLog(ExecLogEntry(
-            actionId: currentAction.id,
-            success: result.success,
-            summary: "Test Run: \(result.summary)",
-            paths: [homePath],
-            stderrTail: OutputTail.tail(result.stderr)
-        ))
-        testResult = result
-    }
 }
 
 // MARK: - Components

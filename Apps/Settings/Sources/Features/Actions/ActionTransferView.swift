@@ -8,8 +8,8 @@ struct ActionTransferView: View {
     let action: ActionDefinition?
     let store: ManifestStore
     let onImport: (PortableActionPackage) throws -> Void
-    @State private var preview: PortableActionPackage?
-    @State private var showPreview = false
+    private struct ImportPreview: Identifiable { let id = UUID(); let package: PortableActionPackage }
+    @State private var preview: ImportPreview?
     @State private var showExport = false
     @State private var dependencies = ""
     @State private var error: String?
@@ -26,12 +26,10 @@ struct ActionTransferView: View {
             load(url)
             return true
         }
-        .sheet(isPresented: $showPreview) {
-            if let preview {
-                ActionImportPreview(package: preview) {
-                    try onImport(preview)
-                    showPreview = false
-                }
+        .sheet(item: $preview) { item in
+            ActionImportPreview(package: item.package) {
+                try onImport(item.package)
+                preview = nil
             }
         }
         .sheet(isPresented: $showExport) {
@@ -67,8 +65,7 @@ struct ActionTransferView: View {
 
     private func load(_ url: URL) {
         do {
-            preview = try PortableActionPackage.read(from: url)
-            showPreview = true
+            preview = ImportPreview(package: try PortableActionPackage.read(from: url))
         } catch { self.error = error.localizedDescription }
     }
 
@@ -77,8 +74,8 @@ struct ActionTransferView: View {
         do {
             let data = try PortableActionPackage.export(action: action, store: store, dependencies: dependencies).encoded()
             let panel = NSSavePanel()
-            panel.nameFieldStringValue = "Action.faaction"
-            panel.allowedContentTypes = [.data]
+            panel.nameFieldStringValue = "Action"
+            panel.allowedContentTypes = [UTType(filenameExtension: "faaction") ?? .data]
             panel.allowsOtherFileTypes = true
             guard panel.runModal() == .OK, let url = panel.url else { return }
             try data.write(to: url, options: .atomic)

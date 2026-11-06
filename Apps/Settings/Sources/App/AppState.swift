@@ -9,6 +9,11 @@ import FinderActionsCore
 final class AppState {
     var manifest: ActionManifest = ActionManifest()
     var logs: [ExecLogEntry] = []
+    let liveTest = LiveTestSession()
+    var selectedActionID: String?
+    var navigationDestination: String?
+    var extensionRegistration: ExtensionRegistration = .unknown
+    var notificationMode: ExecutionNotificationMode = .all
     var extensionEnabledHint: String = "Unknown"
     var showOnboarding: Bool = false
 
@@ -52,6 +57,7 @@ final class AppState {
             showOnboarding = true
         }
         notificationsEnabled = preferences.object(forKey: "notificationsEnabled") as? Bool ?? true
+        notificationMode = .load(preferences: preferences)
     }
 
     func reloadManifest() {
@@ -153,6 +159,7 @@ final class AppState {
 
     func setEnabled(actionId: String, enabled: Bool) {
         guard let idx = manifest.actions.firstIndex(where: { $0.id == actionId }) else { return }
+        if enabled, let error = ActionAuthoring.validationError(manifest.actions[idx]) { configurationError = String(localized: String.LocalizationValue(error)); return }
         manifest.actions[idx].enabled = enabled
         saveManifest()
     }
@@ -187,7 +194,7 @@ final class AppState {
             id: newId,
             name: name,
             type: type,
-            enabled: true,
+            enabled: false,
             sortIndex: maxIndex + 10,
             group: "Custom",
             icon: ActionIcon(sfSymbol: symbol),
@@ -196,6 +203,14 @@ final class AppState {
         )
         manifest.actions.append(action)
         saveManifest()
+        return action
+    }
+
+    @discardableResult
+    func addAction(template: ActionTemplate) -> ActionDefinition {
+        var action = template.make(id: "user.action.\(UUID().uuidString.lowercased())", sortIndex: (manifest.actions.map(\.sortIndex).max() ?? 0) + 10)
+        action.name = String(localized: String.LocalizationValue(action.name))
+        manifest.actions.append(action); saveManifest()
         return action
     }
 
@@ -240,17 +255,9 @@ final class AppState {
                 executable: "/usr/bin/pluginkit",
                 arguments: ["-m", "-i", IPCConstants.extensionBundleId]
             )
-            if out.contains(IPCConstants.extensionBundleId) || out.contains("FinderSync") {
-                if out.contains("+") || out.lowercased().contains("enabled") {
-                    extensionEnabledHint = "Registered (check System Settings if menu missing)"
-                } else {
-                    extensionEnabledHint = "Registered — enable in System Settings → Privacy & Security → Extensions → Added Extensions"
-                }
-            } else if out.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                extensionEnabledHint = "Not registered — open Host once from /Applications, then enable in System Settings"
-            } else {
-                extensionEnabledHint = out.trimmingCharacters(in: .whitespacesAndNewlines)
-            }
+            extensionRegistration = .parse(out, bundleID: IPCConstants.extensionBundleId)
+            extensionEnabledHint = extensionRegistration.message
+
         }
     }
 
@@ -266,13 +273,21 @@ final class AppState {
         }
     }
 
-    func completeOnboarding() {
+    var finderSetupVerified: Bool {
+        preferences.bool(forKey: "finderSetupVerified") || logs.contains {
+            $0.source == .finder && $0.success && $0.actionId == "copy-path"
+        }
+    }
+
+    func completeOnboarding(skipped: Bool = false) {
+        guard skipped || finderSetupVerified else { return }
+        preferences.set(skipped, forKey: "onboardingSkipped")
         preferences.set(true, forKey: "didCompleteOnboarding")
         showOnboarding = false
     }
 
     func persistSettings() {
-        preferences.set(notificationsEnabled, forKey: "notificationsEnabled")
+        notificationMode.persist(preferences: preferences)
         onManifestChanged?()
     }
 

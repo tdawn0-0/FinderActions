@@ -52,7 +52,9 @@ enum WorkflowFeedback {
         preferences.set(destination, forKey: "settingsDestination")
         preferences.set(actionID ?? "", forKey: "settingsActionID")
         guard !preferences.isInMemory else { return }
-        DistributedNotificationCenter.default().postNotificationName(settingsNavigation, object: nil, deliverImmediately: true)
+        if !preferences.isInMemory {
+            DistributedNotificationCenter.default().postNotificationName(settingsNavigation, object: nil, deliverImmediately: true)
+        }
         NotificationCenter.default.post(name: settingsNavigation, object: nil)
     }
     static func verifiesSetup(_ log: ExecLogEntry) -> Bool {

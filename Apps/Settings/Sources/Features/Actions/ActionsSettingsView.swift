@@ -7,6 +7,7 @@ struct ActionsSettingsView: View {
     @State private var selection: String?
     @State private var searchText = ""
     @State private var showInspector = true
+    @State private var showTemplates = false
     @State private var pendingDeletion: [String] = []
 
     private var sortedActions: [ActionDefinition] {
@@ -29,6 +30,20 @@ struct ActionsSettingsView: View {
             .navigationTitle("Actions")
             .searchable(text: $searchText, placement: .toolbar, prompt: "Search actions…")
             .toolbar { toolbarContent }
+            .disabled(state.liveTest.isRunning)
+            .sheet(isPresented: $showTemplates) {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Create an Action").font(.title2)
+                    Text("Start with a template. New actions stay disabled until you enable them.")
+                    ForEach(ActionTemplate.allCases, id: \.self) { template in
+                        Button(templateTitle(template)) {
+                            selection = state.addAction(template: template).id
+                            showInspector = true; showTemplates = false
+                        }
+                    }
+                    Button("Cancel") { showTemplates = false }.keyboardShortcut(.cancelAction)
+                }.padding(24).frame(width: 440)
+            }
             .inspector(isPresented: $showInspector) { inspector }
             .confirmationDialog(
                 "Delete Selected Action",
@@ -41,7 +56,11 @@ struct ActionsSettingsView: View {
                 Button("Delete", role: .destructive) { delete(pendingDeletion) }
                 Button("Cancel", role: .cancel) {}
             }
+            .onChange(of: state.selectedActionID) { _, id in
+                if let id { selection = id; showInspector = true }
+            }
             .onAppear {
+                if let id = state.selectedActionID { selection = id }
                 if selection == nil { selection = sortedActions.first?.id }
             }
     }
@@ -104,8 +123,7 @@ struct ActionsSettingsView: View {
     private var toolbarContent: some ToolbarContent {
         ToolbarItemGroup {
             Button {
-                selection = state.addNewAction().id
-                showInspector = true
+                showTemplates = true
             } label: {
                 Label("Add New Action", systemImage: "plus")
             }
@@ -129,6 +147,13 @@ struct ActionsSettingsView: View {
         }
 
         ToolbarItemGroup {
+            ActionTransferView(action: sortedActions.first { $0.id == selection }, store: state.store) { package in
+                state.flushPendingManifestSave()
+                guard !state.writesBlocked && !state.isDirty else { throw ManifestError.writeFailed("Resolve configuration errors before importing.") }
+                state.manifest = try package.install(into: state.store, manifest: state.manifest)
+                state.onManifestChanged?()
+                selection = state.manifest.actions.last?.id
+            }
             Button {
                 state.openActionsDirectory()
             } label: {
@@ -141,6 +166,15 @@ struct ActionsSettingsView: View {
             } label: {
                 Label("Inspector", systemImage: "sidebar.trailing")
             }
+        }
+    }
+
+    private func templateTitle(_ template: ActionTemplate) -> LocalizedStringKey {
+        switch template {
+        case .perFile: "Process Each Selected File"
+        case .currentDirectory: "Run a Command in Current Directory"
+        case .application: "Open with an Application"
+        case .blank: "Blank Script"
         }
     }
 
@@ -167,6 +201,7 @@ struct ActionsSettingsView: View {
             get: { state.manifest.actions.first(where: { $0.id == id }) ?? current },
             set: { newValue in
                 guard let index = state.manifest.actions.firstIndex(where: { $0.id == id }) else { return }
+                guard !state.liveTest.isRunning else { return }
                 state.manifest.actions[index] = newValue
                 state.scheduleManifestSave()
             }
