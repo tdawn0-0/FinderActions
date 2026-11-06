@@ -1,0 +1,15 @@
+{
+  "id": "compress-archive",
+  "name": "Compress to Archive",
+  "type": "shell",
+  "enabled": true,
+  "sortIndex": 10,
+  "icon": {
+    "sfSymbol": "archivebox.fill"
+  },
+  "showWhen": "always",
+  "shell": {
+    "interpreter": "/bin/zsh",
+    "scriptFile": "compress.zsh"
+  }
+}

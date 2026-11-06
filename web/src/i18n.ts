@@ -1,3 +1,5 @@
+import compressActionManifest from './examples/compress-action.json?raw';
+
 export const translations = {
   en: {
     nav: {
@@ -445,24 +447,7 @@ done
 echo "✅ Compressed $# file(s) into archives!"
 exit 0`,
 
-  manifest: `{
-  "id": "compress-archive",
-  "name": "Compress to Archive",
-  "type": "shell",
-  "enabled": true,
-  "sortIndex": 10,
-  "icon": {
-    "sfSymbol": "archivebox.fill"
-  },
-  "showWhen": {
-    "target": "filesAndFolders",
-    "minSelection": 1
-  },
-  "shell": {
-    "interpreter": "/bin/zsh",
-    "scriptFile": "compress.zsh"
-  }
-}`,
+  manifest: compressActionManifest,
 
   output: `[2026-09-18T14:10:02+08:00] EXEC START: action=compress-archive
 > Working Dir: /Users/developer/Project-Assets
