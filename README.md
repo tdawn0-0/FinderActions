@@ -148,6 +148,25 @@ Save → Host republishes the menu snapshot. Use **Open Scripts Folder** from Se
 
 Exit code `0` = success (first stdout line can appear in the notification). Non-zero = failure (the end of stderr is kept in Settings → Logs).
 
+## Build your own Finder workflow
+
+- Start an action from a per-file, current-directory, application or blank template.
+  New actions stay disabled while you configure them.
+- Set file extensions and file/folder rules to keep the right-click menu relevant.
+- Choose or drop real test inputs, inspect the execution preview, and explicitly
+  run the action from Settings. Tests really execute scripts and may change files.
+- Follow setup through a successful **Copy Path** action in Finder. Extension
+  registration, enablement and verified execution are shown separately.
+- See active Finder tasks in the menu bar and recent results with names, file
+  counts and durations. Open a result to inspect its logs or edit its action.
+  Choose notifications for every completion, failures only, or off.
+- Export a single action and its scripts as a local `.faaction` package. Import
+  previews source/dependencies and creates a disabled copy with a new identifier.
+
+See [the scripting guide](docs/scripting.md) for semantics and package limits, and
+[workflow verification](docs/troubleshooting.md#verify-the-six-workflows) for test
+scenarios. The Settings window stays open while a Live Test is running.
+
 ## Architecture
 
 ```

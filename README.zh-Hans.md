@@ -108,6 +108,24 @@ Finder 始终只显示一个通用的“在终端中打开”；每个已选编�
 
 详见 [docs/architecture.md](docs/architecture.md)、[docs/ipc.md](docs/ipc.md)、[docs/scripting.md](docs/scripting.md)、[docs/troubleshooting.md](docs/troubleshooting.md) 与 [docs/releasing.zh-Hans.md](docs/releasing.zh-Hans.md)（打包公证与网站部署）。
 
+## 创建自己的 Finder 工作流程
+
+- 从逐个处理文件、当前目录命令、打开应用或空白脚本模板创建动作。
+  新动作默认停用，配置完成后再启用。
+- 设置文件扩展名及文件／文件夹条件，让右键菜单只显示适用的动作。
+- 选择或拖入真实测试输入，检查执行预览，再手动运行测试。
+  测试会真实执行脚本，可能更改文件。
+- 首次引导会带你在访达中成功执行一次“复制路径”。界面分别显示
+  扩展已注册、已启用和已验证执行，避免把注册状态当作使用成功。
+- 菜单栏显示正在运行的 Finder 任务；最近活动包含动作名称、文件数量和耗时。
+  点击结果可查看日志，再进入对应动作编辑。通知可设为每次完成、仅失败或关闭。
+- 将单个动作及其脚本导出为本地 `.faaction` 文件。导入前可预览脚本和依赖说明；
+  导入后生成新标识符，并保持停用，等待你检查和启用。
+
+详细行为及动作包限制见 [脚本指南](docs/scripting.md)。
+[工作流程验证](docs/troubleshooting.md#verify-the-six-workflows)提供了可执行检查步骤。
+Live Test 运行期间，设置窗口会保持打开。
+
 ## 架构
 
 ```
