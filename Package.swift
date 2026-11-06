@@ -34,6 +34,7 @@ let package = Package(
                 "Apps/Shared/Sources/Execution/ActionExecutor.swift",
                 "Apps/Shared/Sources/Execution/ExecLogStore.swift",
                 "Tests/AppIntegrationTests/ConfigurationPersistenceTests.swift",
+                "Tests/AppIntegrationTests/LogsRefreshTests.swift",
             ]
         ),
         .executableTarget(

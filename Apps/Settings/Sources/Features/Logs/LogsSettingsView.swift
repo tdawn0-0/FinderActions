@@ -37,7 +37,14 @@ struct LogsSettingsView: View {
         content
             .navigationTitle("Activity Logs")
             .searchable(text: $searchText, placement: .toolbar, prompt: "Search logs…")
+            .onAppear { state.refreshLogs() }
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+                state.refreshLogs()
+            }
             .toolbar {
+                ToolbarItem {
+                    Button { state.refreshLogs() } label: { Label("Refresh", systemImage: "arrow.clockwise") }
+                }
                 ToolbarItem {
                     Picker("Status Filter", selection: $filter) {
                         ForEach(LogFilter.allCases, id: \.self) { Text($0.title).tag($0) }

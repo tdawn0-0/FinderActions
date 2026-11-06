@@ -45,7 +45,7 @@ final class AppState {
 
     func bootstrap() {
         reloadManifest()
-        logs = logStore.recent(limit: 200)
+        refreshLogs()
         refreshExtensionStatus()
 
         if !preferences.bool(forKey: "didCompleteOnboarding") {
@@ -217,6 +217,10 @@ final class AppState {
 
     func recordLog(_ entry: ExecLogEntry) {
         logStore.append(entry)
+        refreshLogs()
+    }
+
+    func refreshLogs() {
         logs = logStore.recent(limit: 200)
     }
 
