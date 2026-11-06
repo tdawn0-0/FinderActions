@@ -32,8 +32,9 @@ jobs:
       - name: Swift package tests
         run: ./Scripts/test.sh
 
+      # Keep product build descriptions separate from swift test on hosted toolchains.
       - name: Build all package products
-        run: swift build --package-path . --scratch-path build/SwiftPM
+        run: swift build --package-path . --scratch-path build/SwiftPMProducts
 
       - name: Install XcodeGen
         run: brew install xcodegen
