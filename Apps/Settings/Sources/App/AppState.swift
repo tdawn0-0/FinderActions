@@ -63,6 +63,7 @@ final class AppState {
             writesBlocked = false
             isDirty = false
         } catch {
+            openWithSettings = SharedConfiguration.loadOpenWithSettings(preferences: preferences)
             configurationError = error.localizedDescription
             writesBlocked = true
         }

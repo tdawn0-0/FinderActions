@@ -10,14 +10,14 @@ enum SharedConfiguration {
     /// Seeds defaults on first launch; otherwise migrates the stored manifest to
     /// its base form (Open With actions are generated, never stored). Always
     /// restores missing bundled scripts.
-    static func bootstrap(store: ManifestStore, preferences: PreferencesStore = .live) throws -> (manifest: ActionManifest, openWith: OpenWithSettings) {
+    static func bootstrap(store: ManifestStore, preferences: PreferencesStore = .live, migrationSave: ((ActionManifest) throws -> Void)? = nil) throws -> (manifest: ActionManifest, openWith: OpenWithSettings) {
         try store.ensureDirectories()
         let result: (manifest: ActionManifest, openWith: OpenWithSettings)
         if FileManager.default.fileExists(atPath: store.fileURL.path) {
             let stored = try store.load()
             let base = OpenWithActions.baseManifest(from: stored)
             if base != stored {
-                try store.save(base)
+                try (migrationSave ?? store.save)(base)
             }
             result = (base, loadOpenWithSettings(preferences: preferences))
         } else {

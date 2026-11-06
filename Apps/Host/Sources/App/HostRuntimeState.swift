@@ -37,7 +37,10 @@ final class HostRuntimeState {
     func bootstrap() {
         do {
             (manifest, openWithSettings) = try SharedConfiguration.bootstrap(store: store, preferences: preferences)
-        } catch { recordConfigurationFailure() }
+        } catch {
+            openWithSettings = SharedConfiguration.loadOpenWithSettings(preferences: preferences)
+            recordConfigurationFailure()
+        }
         loadPreferences()
     }
 
