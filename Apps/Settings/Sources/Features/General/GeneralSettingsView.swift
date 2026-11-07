@@ -1,89 +1,81 @@
+import AppKit
 import SwiftUI
 
 struct GeneralSettingsView: View {
+    private static let repositoryURL = URL(string: "https://github.com/tdawn0-0/FinderActions")!
+
     @Environment(AppState.self) private var state
     @Environment(\.openURL) private var openURL
     @State private var showResetConfirm = false
 
+    private var version: String {
+        let info = Bundle.main.infoDictionary
+        let short = info?["CFBundleShortVersionString"] as? String ?? "—"
+        guard let build = info?["CFBundleVersion"] as? String else { return short }
+        return "\(short) (\(build))"
+    }
+
     var body: some View {
-        @Bindable var state = state
+        @Bindable var bindableState = state
 
         Form {
-            Section("Preferences") {
-                Picker("Execution Notifications", selection: $state.notificationMode) {
+            Section("Behavior") {
+                Picker("Notifications", selection: $bindableState.notificationMode) {
                     ForEach(ExecutionNotificationMode.allCases, id: \.self) { mode in
                         Text(mode.title).tag(mode)
                     }
                 }
             }
 
-            Section("Storage & Configurations") {
-                PathRow(
-                    title: "Manifest Config",
-                    path: state.store.fileURL.path,
-                    buttonTitle: "Reveal in Finder"
-                ) {
-                    openURL(state.store.fileURL.deletingLastPathComponent())
+            Section("Storage") {
+                LabeledContent("Configuration") {
+                    HStack(spacing: 8) {
+                        Text(state.store.fileURL.lastPathComponent)
+                            .font(.callout.monospaced())
+                            .foregroundStyle(.secondary)
+                            .help(state.store.fileURL.path)
+                        Button("Show in Finder") {
+                            NSWorkspace.shared.activateFileViewerSelecting([state.store.fileURL])
+                        }
+                        .controlSize(.small)
+                    }
                 }
-                PathRow(
-                    title: "Scripts Folder",
-                    path: state.store.actionsDirectoryURL.path,
-                    buttonTitle: "Open Folder"
-                ) {
-                    openURL(state.store.actionsDirectoryURL)
-                }
-            }
 
-            Section("Factory Reset") {
-                LabeledContent {
-                    Button("Reset to Defaults", role: .destructive) {
+                LabeledContent("Scripts") {
+                    HStack(spacing: 8) {
+                        Text(state.store.actionsDirectoryURL.lastPathComponent)
+                            .font(.callout.monospaced())
+                            .foregroundStyle(.secondary)
+                            .help(state.store.actionsDirectoryURL.path)
+                        Button("Open") {
+                            openURL(state.store.actionsDirectoryURL)
+                        }
+                        .controlSize(.small)
+                    }
+                }
+
+                LabeledContent("Defaults") {
+                    Button("Reset…", role: .destructive) {
                         showResetConfirm = true
                     }
-                } label: {
-                    Text("Reset actions and application configurations back to the initial defaults.")
-                        .foregroundStyle(.secondary)
+                    .controlSize(.small)
                 }
             }
 
-            Section("Privacy & Offline") {
-                Label(
-                    "FinderActions is completely offline. No telemetry, no accounts, and no data leaves your device.",
-                    systemImage: "hand.raised.fill"
-                )
-                .foregroundStyle(.secondary)
+            Section("About") {
+                LabeledContent("Version", value: version)
+                LabeledContent("License", value: "MIT")
+                LabeledContent("Source") {
+                    Link("GitHub", destination: Self.repositoryURL)
+                }
             }
         }
         .formStyle(.grouped)
         .navigationTitle("General")
         .onChange(of: state.notificationMode) { _, _ in state.persistSettings() }
-        .alert("Reset all actions to default?", isPresented: $showResetConfirm) {
+        .alert("Reset Defaults?", isPresented: $showResetConfirm) {
             Button("Reset", role: .destructive) { state.seedDefaults() }
             Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("This will restore the default manifest and bundled scripts.")
-        }
-    }
-}
-
-private struct PathRow: View {
-    let title: LocalizedStringKey
-    let path: String
-    let buttonTitle: LocalizedStringKey
-    let action: () -> Void
-
-    var body: some View {
-        LabeledContent {
-            Button(buttonTitle, action: action)
-        } label: {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                Text(path)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                    .textSelection(.enabled)
-            }
         }
     }
 }

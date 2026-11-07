@@ -11,7 +11,7 @@ public enum DefaultActions {
             ActionDefinition(
                 id: "copy-path",
                 name: "Copy Path",
-                subtitle: "Absolute path to clipboard",
+                subtitle: nil,
                 type: .shell,
                 enabled: true,
                 sortIndex: 20,
@@ -23,7 +23,7 @@ public enum DefaultActions {
             ActionDefinition(
                 id: "copy-name",
                 name: "Copy Filename",
-                subtitle: "Basename to clipboard",
+                subtitle: nil,
                 type: .shell,
                 enabled: true,
                 sortIndex: 21,

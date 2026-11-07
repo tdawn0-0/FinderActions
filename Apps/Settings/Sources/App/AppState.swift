@@ -4,19 +4,64 @@ import Observation
 import SwiftUI
 import FinderActionsCore
 
+enum SettingsSection: String, CaseIterable, Identifiable, Sendable {
+    case actions
+    case applications
+    case logs
+    case permissions
+    case general
+
+    var id: String { rawValue }
+
+    static let groups: [[SettingsSection]] = [
+        [.actions, .applications, .logs],
+        [.permissions, .general],
+    ]
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .actions: "Actions"
+        case .applications: "Applications"
+        case .logs: "Logs"
+        case .permissions: "Permissions"
+        case .general: "General"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .actions: "bolt"
+        case .applications: "square.grid.2x2"
+        case .logs: "clock.arrow.circlepath"
+        case .permissions: "checkmark.shield"
+        case .general: "gearshape"
+        }
+    }
+}
+
+enum SettingsAccessibilityID {
+    static func sidebar(_ section: SettingsSection) -> String { "settings.sidebar.\(section.rawValue)" }
+    static let actionsList = "actions.list"
+    static let actionsAddMenu = "actions.addMenu"
+    static let actionsTransferMenu = "actions.transferMenu"
+    static let inspectorName = "inspector.name"
+    static let inspectorEnabled = "inspector.enabled"
+    static let inspectorSourceMode = "inspector.sourceMode"
+    static let liveTestRun = "liveTest.run"
+    static let logsFilter = "logs.filter"
+}
+
 @Observable
 @MainActor
 final class AppState {
     var manifest: ActionManifest = ActionManifest()
     var logs: [ExecLogEntry] = []
     let liveTest = LiveTestSession()
+    var selectedSection: SettingsSection = .actions
     var selectedActionID: String?
-    var navigationDestination: String?
     var extensionRegistration: ExtensionRegistration = .unknown
     var notificationMode: ExecutionNotificationMode = .all
-    var extensionEnabledHint: String = "Unknown"
     var showOnboarding: Bool = false
-
     let preferences: PreferencesStore
     var configurationError: String?
     var isDirty = false
@@ -26,7 +71,6 @@ final class AppState {
     let logStore: ExecLogStore
     let executor: ActionExecutor
 
-    var notificationsEnabled: Bool = true
     var openWithSettings: OpenWithSettings = .defaults
 
     var onManifestChanged: (() -> Void)?
@@ -56,8 +100,8 @@ final class AppState {
         if !preferences.bool(forKey: "didCompleteOnboarding") {
             showOnboarding = true
         }
-        notificationsEnabled = preferences.object(forKey: "notificationsEnabled") as? Bool ?? true
         notificationMode = .load(preferences: preferences)
+        consumePendingNavigation()
     }
 
     func reloadManifest() {
@@ -144,12 +188,23 @@ final class AppState {
         openWithSettings.editors.contains { $0.bundleId == application.bundleId }
     }
 
-    func isApplicationInstalled(_ application: ExternalApplication) -> Bool {
-        if NSWorkspace.shared.urlForApplication(withBundleIdentifier: application.bundleId) != nil {
-            return true
+    func applicationURL(for application: ExternalApplication) -> URL? {
+        if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: application.bundleId) {
+            return url
         }
-        guard let path = application.pathFallback else { return false }
-        return FileManager.default.fileExists(atPath: path)
+        guard let path = application.pathFallback, FileManager.default.fileExists(atPath: path) else {
+            return nil
+        }
+        return URL(fileURLWithPath: path)
+    }
+
+    func isApplicationInstalled(_ application: ExternalApplication) -> Bool {
+        applicationURL(for: application) != nil
+    }
+
+    func applicationIcon(for application: ExternalApplication) -> NSImage? {
+        guard let url = applicationURL(for: application) else { return nil }
+        return NSWorkspace.shared.icon(forFile: url.path)
     }
 
     var customEditors: [ExternalApplication] {
@@ -257,8 +312,6 @@ final class AppState {
                 arguments: ["-m", "-i", IPCConstants.extensionBundleId]
             )
             extensionRegistration = .parse(out, bundleID: IPCConstants.extensionBundleId)
-            extensionEnabledHint = extensionRegistration.message
-
         }
     }
 
@@ -290,6 +343,31 @@ final class AppState {
     func persistSettings() {
         notificationMode.persist(preferences: preferences)
         onManifestChanged?()
+    }
+
+    func navigate(to section: SettingsSection, actionID: String? = nil) {
+        selectedSection = section
+        if let actionID, !actionID.isEmpty {
+            selectedActionID = actionID
+        } else if section == .logs {
+            selectedActionID = nil
+        }
+    }
+
+    func consumePendingNavigation() {
+        guard let destination = preferences.object(forKey: "settingsDestination") as? String,
+              let section = SettingsSection(rawValue: destination),
+              section == .logs || section == .actions else { return }
+        selectedSection = section
+        if let id = preferences.object(forKey: "settingsActionID") as? String,
+           !id.isEmpty,
+           section == .logs || manifest.actions.contains(where: { $0.id == id }) {
+            selectedActionID = id
+        } else if section == .logs {
+            selectedActionID = nil
+        }
+        preferences.set("", forKey: "settingsDestination")
+        preferences.set("", forKey: "settingsActionID")
     }
 
     func chooseApplications(kind: ExternalApplicationKind) {

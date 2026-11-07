@@ -1,6 +1,6 @@
 import { latestReleaseURL } from '../release';
 import React, { useState } from 'react';
-import { Download, ToggleLeft, MousePointerClick, Terminal, Check, Copy, AlertCircle } from 'lucide-react';
+import { Check, Copy } from 'lucide-react';
 import type { Language } from '../types';
 import { translations } from '../i18n';
 
@@ -14,134 +14,79 @@ export const GettingStarted: React.FC<GettingStartedProps> = ({ lang }) => {
 
   const troubleCmd = `pluginkit -a "/Applications/FinderActions.app/Contents/PlugIns/FAFinderSync.appex"
 pluginkit -e use -i com.finderactions.host.FinderSync
-pluginkit -m -i com.finderactions.host.FinderSync
 killall Finder`;
 
   const handleCopyTrouble = () => {
     navigator.clipboard.writeText(troubleCmd);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 1800);
   };
 
   return (
-    <section id="guide" className="py-16 md:py-24 px-4 sm:px-6 relative">
+    <section id="guide" className="py-12 md:py-16 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto">
-        {/* Section Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 font-medium mb-3">
-            <Terminal className="w-3.5 h-3.5" />
-            <span>{t.tag}</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-3">
-            {t.title}
-          </h2>
-        </div>
+        <h2 className="text-xl sm:text-2xl font-semibold text-white tracking-tight mb-5">
+          {t.title}
+        </h2>
 
-        {/* 3 Steps Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {/* Step 1 */}
-          <div className="glass-panel rounded-2xl p-6 border border-white/10 bg-[#10131c]/80 flex flex-col justify-between hover:border-white/20 transition-all">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+          <div className="glass-panel rounded-2xl p-5 border border-white/8 bg-[#10121a] flex flex-col justify-between gap-4">
             <div>
-              <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-4">
-                <Download className="w-5 h-5" />
-              </div>
-              <h3 className="text-base font-semibold text-white tracking-tight mb-2">
+              <h3 className="text-sm font-semibold text-white tracking-tight mb-1.5">
                 {t.step1Title}
               </h3>
-              <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+              <p className="text-xs text-zinc-400 leading-relaxed">
                 {t.step1Desc}
               </p>
             </div>
-            <div className="mt-6 flex flex-col gap-1.5">
-              <a
-                href={latestReleaseURL}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300"
-              >
-                <span>{lang === 'zh' ? '前往最新版本下载页 ›' : 'Open latest release downloads ›'}</span>
-              </a>
-              <a
-                href={latestReleaseURL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[11px] text-zinc-500 hover:text-zinc-300"
-              >
-                {lang === 'zh' ? '发布说明与校验和 ›' : 'Release Notes & Checksums ›'}
-              </a>
-            </div>
-          </div>
-
-          {/* Step 2 */}
-          <div className="glass-panel rounded-2xl p-6 border border-white/10 bg-[#10131c]/80 flex flex-col justify-between hover:border-white/20 transition-all">
-            <div>
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-4">
-                <ToggleLeft className="w-5 h-5" />
-              </div>
-              <h3 className="text-base font-semibold text-white tracking-tight mb-2">
-                {t.step2Title}
-              </h3>
-              <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-                {t.step2Desc}
-              </p>
-            </div>
-            <div className="mt-6 text-[11px] text-zinc-500 font-mono">
-              Privacy & Security › Extensions
-            </div>
-          </div>
-
-          {/* Step 3 */}
-          <div className="glass-panel rounded-2xl p-6 border border-white/10 bg-[#10131c]/80 flex flex-col justify-between hover:border-white/20 transition-all">
-            <div>
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4">
-                <MousePointerClick className="w-5 h-5" />
-              </div>
-              <h3 className="text-base font-semibold text-white tracking-tight mb-2">
-                {t.step3Title}
-              </h3>
-              <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-                {t.step3Desc}
-              </p>
-            </div>
-            <div className="mt-6 text-[11px] text-zinc-500 font-mono">
-              Right-click file › Run action
-            </div>
-          </div>
-        </div>
-
-        {/* Sequoia Troubleshooting Box */}
-        <div className="glass-panel rounded-2xl p-6 border border-amber-500/30 bg-[#14161f]/90">
-          <div className="flex items-start justify-between gap-4 mb-3">
-            <div className="flex items-center gap-2 text-amber-400">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <h4 className="text-sm font-semibold tracking-tight">
-                {t.troubleTitle}
-              </h4>
-            </div>
-            <button
-              onClick={handleCopyTrouble}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono text-zinc-300 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
+            <a
+              href={latestReleaseURL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-medium text-[#0a84ff] hover:underline w-fit"
             >
-              {copied ? (
-                <>
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-emerald-400">Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3.5 h-3.5" />
-                  <span>Copy Commands</span>
-                </>
-              )}
-            </button>
+              {t.downloadLink}
+            </a>
           </div>
 
-          <p className="text-xs text-zinc-400 mb-3">
-            {t.troubleDesc}
-          </p>
+          <div className="glass-panel rounded-2xl p-5 border border-white/8 bg-[#10121a]">
+            <h3 className="text-sm font-semibold text-white tracking-tight mb-1.5">
+              {t.step2Title}
+            </h3>
+            <p className="text-xs text-zinc-400 leading-relaxed">
+              {t.step2Desc}
+            </p>
+          </div>
 
-          <div className="bg-black/60 rounded-xl p-3 border border-white/10 font-mono text-xs text-zinc-300 overflow-x-auto leading-relaxed">
-            <pre><code>{troubleCmd}</code></pre>
+          <div className="glass-panel rounded-2xl p-5 border border-white/8 bg-[#10121a]">
+            <h3 className="text-sm font-semibold text-white tracking-tight mb-1.5">
+              {t.step3Title}
+            </h3>
+            <p className="text-xs text-zinc-400 leading-relaxed">
+              {t.step3Desc}
+            </p>
           </div>
         </div>
+
+        <details className="glass-panel rounded-xl border border-white/8 bg-[#0f1118] group">
+          <summary className="px-5 py-3 text-xs font-medium text-zinc-300 cursor-pointer select-none flex items-center justify-between">
+            <span>{t.troubleTitle}</span>
+            <span className="font-mono text-zinc-500 group-open:rotate-180 transition-transform">▾</span>
+          </summary>
+          <div className="px-5 pb-4 pt-1 border-t border-white/6">
+            <div className="relative bg-black/50 rounded-lg p-3 border border-white/8 font-mono text-xs text-zinc-300 overflow-x-auto leading-relaxed">
+              <button
+                type="button"
+                onClick={handleCopyTrouble}
+                className="pressable absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded text-[11px] text-zinc-300 bg-white/8 hover:bg-white/12 cursor-pointer"
+              >
+                {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                <span>{copied ? t.copiedCmd : t.copyCmd}</span>
+              </button>
+              <pre><code>{troubleCmd}</code></pre>
+            </div>
+          </div>
+        </details>
       </div>
     </section>
   );

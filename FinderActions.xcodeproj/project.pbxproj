@@ -49,7 +49,6 @@
 		DBCE7CD6EF9009A1F7F93422 /* HostRuntimeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68390FB08D84B31124DE28E1 /* HostRuntimeState.swift */; };
 		DE328CD58536B44650F34E55 /* SharedConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA49EDCE7FC57A1EF8BEE17E /* SharedConfiguration.swift */; };
 		DED3A02B80BEA8EBEA1848C2 /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF596A31B37E7E28454817F /* AppPreferences.swift */; };
-		E256A35FBD6AE356DA047B94 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E288A1F1B95A2C4A99DF207 /* AboutView.swift */; };
 		EB583EAB5D7C2E85056AF708 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7048E35AB8E6782282D90C /* OnboardingView.swift */; };
 		ED5C0D9E7BAFEEF73965B593 /* IPCServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6015524AE62846F51B5C88A9 /* IPCServer.swift */; };
 		ED60589A61F340B490EFF61A /* ActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FF0FD93DEE2B6A9585FB016 /* ActionExecutor.swift */; };
@@ -106,9 +105,9 @@
 		1C28DE75EA01B130D0307790 /* FinderSync.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FinderSync.framework; path = System/Library/Frameworks/FinderSync.framework; sourceTree = SDKROOT; };
 		36488ADF7113F067ED64522A /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
 		3C0CA36B23AB76C0A0A2602A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		3E288A1F1B95A2C4A99DF207 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		3E4DE01F1815B1970780D836 /* ActionsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionsSettingsView.swift; sourceTree = "<group>"; };
 		49125CAE942DD5821D483D90 /* ActionTransferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionTransferView.swift; sourceTree = "<group>"; };
+		4980120D49FC6D3CEF90EF33 /* finder-menu */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "finder-menu"; path = .; sourceTree = SOURCE_ROOT; };
 		4B4872A5DDB6A1673B1067DE /* SettingsHelperLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHelperLauncher.swift; sourceTree = "<group>"; };
 		4B7272FDFC4D7C9030BA26CF /* FinderActionsSettings.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinderActionsSettings.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C3603FD712481486FC01F45 /* StatusMenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMenuController.swift; sourceTree = "<group>"; };
@@ -140,7 +139,6 @@
 		F414D005950D759ED9F3E9C7 /* BundledActions */ = {isa = PBXFileReference; lastKnownFileType = folder; path = BundledActions; sourceTree = SOURCE_ROOT; };
 		F41B8FBA0CA7319CEB69B3DE /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		F90E0D9614DFEA2AE28DB51D /* PermissionsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsSettingsView.swift; sourceTree = "<group>"; };
-		4980120D49FC6D3CEF90EF33 /* finder-menu */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "finder-menu"; path = .; sourceTree = SOURCE_ROOT; };
 		FBF596A31B37E7E28454817F /* AppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferences.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -219,18 +217,9 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
-		2C9FE2820DEF919E55B1EE9D /* About */ = {
-			isa = PBXGroup;
-			children = (
-				3E288A1F1B95A2C4A99DF207 /* AboutView.swift */,
-			);
-			path = About;
-			sourceTree = "<group>";
-		};
 		33DCEC3E39B4EBD2549865E5 /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				2C9FE2820DEF919E55B1EE9D /* About */,
 				DD33FAD7A1697439A5F75BC4 /* Actions */,
 				CDA8EC683881E1120C29CF6C /* Applications */,
 				B867F504ABCBEF580D6825FA /* General */,
@@ -592,7 +581,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E256A35FBD6AE356DA047B94 /* AboutView.swift in Sources */,
 				ED60589A61F340B490EFF61A /* ActionExecutor.swift in Sources */,
 				1DA684E639B5538D3EEC44CD /* ActionInspectorView.swift in Sources */,
 				4C511895453AAA80F8661414 /* ActionTransferView.swift in Sources */,

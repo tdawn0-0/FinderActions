@@ -52,15 +52,15 @@ Registration and enablement are separate hints. A registered extension may still
 need enabling in System Settings; an unknown status must be checked there. Setup
 is verified only after Host records a successful Finder-origin **Copy Path**
 action. A Settings test, an unrelated action, or a failed execution does not count.
-**Skip for Now** leaves setup unverified. Return to the setup flow to finish it.
+**Skip** leaves setup unverified. Return to the setup flow to finish it.
 
 The menu bar displays the active Host task count. **Recent Activity** contains
-running tasks and recent results. Choose a result to open its filtered Activity
-Logs; **Edit Action** opens the matching action when it still exists. New log
-entries retain the readable action name, path count and duration. Older log rows
-remain readable even when they lack those fields. In **General → Execution
-Notifications**, choose every completion, failures only, or off. Notification
-clicks open the associated logs when macOS delivers them.
+running tasks and recent results. Choose a result to open its filtered **Logs**;
+the **Configure Action** button on a log row opens the matching action or
+application settings. New log entries retain the readable action name, path count
+and duration. Older log rows remain readable even when they lack those fields. In
+**General → Notifications**, choose **All**, **Failures Only**, or **Off**.
+Notification clicks open the associated logs when macOS delivers them.
 
 A long-running command may still be running when no notification appears. Check
 Recent Activity before running it again. FinderActions does not promise to cancel
@@ -101,22 +101,23 @@ isolation, add `--onboarding` to the helper command; it should remain unverified
    input. Clear the container too and check Run is disabled. While a harmless
    `sleep 3; print -r -- "$@"` test runs, verify duplicate Run, changing/deleting
    that action and closing Settings are prevented; after completion inspect output.
-2. **Matching:** On the same action choose Single Selection, Files Only and
-   extensions `.PNG, jpg`. Enable it. A single PNG should be described as visible;
-   two PNGs should be hidden by count; a PNG plus `notes.txt` should be hidden.
-   Remove the count restriction and confirm two PNGs match while mixed extensions
-   do not. Change to Folders Only with extensions retained and check the validation
-   explanation. An action hidden by matching can still be explicitly tested.
+2. **Matching:** On the same action choose **Selection: Single Item**, **Items:
+   Files**, and **Extensions: `.PNG, jpg`**. Enable it. A single PNG should be
+   described as visible; two PNGs should be hidden by selection rule; a PNG plus
+   `notes.txt` should be hidden by extension rule. Remove the count restriction
+   (`Selection: Any`) and confirm two PNGs match while mixed extensions do not.
+   Change **Items** to **Folders** and confirm extensions are cleared automatically.
+   An action hidden by matching can still be explicitly tested.
 3. **Authoring:** Create each of the four templates and check it starts disabled.
-   Configure the application template with Choose Application. For a shell action,
-   save `print -r -- external` in a temporary `.zsh`, choose Use External Script
-   File, and check preview/run uses it. Switch back to inline and check the retained
+   Configure the application template with **Choose…**. For a shell action, save
+   `print -r -- external` in a temporary `.zsh`, switch **Source** to **File**,
+   and check preview/run uses it. Switch back to **Inline** and check the retained
    inline draft becomes active. An empty name, empty source or missing application
    must not become an enabled action. Cancelling a chooser should preserve valid
    existing settings.
 4. **Onboarding:** In the isolated helper with `--onboarding`, inspect tool
-   selection, extension hints and optional protected-folder guidance. Finish should
-   remain unavailable without a confirmed Finder Copy Path execution; Skip should
+   selection, extension status and protected-folder settings. **Done** should
+   remain unavailable without a confirmed Finder Copy Path execution; **Skip** should
    leave verification false. Separately, launch the regular installed app, enable
    its extension, right-click a disposable file in Finder and choose Copy Path.
    Return to onboarding/refresh: successful Host execution should verify setup.
@@ -125,8 +126,8 @@ isolation, add `--onboarding` to the helper command; it should remain unverified
    action and invoke it on disposable files. Open Recent Activity during execution
    to see name/count and the active count. Run two independent actions and verify
    the count returns to zero after both complete. Run `print -u2 -- test-error;
-   exit 1` in a disposable action, then open its result → logs → Edit Action. Check
-   name, paths, duration and stderr. Test notification modes all/failures/off with
+   exit 1` in a disposable action, then open its result → **Logs** → **Configure
+   Action**. Check name, paths, duration and stderr. Test notification modes with
    success and failure, accounting for macOS notification permission; click a
    delivered failure notification to open its logs.
 6. **Sharing:** Export the file-based action with dependency notes, import it via

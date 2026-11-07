@@ -2,14 +2,11 @@
 
 @layer base {
   :root {
-    --mac-bg: #090a0f;
-    --mac-surface: rgba(22, 25, 35, 0.7);
-    --mac-surface-elevated: rgba(30, 34, 48, 0.85);
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --mac-bg: #0b0c10;
+    --mac-surface: rgba(20, 22, 29, 0.78);
     --mac-border: rgba(255, 255, 255, 0.08);
-    --mac-border-hover: rgba(255, 255, 255, 0.18);
-    --mac-accent: #0071e3;
-    --mac-accent-glow: rgba(0, 113, 227, 0.25);
-    --app-version: 1.0.1;
+    --mac-accent: #0a84ff;
   }
 
   html {
@@ -19,8 +16,8 @@
 
   body {
     background-color: var(--mac-bg);
-    color: #f3f4f6;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", -apple-system, system-ui, sans-serif;
+    color: #f4f4f5;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
@@ -28,52 +25,61 @@
   }
 
   ::selection {
-    background-color: #0071e3;
+    background-color: var(--mac-accent);
     color: #ffffff;
   }
 }
 
-/* Subtle custom scrollbar reminiscent of macOS */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.28);
-}
-
-/* Glassmorphism helpers */
 .glass-panel {
-  background: rgba(18, 21, 30, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--mac-surface);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--mac-border);
 }
 
 .glass-dropdown {
-  background: rgba(28, 31, 42, 0.88);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  background: rgba(28, 30, 38, 0.92);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 18px 38px -10px rgba(0, 0, 0, 0.72), 0 0 0 0.5px rgba(255, 255, 255, 0.08);
 }
 
-.ambient-glow {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(90px);
-  pointer-events: none;
-  opacity: 0.45;
+.pressable {
+  transition: transform 140ms var(--ease-out), background-color 140ms ease, border-color 140ms ease, color 140ms ease;
 }
 
-/* build 1.0.1 */
+.pressable:active {
+  transform: scale(0.98);
+}
+
+.context-menu-pop {
+  transform-origin: top left;
+  animation: menuEnter 150ms var(--ease-out);
+}
+
+@keyframes menuEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .pressable {
+    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+  }
+  .pressable:active {
+    transform: none;
+  }
+  .context-menu-pop {
+    animation: none;
+  }
+}

@@ -26,8 +26,8 @@ struct ApplicationsSettingsView: View {
     }
 
     private var terminalSection: some View {
-        Section {
-            Picker("Default Terminal", selection: terminalSelection) {
+        Section("Open in Terminal") {
+            Picker("Terminal", selection: terminalSelection) {
                 ForEach(terminalChoices) { terminal in
                     if state.isApplicationInstalled(terminal) {
                         Text(terminal.name).tag(terminal.bundleId)
@@ -38,22 +38,22 @@ struct ApplicationsSettingsView: View {
                 }
             }
 
-            Button("Choose Other Terminal…") {
-                state.chooseApplications(kind: .terminal)
+            HStack {
+                Spacer()
+                Button("Choose Application…") {
+                    state.chooseApplications(kind: .terminal)
+                }
+                .controlSize(.small)
             }
-            .buttonStyle(.link)
-        } header: {
-            Text("Terminal")
-        } footer: {
-            Text("Finder always renders one single “Open in Terminal” menu item. Selected terminal will launch with the working directory.")
         }
     }
 
     private var editorsSection: some View {
-        Section {
+        Section("Open with Editor") {
             ForEach(editors) { editor in
                 EditorRow(
                     application: editor,
+                    icon: state.applicationIcon(for: editor),
                     isInstalled: state.isApplicationInstalled(editor),
                     isOn: Binding(
                         get: { state.isEditorEnabled(editor) },
@@ -62,14 +62,13 @@ struct ApplicationsSettingsView: View {
                 )
             }
 
-            Button("Add Custom Editor…") {
-                state.chooseApplications(kind: .editor)
+            HStack {
+                Spacer()
+                Button("Add Application…") {
+                    state.chooseApplications(kind: .editor)
+                }
+                .controlSize(.small)
             }
-            .buttonStyle(.link)
-        } header: {
-            Text("Code Editors & IDEs")
-        } footer: {
-            Text("Each enabled editor creates its own dedicated menu entry in Finder.")
         }
     }
 
@@ -87,29 +86,40 @@ struct ApplicationsSettingsView: View {
 
 private struct EditorRow: View {
     let application: ExternalApplication
+    let icon: NSImage?
     let isInstalled: Bool
     @Binding var isOn: Bool
 
     var body: some View {
-        Toggle(isOn: $isOn) {
-            Label {
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(application.name)
-                    if isInstalled {
-                        Text(application.bundleId)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Text("Not Installed")
-                            .font(.caption)
-                            .foregroundStyle(.orange)
-                    }
-                }
-            } icon: {
+        HStack(spacing: 10) {
+            if let icon {
+                Image(nsImage: icon)
+                    .resizable()
+                    .frame(width: 22, height: 22)
+                    .accessibilityHidden(true)
+            } else {
                 Image(systemName: application.sfSymbol)
-                    .foregroundStyle(isOn ? Color.accentColor : .secondary)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 22, height: 22)
+                    .accessibilityHidden(true)
             }
+
+            Text(application.name)
+                .foregroundStyle(isInstalled ? .primary : .secondary)
+
+            Spacer()
+
+            if !isInstalled {
+                Text("Not Installed")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+
+            Toggle(application.name, isOn: $isOn)
+                .labelsHidden()
+                .toggleStyle(.switch)
+                .controlSize(.small)
+                .accessibilityLabel(application.name)
         }
-        .toggleStyle(.switch)
     }
 }

@@ -82,6 +82,21 @@ struct ExecutionFeedbackTests {
         #expect(prefs.object(forKey: "settingsActionID") as? String == "a")
     }
 
+    @Test func appStateConsumesValidatedNavigationRequests() {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let prefs = PreferencesStore.memory()
+        let app = AppState(store: ManifestStore(fileURL: root.appendingPathComponent("manifest.json"), actionsDirectoryURL: root.appendingPathComponent("Actions")), preferences: prefs)
+        app.bootstrap()
+        WorkflowFeedback.requestNavigation(destination: "logs", actionID: "copy-path", preferences: prefs)
+        app.consumePendingNavigation()
+        #expect(app.selectedSection == .logs)
+        #expect(app.selectedActionID == "copy-path")
+        #expect(prefs.object(forKey: "settingsDestination") as? String == "")
+        app.navigate(to: .applications)
+        #expect(app.selectedSection == .applications)
+    }
+
     @Test func skippingAndVerifiedCompletionRemainDistinct() {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         let prefs = PreferencesStore.memory()

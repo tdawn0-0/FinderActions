@@ -36,22 +36,26 @@ struct LogsSettingsView: View {
 
     var body: some View {
         content
-            .navigationTitle("Activity Logs")
-            .searchable(text: $searchText, placement: .toolbar, prompt: "Search logs…")
+            .navigationTitle("Logs")
+            .searchable(text: $searchText, placement: .toolbar, prompt: "Filter")
             .onAppear { state.refreshLogs(); searchText = state.selectedActionID ?? "" }
             .onChange(of: state.selectedActionID) { _, id in searchText = id ?? "" }
             .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
                 state.refreshLogs()
             }
+            .onReceive(DistributedNotificationCenter.default().publisher(for: WorkflowFeedback.executionChanged)) { _ in
+                state.refreshLogs()
+            }
             .toolbar {
                 ToolbarItem {
-                    Button { state.refreshLogs() } label: { Label("Refresh", systemImage: "arrow.clockwise") }
-                }
-                ToolbarItem {
-                    Picker("Status Filter", selection: $filter) {
+                    Picker("Filter", selection: $filter) {
                         ForEach(LogFilter.allCases, id: \.self) { Text($0.title).tag($0) }
                     }
                     .pickerStyle(.segmented)
+                    .accessibilityIdentifier(SettingsAccessibilityID.logsFilter)
+                }
+                ToolbarItem {
+                    Button { state.refreshLogs() } label: { Label("Refresh", systemImage: "arrow.clockwise") }
                 }
                 ToolbarItem {
                     Button(role: .destructive) {
@@ -59,7 +63,6 @@ struct LogsSettingsView: View {
                     } label: {
                         Label("Clear", systemImage: "trash")
                     }
-                    .help("Clear")
                     .disabled(state.logs.isEmpty)
                 }
             }
@@ -68,11 +71,7 @@ struct LogsSettingsView: View {
     @ViewBuilder
     private var content: some View {
         if state.logs.isEmpty {
-            ContentUnavailableView(
-                "No execution logs yet",
-                systemImage: "tray",
-                description: Text("Actions run from Finder will be recorded here.")
-            )
+            ContentUnavailableView("No Activity", systemImage: "clock")
         } else if filteredLogs.isEmpty {
             ContentUnavailableView.search(text: searchText)
         } else {
@@ -85,33 +84,69 @@ private struct LogRow: View {
     @Environment(AppState.self) private var state
     let log: ExecLogEntry
 
+    private var isCustomAction: Bool {
+        state.manifest.actions.contains { $0.id == log.actionId }
+    }
+
+    private var isOpenWithAction: Bool {
+        log.actionId == OpenWithActions.terminalActionId || log.actionId.hasPrefix(OpenWithActions.editorActionPrefix)
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: log.success ? "checkmark.circle.fill" : "xmark.circle.fill")
                 .foregroundStyle(log.success ? .green : .red)
-                .imageScale(.large)
+                .padding(.top, 2)
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text(log.actionName ?? log.actionId).fontWeight(.medium)
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(log.actionName ?? log.actionId)
+                        .fontWeight(.medium)
+
+                    if log.source == .test {
+                        Text("Test")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 1)
+                            .background(.quaternary, in: Capsule())
+                    }
+
                     Spacer()
+
+                    if let duration = log.durationSeconds {
+                        Text("\(duration, specifier: "%.1f")s")
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.tertiary)
+                    }
+
                     timestamp
-                        .font(.caption)
+                        .font(.caption.monospacedDigit())
                         .foregroundStyle(.secondary)
+
+                    if isCustomAction || isOpenWithAction {
+                        Button {
+                            if isCustomAction {
+                                state.navigate(to: .actions, actionID: log.actionId)
+                            } else {
+                                state.navigate(to: .applications)
+                            }
+                        } label: {
+                            Image(systemName: "slider.horizontal.3")
+                        }
+                        .buttonStyle(.borderless)
+                        .controlSize(.small)
+                        .accessibilityLabel("Configure Action")
+                    }
                 }
 
-                Text(log.summary)
-                    .foregroundStyle(.secondary)
-                HStack {
-                    Text("\(log.paths.count) paths")
-                    if let duration = log.durationSeconds { Text("\(duration, specifier: "%.1f") s") }
-                    if log.source == .test { Text("Test Run") }
-                    Spacer()
-                    Button("Edit Action") {
-                        WorkflowFeedback.requestNavigation(destination: "actions", actionID: log.actionId, preferences: state.preferences)
-                    }
-                    .disabled(!state.effectiveManifest.actions.contains { $0.id == log.actionId })
-                }.font(.caption).foregroundStyle(.secondary)
+                if !log.summary.isEmpty {
+                    Text(log.summary)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .textSelection(.enabled)
+                }
 
                 if let stderrTail = log.stderrTail, !stderrTail.isEmpty {
                     Text(stderrTail)
@@ -119,6 +154,9 @@ private struct LogRow: View {
                         .foregroundStyle(.red)
                         .lineLimit(6)
                         .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(6)
+                        .background(.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 5, style: .continuous))
                 }
 
                 if !log.paths.isEmpty {
@@ -130,7 +168,7 @@ private struct LogRow: View {
                 }
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 3)
     }
 
     @ViewBuilder

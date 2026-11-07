@@ -1,102 +1,91 @@
 import SwiftUI
 
-// MARK: - Navigation Sections
-
-enum SettingsSection: String, CaseIterable, Identifiable {
-    case actions
-    case applications
-    case permissions
-    case logs
-    case general
-    case about
-
-    var id: String { rawValue }
-
-    /// Grouped the way the sidebar renders them: content first, app-level last.
-    static let groups: [[SettingsSection]] = [
-        [.actions, .applications, .permissions, .logs],
-        [.general, .about],
-    ]
-
-    var title: LocalizedStringKey {
-        switch self {
-        case .actions: "Actions"
-        case .applications: "Applications"
-        case .permissions: "Extensions & Permissions"
-        case .logs: "Activity Logs"
-        case .general: "General"
-        case .about: "About"
-        }
-    }
-
-    var systemImage: String {
-        switch self {
-        case .actions: "bolt"
-        case .applications: "square.grid.2x2"
-        case .permissions: "puzzlepiece.extension"
-        case .logs: "list.bullet.rectangle"
-        case .general: "gearshape"
-        case .about: "info.circle"
-        }
-    }
-}
-
-// MARK: - Root Settings View
-
-/// Root view for the short-lived Settings helper process.
 struct SettingsRootView: View {
     @Environment(AppState.self) private var state
-    @State private var selection: SettingsSection? = .actions
 
     var body: some View {
+        @Bindable var bindableState = state
+
         NavigationSplitView {
-            List(selection: $selection) {
+            List(selection: $bindableState.selectedSection) {
                 ForEach(SettingsSection.groups, id: \.self) { group in
                     Section {
                         ForEach(group) { section in
-                            Label(section.title, systemImage: section.systemImage)
+                            sidebarRow(for: section)
                                 .tag(section)
+                                .accessibilityIdentifier(SettingsAccessibilityID.sidebar(section))
                         }
                     }
                 }
             }
-            .navigationSplitViewColumnWidth(min: 210, ideal: 240, max: 280)
+            .navigationSplitViewColumnWidth(min: 180, ideal: 205, max: 240)
         } detail: {
-            switch selection ?? .actions {
+            switch state.selectedSection {
             case .actions: ActionsSettingsView()
             case .applications: ApplicationsSettingsView()
-            case .permissions: PermissionsSettingsView()
             case .logs: LogsSettingsView()
+            case .permissions: PermissionsSettingsView()
             case .general: GeneralSettingsView()
-            case .about: AboutView()
             }
         }
-        .onAppear { consumeNavigation() }
-        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in consumeNavigation() }
-        .onReceive(NotificationCenter.default.publisher(for: WorkflowFeedback.settingsNavigation)) { _ in consumeNavigation() }
-        .onReceive(DistributedNotificationCenter.default().publisher(for: WorkflowFeedback.settingsNavigation)) { _ in consumeNavigation() }
+        .onAppear { state.consumePendingNavigation() }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            state.consumePendingNavigation()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: WorkflowFeedback.settingsNavigation)) { _ in
+            state.consumePendingNavigation()
+        }
+        .onReceive(DistributedNotificationCenter.default().publisher(for: WorkflowFeedback.settingsNavigation)) { _ in
+            state.consumePendingNavigation()
+        }
         .safeAreaInset(edge: .bottom) {
             if let error = state.configurationError {
-                VStack(alignment: .leading) {
-                    Label("Configuration could not be saved or loaded", systemImage: "exclamationmark.triangle")
-                    Text(error).font(.caption).textSelection(.enabled)
-                    HStack {
-                        Button("Reload from Disk") { state.reloadManifest() }
-                        if !state.writesBlocked { Button("Retry Save") { state.saveManifest() } }
-                    }
-                }.padding().frame(maxWidth: .infinity, alignment: .leading)
+                errorBar(error)
             }
         }
-        .frame(minWidth: 900, minHeight: 540)
-    }
-    private func consumeNavigation() {
-        guard let destination = state.preferences.object(forKey: "settingsDestination") as? String,
-              let section = SettingsSection(rawValue: destination), section == .logs || section == .actions else { return }
-        selection = section
-        if let id = state.preferences.object(forKey: "settingsActionID") as? String,
-           section == .logs || state.manifest.actions.contains(where: { $0.id == id }) { state.selectedActionID = id }
-        state.preferences.set("", forKey: "settingsDestination")
-        state.preferences.set("", forKey: "settingsActionID")
+        .frame(minWidth: 880, minHeight: 540)
     }
 
+    @ViewBuilder
+    private func sidebarRow(for section: SettingsSection) -> some View {
+        HStack {
+            Label(section.title, systemImage: section.systemImage)
+            if section == .permissions && !state.finderSetupVerified {
+                Spacer()
+                Circle()
+                    .fill(.orange)
+                    .frame(width: 7, height: 7)
+                    .accessibilityLabel("Attention Required")
+            }
+        }
+    }
+
+    private func errorBar(_ error: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.orange)
+            Text(error)
+                .font(.callout)
+                .lineLimit(2)
+                .textSelection(.enabled)
+            Spacer()
+            Button("Reload") { state.reloadManifest() }
+            if !state.writesBlocked && state.isDirty {
+                Button("Retry") { state.saveManifest() }
+            }
+            if !state.writesBlocked && !state.isDirty {
+                Button {
+                    state.configurationError = nil
+                } label: {
+                    Image(systemName: "xmark")
+                }
+                .buttonStyle(.borderless)
+                .accessibilityLabel("Dismiss")
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(.regularMaterial)
+        .overlay(alignment: .top) { Divider() }
+    }
 }

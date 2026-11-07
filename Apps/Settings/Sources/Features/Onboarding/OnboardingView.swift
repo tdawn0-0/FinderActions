@@ -7,50 +7,100 @@ struct OnboardingView: View {
 
     init(onDismiss: @escaping () -> Void) { self.onDismiss = onDismiss }
 
+    private var terminalChoices: [ExternalApplication] {
+        var choices = ExternalApplicationCatalog.terminals
+        if !choices.contains(where: { $0.bundleId == state.openWithSettings.terminal.bundleId }) {
+            choices.append(state.openWithSettings.terminal)
+        }
+        return choices
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
-            Form {
-                Section {
-                    Text("Set up FinderActions").font(.title2.weight(.semibold))
-                    Text("Choose your tools, enable the extension, then try one action in Finder.")
-                        .foregroundStyle(.secondary)
+        Form {
+                Section("1. Applications") {
+                    Picker("Terminal", selection: Binding(
+                        get: { state.openWithSettings.terminal.bundleId },
+                        set: { bundleId in
+                            if let terminal = terminalChoices.first(where: { $0.bundleId == bundleId }) {
+                                state.selectTerminal(terminal)
+                            }
+                        }
+                    )) {
+                        ForEach(terminalChoices) { terminal in
+                            Text(terminal.name).tag(terminal.bundleId)
+                        }
+                    }
+
+                    LabeledContent("Editors") {
+                        HStack(spacing: 8) {
+                            Text(state.openWithSettings.editors.isEmpty
+                                 ? String(localized: "None")
+                                 : state.openWithSettings.editors.map(\.name).joined(separator: ", "))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                            Button("Add…") { state.chooseApplications(kind: .editor) }
+                                .controlSize(.small)
+                        }
+                    }
                 }
-                Section("1. Choose your tools") {
-                    LabeledContent("Terminal", value: state.openWithSettings.terminal.name)
-                    Button("Choose Other Terminal…") { state.chooseApplications(kind: .terminal) }
-                    LabeledContent("Editors", value: state.openWithSettings.editors.map(\.name).joined(separator: ", "))
-                    Button("Add Custom Editor…") { state.chooseApplications(kind: .editor) }
+
+                Section("2. Finder Extension") {
+                    LabeledContent("Status") {
+                        HStack(spacing: 8) {
+                            Text(state.extensionRegistration.message)
+                                .foregroundStyle(.secondary)
+                            Button("Extension Settings…") { state.openExtensionSettings() }
+                                .controlSize(.small)
+                        }
+                    }
                 }
-                Section("2. Enable the Finder extension") {
-                    Text(state.extensionRegistration.message).foregroundStyle(.secondary)
-                    Button("Open Extension Settings") { state.openExtensionSettings() }
+
+                Section("3. Verify Copy Path in Finder") {
+                    LabeledContent {
+                        Button("Open Finder") { state.openActionsDirectory() }
+                            .controlSize(.small)
+                    } label: {
+                        Label(
+                            state.finderSetupVerified ? "Verified" : "Waiting for Copy Path",
+                            systemImage: state.finderSetupVerified ? "checkmark.circle.fill" : "circle.dotted"
+                        )
+                        .foregroundStyle(state.finderSetupVerified ? .green : .primary)
+                    }
                 }
-                Section("3. Try Copy Path in Finder") {
-                    Text("Open Finder, select a file, then right-click and choose Copy Path. This copies its path to your clipboard.")
-                    Button("Open Finder") { state.openActionsDirectory() }
-                    Label(state.finderSetupVerified ? "Verified — Copy Path completed in Finder" : "Waiting for a successful Finder action",
-                          systemImage: state.finderSetupVerified ? "checkmark.circle.fill" : "circle.dotted")
-                    Button("Refresh Status") { state.refreshLogs(); state.refreshExtensionStatus() }
+
+                Section("Protected Folders") {
+                    LabeledContent("Full Disk Access") {
+                        Button("Open Settings…") { FullDiskAccessSettings.openSystemSettings() }
+                            .controlSize(.small)
+                    }
                 }
-                Section("Protected folders (optional)") {
-                    Text("Full Disk Access is needed only for scripts that access protected folders. Enable it when your workflow needs that access.")
-                        .foregroundStyle(.secondary)
-                    DisclosureGroup("Full Disk Access (FDA)") { FullDiskAccessGuideView() }
-                }
-            }
-            .formStyle(.grouped)
-            Divider()
-            HStack {
-                Button("Skip for Now") { state.completeOnboarding(skipped: true); onDismiss() }
-                Spacer()
-                Button("Finish Setup") { state.completeOnboarding(); onDismiss() }
+        }
+        .formStyle(.grouped)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            VStack(spacing: 0) {
+                Divider()
+                HStack {
+                    Button("Skip") {
+                        state.completeOnboarding(skipped: true)
+                        onDismiss()
+                    }
+                    Spacer()
+                    Button("Done") {
+                        state.completeOnboarding()
+                        onDismiss()
+                    }
                     .disabled(!state.finderSetupVerified)
                     .keyboardShortcut(.defaultAction)
-            }.padding()
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+            }
+            .background(.bar)
         }
-        .frame(width: 580, height: 680)
+        .frame(width: 480, height: 520)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
-            state.refreshLogs(); state.refreshExtensionStatus()
+            state.refreshLogs()
+            state.refreshExtensionStatus()
         }
         .onReceive(DistributedNotificationCenter.default().publisher(for: WorkflowFeedback.executionChanged)) { _ in
             state.refreshLogs()

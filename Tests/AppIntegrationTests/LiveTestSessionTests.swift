@@ -93,4 +93,23 @@ struct LiveTestSessionTests {
         await first.value
         #expect(session.preview == nil); #expect(session.validationError != nil)
     }
+
+    @Test func selectionRulesRoundTripWithoutIllegalCombinations() {
+        var action = ActionTemplate.perFile.make(id: "rule-test", sortIndex: 0)
+        action.extRules = ExtRules(pathExtensions: ["png"])
+        for target in SelectionTargetRule.allCases {
+            for count in SelectionCountRule.allCases {
+                ActionAuthoring.applySelectionRule(&action, target: target, count: count)
+                #expect(ActionAuthoring.selectionTarget(for: action) == target)
+                #expect(ActionAuthoring.selectionCount(for: action) == count)
+                #expect(ActionAuthoring.validationError(action) == nil)
+                if target == .folders {
+                    #expect(action.extRules?.pathExtensions.isEmpty != false)
+                }
+            }
+        }
+        #expect(ActionAuthoring.sourceMode(for: action) == .inline)
+        action.shell?.scriptFile = "custom.zsh"
+        #expect(ActionAuthoring.sourceMode(for: action) == .file)
+    }
 }

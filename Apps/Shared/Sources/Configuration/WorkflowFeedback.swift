@@ -15,10 +15,10 @@ enum ExtensionRegistration: String, Sendable, Equatable {
 
     var message: String {
         switch self {
-        case .unknown: String(localized: "Extension status unknown — check System Settings")
-        case .notRegistered: String(localized: "Not registered — launch FinderActions from Applications")
-        case .registered: String(localized: "Registered — enable the extension in System Settings")
-        case .enabled: String(localized: "Enabled — verify by running Copy Path in Finder")
+        case .unknown: String(localized: "Unknown")
+        case .notRegistered: String(localized: "Not Registered")
+        case .registered: String(localized: "Disabled")
+        case .enabled: String(localized: "Enabled")
         }
     }
 }
@@ -27,8 +27,8 @@ enum ExecutionNotificationMode: String, CaseIterable, Sendable {
     case all, failures, off
     var title: String {
         switch self {
-        case .all: String(localized: "Every completion")
-        case .failures: String(localized: "Failures only")
+        case .all: String(localized: "All")
+        case .failures: String(localized: "Failures Only")
         case .off: String(localized: "Off")
         }
     }

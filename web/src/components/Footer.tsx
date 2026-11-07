@@ -1,3 +1,4 @@
+import { latestReleaseURL } from '../release';
 import React from 'react';
 import { GithubIcon } from './GithubIcon';
 import type { Language } from '../types';
@@ -15,26 +16,16 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
   };
 
   return (
-    <footer className="border-t border-white/10 bg-[#07080c] py-12 px-4 sm:px-6 relative">
-      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-        {/* Brand & Tagline */}
-        <div className="flex flex-col items-center md:items-start gap-2">
-          <div className="flex items-center gap-2.5">
-            <img src="/app-icon.png" alt="FinderActions" className="w-6 h-6 rounded-md shadow" />
-            <span className="font-semibold text-white tracking-tight text-sm">
-              FinderActions
-            </span>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-zinc-400">
-              MIT
-            </span>
-          </div>
-          <p className="text-xs text-zinc-500 max-w-sm text-center md:text-left">
-            {t.tagline}
-          </p>
+    <footer className="border-t border-white/8 bg-[#090a0e] py-8 px-4 sm:px-6">
+      <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
+        <div className="flex items-center gap-2.5">
+          <img src="/app-icon.png" alt="FinderActions" className="w-5 h-5 rounded" />
+          <span className="font-medium text-zinc-200">FinderActions</span>
+          <span className="text-zinc-600">·</span>
+          <span className="font-mono text-zinc-500">MIT</span>
         </div>
 
-        {/* Links */}
-        <div className="flex items-center gap-6 text-xs text-zinc-400">
+        <div className="flex items-center gap-5">
           <a
             href="https://github.com/tdawn0-0/FinderActions"
             target="_blank"
@@ -45,7 +36,7 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
             <span>{t.github}</span>
           </a>
           <a
-            href="https://github.com/tdawn0-0/FinderActions/releases"
+            href={latestReleaseURL}
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-white transition-colors"
@@ -53,17 +44,13 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
             {t.releases}
           </a>
           <button
+            type="button"
             onClick={scrollToTop}
-            className="hover:text-white transition-colors flex items-center gap-1 text-zinc-400 cursor-pointer"
+            className="hover:text-white transition-colors cursor-pointer"
           >
-            <span>{t.backToTop}</span>
+            {t.backToTop}
           </button>
         </div>
-      </div>
-
-      <div className="max-w-5xl mx-auto mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-[11px] text-zinc-600 gap-2">
-        <div>{t.builtWith}</div>
-        <div>macOS is a trademark of Apple Inc.</div>
       </div>
     </footer>
   );

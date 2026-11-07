@@ -86,10 +86,10 @@ final class LiveTestSession {
         } else { description = "Launch terminal at \(cwd)" }
         let context = SelectionContext(paths: paths, isDirectory: paths.isEmpty ? [] : folders)
         let reason: String
-        if !action.enabled { reason = "The action is disabled." }
-        else if !ShowWhenMatcher.matches(showWhen: action.showWhen, context: context) { reason = "The selection does not match Show When." }
-        else if !ShowWhenMatcher.matchesExtRules(action.extRules, context: context) { reason = "Not every selected item matches the file type rule." }
-        else { reason = "All menu rules match." }
+        if !action.enabled { reason = "Disabled" }
+        else if !ShowWhenMatcher.matches(showWhen: action.showWhen, context: context) { reason = "Selection rule mismatch" }
+        else if !ShowWhenMatcher.matchesExtRules(action.extRules, context: context) { reason = "File extension mismatch" }
+        else { reason = "Shown in Finder" }
         return LiveTestPreview(action: action, inputPaths: paths, paths: resolved, container: container, workingDirectory: cwd, description: description, visibilityReason: reason,
             visible: action.enabled && ShowWhenMatcher.shouldShow(showWhen: action.showWhen, extRules: action.extRules,
                 context: SelectionContext(paths: paths, isDirectory: paths.isEmpty ? [] : folders)))

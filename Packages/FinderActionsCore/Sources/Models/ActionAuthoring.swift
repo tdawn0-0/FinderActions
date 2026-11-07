@@ -24,6 +24,23 @@ public enum ActionTemplate: String, CaseIterable, Sendable {
     }
 }
 
+public enum ScriptSourceMode: String, CaseIterable, Sendable {
+    case inline
+    case file
+}
+
+public enum SelectionTargetRule: String, CaseIterable, Sendable {
+    case any
+    case files
+    case folders
+}
+
+public enum SelectionCountRule: String, CaseIterable, Sendable {
+    case any
+    case single
+    case multiple
+}
+
 public enum ActionAuthoring {
     public static func normalizedExtensions(_ text: String) -> [String] {
         Array(Set(text.components(separatedBy: CharacterSet(charactersIn: ",; \n"))
@@ -57,10 +74,61 @@ public enum ActionAuthoring {
         return nil
     }
 
+    public static func sourceMode(for action: ActionDefinition) -> ScriptSourceMode {
+        switch action.type {
+        case .shell:
+            return (action.shell?.scriptFile ?? "").isEmpty ? .inline : .file
+        case .appleScript:
+            return (action.appleScript?.scriptFile ?? "").isEmpty ? .inline : .file
+        default:
+            return .inline
+        }
+    }
+
     /// Switching to inline removes the file reference that otherwise takes priority.
     /// Switching to file preserves the inline draft until a file is chosen.
     public static func useInline(_ action: inout ActionDefinition) {
         if action.type == .shell { action.shell?.scriptFile = nil }
         if action.type == .appleScript { action.appleScript?.scriptFile = nil }
+    }
+
+    public static func selectionTarget(for action: ActionDefinition) -> SelectionTargetRule {
+        if action.showWhen == .filesOnly || action.extRules?.filesOnly == true { return .files }
+        if action.showWhen == .foldersOnly || action.extRules?.foldersOnly == true { return .folders }
+        return .any
+    }
+
+    public static func selectionCount(for action: ActionDefinition) -> SelectionCountRule {
+        switch action.showWhen {
+        case .single: return .single
+        case .multiple: return .multiple
+        case .always, .filesOnly, .foldersOnly: return .any
+        }
+    }
+
+    public static func applySelectionRule(
+        _ action: inout ActionDefinition,
+        target: SelectionTargetRule,
+        count: SelectionCountRule
+    ) {
+        var rules = action.extRules ?? ExtRules()
+        switch count {
+        case .any:
+            switch target {
+            case .any: action.showWhen = .always
+            case .files: action.showWhen = .filesOnly
+            case .folders: action.showWhen = .foldersOnly
+            }
+            rules.filesOnly = false
+            rules.foldersOnly = false
+        case .single, .multiple:
+            action.showWhen = count == .single ? .single : .multiple
+            rules.filesOnly = target == .files
+            rules.foldersOnly = target == .folders
+        }
+        if target == .folders {
+            rules.pathExtensions = []
+        }
+        action.extRules = (rules.pathExtensions.isEmpty && !rules.filesOnly && !rules.foldersOnly) ? nil : rules
     }
 }

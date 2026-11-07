@@ -1,5 +1,18 @@
 # Implementation Plans
 
+## Product workflow implementation — 2026-11-06
+
+User authorized implementing and verifying all six product recommendations.
+[021](021-product-workflows.md) is DONE at `caad1b6` in isolated worktree
+`/private/tmp/finder-menu-product-workflows`, branch `codex/product-workflows`,
+based on verified v1.0.3 integration `7f501db`. Scope: real-input Live Test,
+matching UI, action templates/source selection, verified onboarding,
+execution feedback, and portable single-action packages. Final review must map
+all six requirements to actual tests, builds and available runtime evidence.
+Final [verification record](021-verification.md): reviewer reran **110 tests**,
+Debug build and dependency boundary; Settings GUI smoke tests passed. Live Finder
+permission/notification delivery remains outside these scoped runtime checks.
+
 ## Current planning batch — 2026-11-06
 
 Plans **011–020** were written against commit **`9898180`** after the maintainer
@@ -32,6 +45,16 @@ For 019/020, DONE means the **design/experiment specification** is complete; it
 must never mean the proposed feature or authenticated transport has shipped.
 
 ### Execution verification — 2026-11-06
+
+Release published: [v1.0.3](https://github.com/tdawn0-0/FinderActions/releases/tag/v1.0.3),
+build 4, tag commit `201ace1`. ZIP/DMG and SHA-256 files uploaded; Apple notarization
+Accepted for both app and DMG, stapler and Gatekeeper verified. Website deployed
+successfully. Follow-up main `7f501db` fixes test scheduling races, isolates SwiftPM
+CI scratch directories, and uses identical explicit delegate initializer arguments
+to avoid the Xcode 16.4 compiler crash. Released tag/assets were not replaced.
+Final [remote CI](https://github.com/tdawn0-0/FinderActions/actions/runs/42229309104)
+passed macOS (including Xcode 16.4 app build) and web jobs.
+
 
 All ten plans completed and reviewed. Final implementation base `d52c5c5` is
 v1.0.3 build 4. Combined suite: **76 Core tests + 12 application tests = 88 passed**.

@@ -3,24 +3,39 @@ import AppKit
 import UniformTypeIdentifiers
 import FinderActionsCore
 
-/// Place in the Actions toolbar. A dropped package opens the same preview as the chooser.
 struct ActionTransferView: View {
     let action: ActionDefinition?
     let store: ManifestStore
     let onImport: (PortableActionPackage) throws -> Void
-    private struct ImportPreview: Identifiable { let id = UUID(); let package: PortableActionPackage }
+
+    private struct ImportPreview: Identifiable {
+        let id = UUID()
+        let package: PortableActionPackage
+    }
+
     @State private var preview: ImportPreview?
     @State private var showExport = false
     @State private var dependencies = ""
     @State private var error: String?
 
     var body: some View {
-        HStack {
-            Button("Import Action…", systemImage: "square.and.arrow.down") { chooseImport() }
-            Button("Export Action…", systemImage: "square.and.arrow.up") { showExport = true }
-                .disabled(action == nil)
+        Menu {
+            Button {
+                chooseImport()
+            } label: {
+                Label("Import Package…", systemImage: "square.and.arrow.down")
+            }
+            Button {
+                dependencies = ""
+                showExport = true
+            } label: {
+                Label("Export Package…", systemImage: "square.and.arrow.up")
+            }
+            .disabled(action == nil)
+        } label: {
+            Label("Package", systemImage: "shippingbox")
         }
-        .help("Drop an .faaction file here to preview it before importing.")
+        .accessibilityIdentifier(SettingsAccessibilityID.actionsTransferMenu)
         .dropDestination(for: URL.self) { urls, _ in
             guard urls.count == 1, let url = urls.first else { return false }
             load(url)
@@ -33,31 +48,46 @@ struct ActionTransferView: View {
             }
         }
         .sheet(isPresented: $showExport) {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Export Action").font(.title2)
-                Text("Describe required command-line tools or applications. The package includes this action and its scripts; other files are not included.")
-                TextEditor(text: $dependencies)
-                    .frame(minHeight: 100)
-                    .border(.quaternary)
-                HStack {
-                    Button("Cancel") { showExport = false }
-                    Spacer()
-                    Button("Save Package…") { export() }
-                        .keyboardShortcut(.defaultAction)
+            exportSheet
+        }
+        .alert("Package Error", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
+            Button("OK") { error = nil }
+        } message: {
+            Text(error ?? "")
+        }
+    }
+
+    private var exportSheet: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if let action {
+                HStack(spacing: 10) {
+                    ActionIconTile(symbol: action.icon?.sfSymbol, size: 32)
+                    Text(action.name)
+                        .font(.headline)
                 }
             }
-            .padding(24)
-            .frame(width: 480)
+
+            LabeledContent("Requirements") {
+                TextField("Requirements", text: $dependencies, prompt: Text(verbatim: "ffmpeg, jq"))
+                    .labelsHidden()
+                    .textFieldStyle(.roundedBorder)
+            }
+
+            HStack {
+                Button("Cancel") { showExport = false }
+                    .keyboardShortcut(.cancelAction)
+                Spacer()
+                Button("Export…") { export() }
+                    .keyboardShortcut(.defaultAction)
+            }
         }
-        .alert("Action Package", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
-            Button("OK") { error = nil }
-        } message: { Text(error ?? "") }
+        .padding(20)
+        .frame(width: 400)
     }
 
     private func chooseImport() {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = false
-        // Unknown custom extensions still conform to data; the codec validates content.
         panel.allowedContentTypes = [.data]
         guard panel.runModal() == .OK, let url = panel.url else { return }
         load(url)
@@ -66,7 +96,9 @@ struct ActionTransferView: View {
     private func load(_ url: URL) {
         do {
             preview = ImportPreview(package: try PortableActionPackage.read(from: url))
-        } catch { self.error = String(localized: String.LocalizationValue(error.localizedDescription)) }
+        } catch {
+            self.error = String(localized: String.LocalizationValue(error.localizedDescription))
+        }
     }
 
     private func export() {
@@ -74,13 +106,16 @@ struct ActionTransferView: View {
         do {
             let data = try PortableActionPackage.export(action: action, store: store, dependencies: dependencies).encoded()
             let panel = NSSavePanel()
-            panel.nameFieldStringValue = "Action"
+            let baseName = action.name.trimmingCharacters(in: .whitespacesAndNewlines)
+            panel.nameFieldStringValue = baseName.isEmpty ? "Action.faaction" : "\(baseName).faaction"
             panel.allowedContentTypes = [UTType(filenameExtension: "faaction") ?? .data]
             panel.allowsOtherFileTypes = true
             guard panel.runModal() == .OK, let url = panel.url else { return }
             try data.write(to: url, options: .atomic)
             showExport = false
-        } catch { self.error = String(localized: String.LocalizationValue(error.localizedDescription)) }
+        } catch {
+            self.error = String(localized: String.LocalizationValue(error.localizedDescription))
+        }
     }
 }
 
@@ -91,40 +126,80 @@ private struct ActionImportPreview: View {
     @State private var error: String?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Preview Action Import").font(.title2)
-            Text(package.action.name).font(.headline)
-            Text("Imported actions start disabled. Existing actions are kept; conflicting names receive a numbered suffix and every import receives a new identifier.")
-                .foregroundStyle(.secondary)
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Dependencies").font(.headline)
-                    Text(package.dependencies.isEmpty ? String(localized: "No dependencies declared. Review the script before enabling it.") : package.dependencies)
-                    if let application = package.action.application {
-                        Text(application.bundleId).font(.body.monospaced())
-                    }
-                    ForEach(Array(package.scriptPreviews.enumerated()), id: \.offset) { _, preview in
-                        Text(preview.name).font(.headline)
-                        Text(preview.source)
-                            .font(.body.monospaced())
-                            .textSelection(.enabled)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                ActionIconTile(symbol: package.action.icon?.sfSymbol, isActive: false, size: 34)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(package.action.name)
+                        .font(.headline)
+                    Text(package.action.type.displayName)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Text("Disabled")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(.quaternary, in: Capsule())
+            }
+
+            if !package.dependencies.isEmpty {
+                LabeledContent("Requirements", value: package.dependencies)
+                    .font(.callout)
+            }
+
+            if let application = package.action.application, !application.bundleId.isEmpty {
+                LabeledContent("Application") {
+                    Text(application.bundleId)
+                        .font(.callout.monospaced())
+                }
+            }
+
+            if !package.scriptPreviews.isEmpty {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 10) {
+                        ForEach(Array(package.scriptPreviews.enumerated()), id: \.offset) { _, item in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(item.name)
+                                    .font(.caption.monospaced())
+                                    .foregroundStyle(.secondary)
+                                Text(item.source)
+                                    .font(.callout.monospaced())
+                                    .textSelection(.enabled)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(8)
+                                    .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                            }
+                        }
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(minHeight: 160, maxHeight: 340)
             }
-            .frame(minHeight: 200, maxHeight: 400)
-            if let error { Text(error).foregroundStyle(.red).textSelection(.enabled) }
+
+            if let error {
+                Text(error)
+                    .font(.callout)
+                    .foregroundStyle(.red)
+                    .textSelection(.enabled)
+            }
+
             HStack {
                 Button("Cancel") { dismiss() }
+                    .keyboardShortcut(.cancelAction)
                 Spacer()
-                Button("Import Disabled Action") {
-                    do { try onImport() } catch { self.error = String(localized: String.LocalizationValue(error.localizedDescription)) }
+                Button("Import") {
+                    do {
+                        try onImport()
+                    } catch {
+                        self.error = String(localized: String.LocalizationValue(error.localizedDescription))
+                    }
                 }
                 .keyboardShortcut(.defaultAction)
             }
         }
-        .padding(24)
-        .frame(width: 560)
+        .padding(20)
+        .frame(width: 520)
     }
 }

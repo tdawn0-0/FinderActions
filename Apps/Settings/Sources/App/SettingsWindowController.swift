@@ -47,8 +47,8 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         .environment(appState)
         let controller = makeWindowController(
             kind: .onboarding,
-            title: NSLocalizedString("Set Up FinderActions", comment: "Onboarding window title"),
-            contentSize: NSSize(width: 580, height: 680),
+            title: NSLocalizedString("FinderActions Setup", comment: "Onboarding window title"),
+            contentSize: NSSize(width: 480, height: 520),
             resizable: false,
             rootView: rootView
         )
@@ -59,9 +59,8 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     func windowShouldClose(_ sender: NSWindow) -> Bool {
         guard appState.liveTest.isRunning else { return true }
         let alert = NSAlert()
-        alert.messageText = String(localized: "A test is running")
-        alert.informativeText = String(localized: "Keep Settings open until the test finishes. File changes cannot be rolled back.")
-        alert.addButton(withTitle: String(localized: "Keep Open"))
+        alert.messageText = String(localized: "Action is running")
+        alert.addButton(withTitle: String(localized: "OK"))
         alert.runModal()
         return false
     }
