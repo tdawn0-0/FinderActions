@@ -2,35 +2,45 @@
 
 @layer base {
   :root {
-    --bg-deep: #0f0f10;
-    --bg-page: #141415;
-    --bg-card: #19191b;
-    --bg-raised: #232325;
-    --hairline: rgba(237, 237, 237, 0.08);
-    --text-primary: #ededed;
-    --text-secondary: #a1a1a6;
-    --text-muted: #85858b;
-    --accent: #0a84ff;
-    --positive: #4cc38a;
-    --ease: cubic-bezier(0.22, 1, 0.36, 1);
-    --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif;
-    --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+    --color-ink: #0b0b0f;
+    --color-ink-2: #3f3f46;
+    --color-ink-3: #71717a;
+    --color-paper: #fafaf8;
+    --color-surface: #ffffff;
+    --color-line: rgba(15, 23, 42, 0.08);
+    --color-accent: #0a7cff;
+    --color-accent-soft: #e8f1ff;
+    --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --font-sans: "Geist Variable", "Geist", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
+    --font-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    color-scheme: light;
+  }
+
+  .dark {
+    --color-ink: #f5f5f7;
+    --color-ink-2: #c7c7cc;
+    --color-ink-3: #8e8e96;
+    --color-paper: #0a0a0d;
+    --color-surface: #141418;
+    --color-line: rgba(255, 255, 255, 0.09);
+    --color-accent: #2b8fff;
+    --color-accent-soft: rgba(43, 143, 255, 0.16);
+    color-scheme: dark;
   }
 
   html {
     scroll-behavior: smooth;
-    color-scheme: dark;
   }
 
   body {
-    background-color: var(--bg-page);
-    color: var(--text-primary);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
     font-family: var(--font-sans);
-    font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
     margin: 0;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
   code,
@@ -41,85 +51,395 @@
   }
 
   ::selection {
-    background-color: var(--accent);
+    background-color: var(--color-accent);
     color: #ffffff;
   }
 
   :focus-visible {
-    outline: 1.5px solid var(--text-secondary);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
 }
 
-.keycap {
+.container-page {
+  width: 100%;
+  max-width: 1180px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+.display {
+  letter-spacing: -0.042em;
+  font-weight: 650;
+  line-height: 1.04;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.hero-bg {
+  background: linear-gradient(180deg, #e2e2e5 0%, #ececee 46%, var(--color-paper) 100%);
+}
+
+.dark .hero-bg {
+  background: linear-gradient(180deg, #16161b 0%, #111115 46%, var(--color-paper) 100%);
+}
+
+/* Shoji inline headline tactile chips */
+.hchip {
+  vertical-align: -0.11em;
+  height: 0.88em;
+  background: #16161a;
+  border-radius: 0.24em;
+  margin: 0 0.08em;
+  padding: 0.06em;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 5px;
-  background-color: var(--bg-raised);
-  border: 1px solid var(--hairline);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 16px;
-  color: var(--text-secondary);
-  font-variant-numeric: tabular-nums;
+  box-shadow:
+    inset 0 0.02em rgba(255, 255, 255, 0.18),
+    0 0.12em 0.3em -0.08em rgba(20, 30, 60, 0.42),
+    0 0.04em 0.08em rgba(0, 0, 0, 0.2);
 }
 
+.hchip-menu {
+  width: 1.48em;
+  transform: rotate(-4deg);
+}
+
+.hchip-mark {
+  background: #ffffff;
+  width: 1.04em;
+  transform: rotate(5deg);
+  box-shadow:
+    0 0 0 1px rgba(15, 23, 42, 0.08),
+    0 0.12em 0.28em -0.08em rgba(15, 23, 42, 0.22);
+}
+
+.dark .hchip-mark {
+  background: #1c1c22;
+  box-shadow:
+    inset 0 0.02em rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 0.12em 0.3em -0.08em rgba(0, 0, 0, 0.7);
+}
+
+/* Shoji pill buttons */
 .btn-primary {
-  background-color: var(--text-primary);
-  color: var(--bg-page);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  transition: transform 140ms var(--ease), background-color 140ms var(--ease);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  padding-inline: 22px 8px;
+  border-radius: 999px;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-size: 15px;
+  font-weight: 560;
+  box-shadow: 0 10px 30px -8px rgba(11, 11, 15, 0.45), inset 0 1px rgba(255, 255, 255, 0.14);
+  transition: transform 0.2s var(--ease-out-soft), box-shadow 0.2s ease;
 }
 
 .btn-primary:hover {
-  background-color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 16px 36px -10px rgba(11, 11, 15, 0.55), inset 0 1px rgba(255, 255, 255, 0.18);
 }
 
 .btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.dark .btn-primary {
+  box-shadow: 0 10px 34px -10px rgba(43, 143, 255, 0.38);
+}
+
+.btn-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding-inline: 20px;
+  border-radius: 999px;
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  box-shadow: 0 0 0 1px var(--color-line);
+  font-size: 15px;
+  font-weight: 520;
+  transition: background-color 0.2s ease, transform 0.15s var(--ease-out-soft);
+}
+
+.btn-ghost:hover {
+  background: var(--color-surface);
+}
+
+.btn-ghost:active {
   transform: scale(0.98);
 }
 
-.btn-secondary {
-  background-color: var(--bg-card);
-  color: var(--text-primary);
-  border: 1px solid var(--hairline);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  transition: transform 140ms var(--ease), background-color 140ms var(--ease), border-color 140ms var(--ease);
+/* Shoji release badge */
+.shoji-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 14px 4px 4px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1px solid color-mix(in srgb, var(--color-ink) 16%, transparent);
+  box-shadow: 0 6px 18px -10px rgba(15, 23, 42, 0.22);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  transition: border-color 0.2s ease;
 }
 
-.btn-secondary:hover {
-  background-color: var(--bg-raised);
+.shoji-badge:hover {
+  border-color: color-mix(in srgb, var(--color-ink) 34%, transparent);
 }
 
-.btn-secondary:active {
-  transform: scale(0.98);
+.shoji-badge-new {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  border-radius: 999px;
+  padding: 6px 11px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
-.surface-active {
-  background-color: var(--bg-raised);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+.sale-tag {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 12.5px;
+  font-weight: 600;
 }
 
-.finder-menu {
-  background-color: #1e1e21;
-  border: 1px solid rgba(237, 237, 237, 0.12);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+/* Shoji Bento fit-card & mini UI art */
+.fit-card {
+  background: var(--color-surface);
+  box-shadow: 0 0 0 1px var(--color-line);
+  border-radius: 26px;
+  padding: 14px 14px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.fit-art {
+  background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+  border-radius: 16px;
+  height: 132px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.fit-pill {
+  background: var(--color-surface);
+  box-shadow: 0 0 0 1px var(--color-line);
+  color: var(--color-ink);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 13.5px;
+  font-weight: 540;
+}
+
+.fit-keycap {
+  background: var(--color-surface);
+  min-width: 38px;
+  height: 38px;
+  padding-inline: 10px;
+  box-shadow: inset 0 -2px 0 rgba(15, 23, 42, 0.12), 0 0 0 1px var(--color-line);
+  color: var(--color-ink);
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+/* Shoji MacBook Pro Hardware Frame */
+.mbp {
+  --metal: linear-gradient(100deg, #8f9195, #f2f3f4 16%, #cfd1d4 50%, #f2f3f4 84%, #8f9195);
+  --metal-base: linear-gradient(90deg, #77797f 0%, #d7d9dc 5%, #f3f4f5 28%, #e2e3e5 72%, #d7d9dc 95%, #77797f 100%);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.dark .mbp {
+  --metal: linear-gradient(100deg, #1b1c1f, #4a4c52 16%, #2d2e33 50%, #4a4c52 84%, #1b1c1f);
+  --metal-base: linear-gradient(90deg, #121315 0%, #3a3c41 5%, #55575d 28%, #45474c 72%, #3a3c41 95%, #121315 100%);
+}
+
+.mbp-lid {
+  z-index: 2;
+  width: 92%;
+  padding: 3px;
+  border-radius: 24px 24px 4px 4px;
+  background: var(--metal);
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.25), 0 24px 56px -20px rgba(20, 30, 60, 0.35);
+  position: relative;
+}
+
+.mbp-bezel {
+  padding: 11px 11px 13px;
+  border-radius: 21px 21px 3px 3px;
+  background: #050506;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.mbp-notch {
+  z-index: 30;
+  border-radius: 0 0 7px 7px;
+  pointer-events: none;
+  background: #050506;
+  width: 116px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.mbp-notch i {
+  width: 5px;
+  height: 5px;
+  background: radial-gradient(circle at 35% 35%, #2a3350, #07080b 70%);
+  border-radius: 50%;
+  display: block;
+}
+
+.mbp-hinge {
+  z-index: 1;
+  width: 90%;
+  height: 10px;
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(#050506, #2a2b2c 55%, #080809);
+  margin-top: -1px;
+}
+
+.mbp-base {
+  z-index: 1;
+  width: 100%;
+  height: 22px;
+  margin-top: -3px;
+  border-radius: 3px 3px 22px 22px / 3px 3px 16px 16px;
+  background: var(--metal-base);
+  position: relative;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.7), inset 0 -2px 3px rgba(0, 0, 0, 0.25);
+}
+
+.dark .mbp-base {
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.18), inset 0 -2px 3px rgba(0, 0, 0, 0.5);
+}
+
+.mbp-base::before {
+  content: "";
+  border-radius: 0 0 10px 10px;
+  background: linear-gradient(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.04));
+  width: 14%;
+  height: 42%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.mbp-feet {
+  width: 88%;
+  height: 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.mbp-feet i {
+  border-radius: 0 0 4px 4px;
+  background: #1a1b1d;
+  width: 7%;
+  height: 100%;
+  display: block;
+}
+
+.mbp-shadow {
+  width: 102%;
+  height: 18px;
+  margin-top: -10px;
+  filter: blur(5px);
+  pointer-events: none;
+  background: radial-gradient(50% 50%, rgba(15, 16, 18, 0.28), rgba(15, 16, 18, 0.08) 55%, transparent 75%);
+}
+
+/* Verdict circles in Comparison table */
+.verdict {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.verdict-yes {
+  background: var(--color-accent);
+  color: #ffffff;
+}
+
+.verdict-some {
+  background: rgba(255, 149, 0, 0.16);
+  color: #e07800;
+}
+
+.verdict-no {
+  background: color-mix(in srgb, var(--color-ink) 7%, transparent);
+  color: var(--color-ink-3);
+}
+
+/* Context menu pop inside MacBook screen */
+.finder-menu-pop {
   transform-origin: top left;
-  animation: menuRise 180ms var(--ease);
+  animation: menuPop 0.16s var(--ease-out-soft);
 }
 
-@keyframes menuRise {
+@keyframes menuPop {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(4px) scale(0.97);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -128,14 +448,10 @@
     scroll-behavior: auto;
   }
   .btn-primary,
-  .btn-secondary {
-    transition: background-color 140ms var(--ease);
+  .btn-ghost {
+    transition: none;
   }
-  .btn-primary:active,
-  .btn-secondary:active {
-    transform: none;
-  }
-  .finder-menu {
+  .finder-menu-pop {
     animation: none;
   }
 }

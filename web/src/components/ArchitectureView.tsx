@@ -1,4 +1,6 @@
 import React from 'react';
+import { Check, Minus } from 'lucide-react';
+import { ShojiMark } from './Navbar';
 import type { Language } from '../types';
 import { translations } from '../i18n';
 
@@ -7,74 +9,91 @@ interface ArchitectureViewProps {
 }
 
 export const ArchitectureView: React.FC<ArchitectureViewProps> = ({ lang }) => {
-  const t = translations[lang].architecture;
+  const t = translations[lang].compare;
+
+  const renderVerdict = (v: 'yes' | 'some' | 'no', text: string, emphasize = false) => (
+    <div className="flex items-start gap-2.5">
+      {v === 'yes' && (
+        <span className="verdict verdict-yes mt-0.5">
+          <Check className="w-3 h-3" strokeWidth={2.8} />
+        </span>
+      )}
+      {v === 'some' && (
+        <span className="verdict verdict-some mt-0.5 text-[12px] font-bold leading-none">
+          ~
+        </span>
+      )}
+      {v === 'no' && (
+        <span className="verdict verdict-no mt-0.5">
+          <Minus className="w-3 h-3" strokeWidth={2.4} />
+        </span>
+      )}
+      <span
+        className={`text-[13.5px] leading-[1.4] ${
+          emphasize ? 'font-medium text-[var(--color-ink)]' : 'text-[var(--color-ink-2)]'
+        }`}
+      >
+        {text}
+      </span>
+    </div>
+  );
 
   return (
-    <section id="architecture" className="py-20 md:py-24 px-6 md:px-8 border-t border-[#ededed]/8">
-      <div className="max-w-[1120px] mx-auto">
-        <h2 className="text-[28px] md:text-[32px] leading-[1.15] font-medium text-[#ededed] mb-10">
-          {t.title}
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          {t.stats.map((stat, idx) => (
-            <div
-              key={stat.label}
-              className="rounded-[16px] bg-[#19191b] border border-[#ededed]/8 p-6 flex flex-col gap-2"
-            >
-              <span className="text-[13px] leading-[20px] text-[#a1a1a6]">
-                {stat.label}
-              </span>
-              <span
-                className={`text-[32px] leading-none font-medium font-mono tabular-nums ${
-                  idx === 0 ? 'text-[#0a84ff]' : 'text-[#ededed]'
-                }`}
-              >
-                {stat.value}
-              </span>
-              <span className="text-[12px] leading-[16px] text-[#85858b]">
-                {stat.note}
-              </span>
-            </div>
-          ))}
+    <section id="compare" className="scroll-mt-16 py-20 sm:py-28">
+      <div className="container-page">
+        <div className="flex flex-col items-center text-center gap-3 mb-12 sm:mb-14">
+          <p className="eyebrow">{t.eyebrow}</p>
+          <h2 className="display text-[clamp(30px,3.6vw,48px)] text-[var(--color-ink)]">
+            {t.titleDark}
+            <br />
+            <span className="text-[var(--color-ink-3)]">{t.titleMuted}</span>
+          </h2>
+          <p className="mt-2 max-w-[42rem] text-balance text-[16.5px] leading-relaxed text-[var(--color-ink-2)]">
+            {t.lede}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          <div className="lg:col-span-5 rounded-[16px] bg-[#19191b] border border-[#ededed]/8 divide-y divide-[#ededed]/8">
-            {t.processes.map((proc) => (
-              <div key={proc.name} className="p-5 flex flex-col gap-1.5">
-                <div className="flex items-baseline justify-between gap-2">
-                  <h3 className="text-[15px] leading-[22px] font-medium text-[#ededed]">
-                    {proc.name}
-                  </h3>
-                  <span className="text-[12px] leading-[16px] font-mono text-[#85858b]">
-                    {proc.role}
-                  </span>
-                </div>
-                <p className="text-[13px] leading-[20px] text-[#a1a1a6]">
-                  {proc.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="lg:col-span-7 rounded-[16px] overflow-hidden bg-[#19191b] border border-[#ededed]/8 flex flex-col justify-between">
-            <div className="grid grid-cols-3 h-11 px-5 border-b border-[#ededed]/8 items-center text-[12px] leading-[16px] text-[#85858b]">
-              <span>{t.compHeaders[0]}</span>
-              <span>{t.compHeaders[1]}</span>
-              <span>{t.compHeaders[2]}</span>
-            </div>
-            <div className="divide-y divide-[#ededed]/8 flex-1 flex flex-col justify-around">
-              {t.compRows.map((row) => (
-                <div key={row.label} className="grid grid-cols-3 px-5 py-4 items-center text-[13px] leading-[20px] gap-3">
-                  <span className="text-[#a1a1a6]">{row.label}</span>
-                  <span className="text-[#ededed] font-mono text-[12px]">{row.fa}</span>
-                  <span className="text-[#85858b] font-mono text-[12px]">{row.others}</span>
-                </div>
-              ))}
-            </div>
+        <div className="rounded-[26px] overflow-hidden bg-[var(--color-surface)] shadow-[0_0_0_1px_var(--color-line)]">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[760px] border-collapse text-left">
+              <thead>
+                <tr className="border-b border-[var(--color-line)] text-[13.5px] font-semibold text-[var(--color-ink-2)]">
+                  <th className="py-4 px-6 w-[23%] font-medium text-[var(--color-ink-3)]">
+                    {t.headers[0]}
+                  </th>
+                  <th className="py-4 px-5 w-[22%] bg-[var(--color-accent)]/4 text-[var(--color-ink)]">
+                    <span className="inline-flex items-center gap-2">
+                      <ShojiMark className="w-4 h-4 text-[var(--color-ink)]" />
+                      <span>{t.headers[1]}</span>
+                    </span>
+                  </th>
+                  <th className="py-4 px-5 w-[18.5%]">{t.headers[2]}</th>
+                  <th className="py-4 px-5 w-[18.5%]">{t.headers[3]}</th>
+                  <th className="py-4 px-5 w-[18%]">{t.headers[4]}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--color-line)]">
+                {t.rows.map((row) => (
+                  <tr key={row.topic} className="align-top">
+                    <td className="py-4 px-6 text-[14px] font-medium text-[var(--color-ink)]">
+                      {row.topic}
+                    </td>
+                    <td className="py-4 px-5 bg-[var(--color-accent)]/4">
+                      {renderVerdict(row.fa.v, row.fa.t, true)}
+                    </td>
+                    <td className="py-4 px-5">{renderVerdict(row.mac.v, row.mac.t)}</td>
+                    <td className="py-4 px-5">{renderVerdict(row.sbx.v, row.sbx.t)}</td>
+                    <td className="py-4 px-5">{renderVerdict(row.elec.v, row.elec.t)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
+
+        <p className="mt-5 text-center text-[13px] text-[var(--color-ink-3)]">
+          {t.footnote}
+        </p>
       </div>
     </section>
   );
