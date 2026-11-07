@@ -16,13 +16,15 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ lang }) => {
   };
 
   return (
-    <section id="faq" className="py-12 md:py-16 px-4 sm:px-6">
-      <div className="max-w-5xl mx-auto">
-        <h2 className="text-xl sm:text-2xl font-semibold text-white tracking-tight mb-5">
-          {t.title}
-        </h2>
+    <section id="faq" className="py-20 md:py-24 px-6 md:px-8 border-t border-[#ededed]/8">
+      <div className="max-w-[1120px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        <div className="lg:col-span-4">
+          <h2 className="text-[28px] md:text-[32px] leading-[1.15] font-medium text-[#ededed]">
+            {t.title}
+          </h2>
+        </div>
 
-        <div className="rounded-2xl overflow-hidden border border-white/8 bg-[#0f1118] divide-y divide-white/6">
+        <div className="lg:col-span-8 divide-y divide-[#ededed]/8 border-y border-[#ededed]/8">
           {t.items.map((item, idx) => {
             const isOpen = openIdx === idx;
             return (
@@ -31,22 +33,23 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ lang }) => {
                   type="button"
                   onClick={() => toggle(idx)}
                   aria-expanded={isOpen}
-                  className="w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-white/4 transition-colors gap-4 cursor-pointer"
+                  className="w-full py-4 flex items-center justify-between text-left gap-4 cursor-pointer group"
                 >
-                  <span className="text-sm font-medium text-zinc-100">
+                  <span className="text-[15px] leading-[22px] font-normal text-[#ededed] group-hover:text-white transition-colors">
                     {item.q}
                   </span>
                   <ChevronDown
-                    className={`w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-150 ${
-                      isOpen ? 'rotate-180 text-white' : ''
+                    strokeWidth={1.5}
+                    className={`w-4 h-4 text-[#85858b] shrink-0 transition-transform duration-150 ${
+                      isOpen ? 'rotate-180 text-[#ededed]' : ''
                     }`}
                   />
                 </button>
 
                 {isOpen && (
-                  <div className="px-5 pb-4 text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                  <p className="pb-5 text-[14px] leading-[22px] text-[#a1a1a6] max-w-[64ch]">
                     {item.a}
-                  </div>
+                  </p>
                 )}
               </div>
             );

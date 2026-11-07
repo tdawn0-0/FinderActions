@@ -10,7 +10,6 @@ import {
   Archive,
   ChevronLeft,
   ChevronRight,
-  CheckCircle2,
   Clock,
   FileCheck2,
   Layers,
@@ -32,11 +31,11 @@ interface FileItem {
 }
 
 const FILES: FileItem[] = [
-  { id: '1', name: 'hero-banner.png', size: '1.4 MB', type: 'PNG', iconType: 'image', matched: ['copy-path', 'copy-name', 'convert-webp', 'compress'] },
-  { id: '2', name: 'api-schema.json', size: '18 KB', type: 'JSON', iconType: 'json', matched: ['open-vscode', 'copy-path', 'format-json', 'compress'] },
-  { id: '3', name: 'deploy-pipeline.sh', size: '3.2 KB', type: 'Shell', iconType: 'sh', matched: ['open-terminal', 'open-vscode', 'copy-path', 'copy-name'] },
-  { id: '4', name: 'design-spec.pdf', size: '4.8 MB', type: 'PDF', iconType: 'pdf', matched: ['copy-path', 'copy-name', 'compress'] },
-  { id: '5', name: 'build-artifacts', size: '12 items', type: 'Folder', iconType: 'folder', matched: ['open-terminal', 'open-vscode', 'copy-path', 'compress'] },
+  { id: '1', name: 'hero-banner.png', size: '1.42 MB', type: 'PNG', iconType: 'image', matched: ['copy-path', 'copy-name', 'convert-webp', 'compress'] },
+  { id: '2', name: 'api-schema.json', size: '0.02 MB', type: 'JSON', iconType: 'json', matched: ['open-vscode', 'copy-path', 'format-json', 'compress'] },
+  { id: '3', name: 'deploy-pipeline.sh', size: '0.01 MB', type: 'Shell', iconType: 'sh', matched: ['open-terminal', 'open-vscode', 'copy-path', 'copy-name'] },
+  { id: '4', name: 'design-spec.pdf', size: '4.80 MB', type: 'PDF', iconType: 'pdf', matched: ['copy-path', 'copy-name', 'compress'] },
+  { id: '5', name: 'build-artifacts', size: '12.40 MB', type: 'Folder', iconType: 'folder', matched: ['open-terminal', 'open-vscode', 'copy-path', 'compress'] },
 ];
 
 export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = ({ lang }) => {
@@ -44,7 +43,7 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
 
   const [selectedFile, setSelectedFile] = useState<FileItem>(FILES[0]);
   const [menuOpen, setMenuOpen] = useState(true);
-  const [menuPosition, setMenuPosition] = useState({ x: 260, y: 92 });
+  const [menuPosition, setMenuPosition] = useState({ x: 268, y: 96 });
   const [toastKey, setToastKey] = useState<keyof typeof t.toastFeedback | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -52,12 +51,12 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
     setSelectedFile(file);
     if (containerRef.current && clientX !== undefined && clientY !== undefined) {
       const rect = containerRef.current.getBoundingClientRect();
-      const clickX = Math.min(Math.max(clientX - rect.left, 24), Math.max(rect.width - 252, 24));
-      const clickY = Math.min(Math.max(clientY - rect.top, 52), Math.max(rect.height - 250, 52));
+      const clickX = Math.min(Math.max(clientX - rect.left, 24), Math.max(rect.width - 264, 24));
+      const clickY = Math.min(Math.max(clientY - rect.top, 52), Math.max(rect.height - 256, 52));
       setMenuPosition({ x: clickX, y: clickY });
     } else {
       const rowIdx = FILES.findIndex((item) => item.id === file.id);
-      setMenuPosition({ x: 240, y: 88 + Math.max(rowIdx, 0) * 38 });
+      setMenuPosition({ x: 268, y: 96 + Math.max(rowIdx, 0) * 36 });
     }
     setMenuOpen(true);
   };
@@ -70,107 +69,114 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
     }, 2600);
   };
 
-  const getFileIcon = (type: FileItem['iconType']) => {
+  const renderFileIcon = (type: FileItem['iconType'], selected: boolean) => {
+    const cls = `w-4 h-4 shrink-0 ${selected ? 'text-white' : 'text-[#85858b]'}`;
     switch (type) {
       case 'image':
-        return <ImageIcon className="w-4 h-4 text-sky-400 shrink-0" />;
+        return <ImageIcon className={cls} strokeWidth={1.5} />;
       case 'json':
-        return <FileCode className="w-4 h-4 text-amber-400 shrink-0" />;
+        return <FileCode className={cls} strokeWidth={1.5} />;
       case 'sh':
-        return <Terminal className="w-4 h-4 text-emerald-400 shrink-0" />;
+        return <Terminal className={cls} strokeWidth={1.5} />;
       case 'pdf':
-        return <FileText className="w-4 h-4 text-rose-400 shrink-0" />;
+        return <FileText className={cls} strokeWidth={1.5} />;
       case 'folder':
-        return <Folder className="w-4 h-4 text-[#0a84ff] fill-[#0a84ff]/20 shrink-0" />;
+        return <Folder className={cls} strokeWidth={1.5} />;
     }
   };
 
   return (
-    <section id="demo" className="pb-12 md:pb-16 px-4 sm:px-6">
-      <div className="max-w-5xl mx-auto">
+    <section id="demo" className="pb-20 md:pb-24 px-6 md:px-8">
+      <div className="max-w-[1120px] mx-auto">
         <div
           ref={containerRef}
           onClick={() => {
             if (menuOpen) setMenuOpen(false);
           }}
-          className="relative rounded-2xl overflow-hidden glass-panel border border-white/12 shadow-[0_24px_60px_-16px_rgba(0,0,0,0.85)] bg-[#0f1118] select-none"
+          className="relative rounded-[16px] overflow-hidden bg-[#19191b] border border-[#ededed]/8 select-none"
         >
           {toastKey && (
             <div
               role="status"
-              className="absolute top-3 right-3 z-40 max-w-xs glass-dropdown rounded-xl px-3.5 py-2.5 flex items-center gap-2.5"
+              className="absolute top-3 right-3 z-40 max-w-sm rounded-[8px] px-3 h-9 bg-[#232325] border border-[#ededed]/10 flex items-center gap-2"
             >
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="text-xs text-zinc-100 truncate">{t.toastFeedback[toastKey]}</span>
+              <span className="w-2 h-2 rounded-full bg-[#4cc38a] shrink-0" />
+              <span className="text-[12px] leading-[16px] font-mono text-[#ededed] truncate">
+                {t.toastFeedback[toastKey]}
+              </span>
             </div>
           )}
 
-          <div className="h-10 px-4 border-b border-white/8 bg-[#161922] flex items-center justify-between">
-            <div className="flex items-center gap-2 w-20" aria-hidden="true">
-              <span className="w-3 h-3 rounded-full bg-[#ff5f57]" />
-              <span className="w-3 h-3 rounded-full bg-[#febc2e]" />
-              <span className="w-3 h-3 rounded-full bg-[#28c840]" />
+          <div className="h-12 px-4 border-b border-[#ededed]/8 bg-[#19191b] flex items-center justify-between">
+            <div className="flex items-center gap-2 w-24" aria-hidden="true">
+              <span className="w-3 h-3 rounded-full bg-[#232325] border border-[#ededed]/12" />
+              <span className="w-3 h-3 rounded-full bg-[#232325] border border-[#ededed]/12" />
+              <span className="w-3 h-3 rounded-full bg-[#232325] border border-[#ededed]/12" />
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-medium text-zinc-200">
-              <div className="hidden sm:flex items-center text-zinc-500 gap-1 mr-1" aria-hidden="true">
-                <ChevronLeft className="w-3.5 h-3.5" />
-                <ChevronRight className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-2 text-[13px] leading-[20px] text-[#ededed]">
+              <div className="hidden sm:flex items-center text-[#85858b] gap-1 mr-1" aria-hidden="true">
+                <ChevronLeft className="w-4 h-4" strokeWidth={1.5} />
+                <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
               </div>
-              <Folder className="w-3.5 h-3.5 text-[#0a84ff]" />
-              <span>Project-Assets</span>
+              <Folder className="w-4 h-4 text-[#85858b] shrink-0" strokeWidth={1.5} />
+              <span className="font-medium">Project-Assets</span>
             </div>
 
-            <div className="w-20 text-right text-[11px] font-mono text-zinc-500">
-              {FILES.length} items
+            <div className="w-24 text-right text-[12px] leading-[16px] font-mono tabular-nums text-[#85858b]">
+              {t.itemCount}
             </div>
           </div>
 
-          <div className="flex min-h-[340px] text-xs">
-            <div className="w-44 bg-[#11131b] border-r border-white/6 p-3 hidden sm:flex flex-col gap-4 shrink-0" aria-hidden="true">
+          <div className="flex min-h-[360px]">
+            <div className="w-[224px] bg-[#0f0f10] border-r border-[#ededed]/8 p-4 hidden sm:flex flex-col gap-6 shrink-0" aria-hidden="true">
               <div>
-                <div className="text-[10px] font-medium text-zinc-500 px-2 mb-1">
-                  {t.sidebar.favorites}
+                <div className="text-[12px] leading-[16px] text-[#85858b] px-2 mb-2">
+                  {t.sidebar.locations}
                 </div>
-                <div className="flex flex-col gap-0.5 text-zinc-400">
-                  <div className="flex items-center gap-2 px-2 py-1 rounded">
-                    <Clock className="w-3.5 h-3.5 text-[#0a84ff]" />
+                <div className="flex flex-col gap-0.5 text-[13px] leading-[20px] text-[#a1a1a6]">
+                  <div className="h-8 px-2 rounded-[8px] flex items-center gap-2.5">
+                    <Clock className="w-4 h-4 text-[#85858b] shrink-0" strokeWidth={1.5} />
                     <span>{t.sidebar.recents}</span>
                   </div>
-                  <div className="flex items-center gap-2 px-2 py-1 rounded">
-                    <Layers className="w-3.5 h-3.5 text-[#0a84ff]" />
+                  <div className="h-8 px-2 rounded-[8px] flex items-center gap-2.5">
+                    <Layers className="w-4 h-4 text-[#85858b] shrink-0" strokeWidth={1.5} />
                     <span>{t.sidebar.applications}</span>
                   </div>
-                  <div className="flex items-center gap-2 px-2 py-1 rounded text-white bg-white/10 font-medium">
-                    <Folder className="w-3.5 h-3.5 text-[#0a84ff]" />
+                  <div className="h-8 px-2 rounded-[8px] surface-active flex items-center gap-2.5 text-[#ededed] font-medium">
+                    <Folder className="w-4 h-4 text-[#a1a1a6] shrink-0" strokeWidth={1.5} />
                     <span>Project-Assets</span>
                   </div>
-                  <div className="flex items-center gap-2 px-2 py-1 rounded">
-                    <FileText className="w-3.5 h-3.5 text-[#0a84ff]" />
+                  <div className="h-8 px-2 rounded-[8px] flex items-center gap-2.5">
+                    <FileText className="w-4 h-4 text-[#85858b] shrink-0" strokeWidth={1.5} />
                     <span>{t.sidebar.documents}</span>
                   </div>
                 </div>
               </div>
 
               <div>
-                <div className="text-[10px] font-medium text-zinc-500 px-2 mb-1">
+                <div className="text-[12px] leading-[16px] text-[#85858b] px-2 mb-2">
                   {t.sidebar.tags}
                 </div>
-                <div className="flex flex-col gap-0.5 text-zinc-400">
-                  <div className="flex items-center gap-2 px-2 py-1">
-                    <span className="w-2 h-2 rounded-full bg-[#0a84ff]" />
+                <div className="flex flex-col gap-0.5 text-[13px] leading-[20px] text-[#a1a1a6]">
+                  <div className="h-8 px-2 rounded-[8px] flex items-center gap-2.5">
+                    <span className="w-4 h-4 inline-flex items-center justify-center shrink-0">
+                      <span className="w-2 h-2 rounded-full bg-[#0a84ff]" />
+                    </span>
                     <span>{t.sidebar.work}</span>
                   </div>
-                  <div className="flex items-center gap-2 px-2 py-1">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <div className="h-8 px-2 rounded-[8px] flex items-center gap-2.5">
+                    <span className="w-4 h-4 inline-flex items-center justify-center shrink-0">
+                      <span className="w-2 h-2 rounded-full bg-[#4cc38a]" />
+                    </span>
                     <span>{t.sidebar.personal}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex-1 p-3 sm:p-4 bg-[#0c0e14] flex flex-col justify-between overflow-x-auto">
-              <div className="rounded-lg overflow-hidden border border-white/6 divide-y divide-white/5">
+            <div className="flex-1 p-4 bg-[#141415] flex flex-col justify-between overflow-x-auto">
+              <div className="rounded-[8px] overflow-hidden border border-[#ededed]/8 divide-y divide-[#ededed]/8">
                 {FILES.map((file) => {
                   const isSelected = selectedFile.id === file.id;
                   return (
@@ -186,23 +192,23 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
                         e.stopPropagation();
                         openMenuForItem(file, e.clientX, e.clientY);
                       }}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 text-left transition-colors cursor-pointer ${
+                      className={`w-full h-9 px-3 flex items-center justify-between text-left transition-colors cursor-pointer ${
                         isSelected
                           ? 'bg-[#0a84ff] text-white'
-                          : 'hover:bg-white/5 text-zinc-200'
+                          : 'bg-[#19191b] hover:bg-[#232325] text-[#ededed]'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        {getFileIcon(file.iconType)}
-                        <span className="font-medium tracking-tight text-xs sm:text-[13px] truncate">
+                        {renderFileIcon(file.iconType, isSelected)}
+                        <span className="text-[13px] leading-[20px] truncate">
                           {file.name}
                         </span>
                       </div>
-                      <div className="flex items-center gap-6 text-[11px] shrink-0 ml-4">
-                        <span className={isSelected ? 'text-blue-100' : 'text-zinc-500'}>
+                      <div className="flex items-center gap-6 text-[12px] leading-[16px] shrink-0 ml-4">
+                        <span className={isSelected ? 'text-white/80' : 'text-[#85858b]'}>
                           {file.type}
                         </span>
-                        <span className={`${isSelected ? 'text-blue-100' : 'text-zinc-400'} font-mono w-16 text-right`}>
+                        <span className={`${isSelected ? 'text-white/90' : 'text-[#a1a1a6]'} font-mono tabular-nums w-20 text-right`}>
                           {file.size}
                         </span>
                       </div>
@@ -211,7 +217,7 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
                 })}
               </div>
 
-              <div className="mt-3 pt-2.5 border-t border-white/6 flex items-center justify-between text-[11px] text-zinc-500 font-mono">
+              <div className="mt-4 pt-3 border-t border-[#ededed]/8 flex items-center justify-between text-[12px] leading-[16px] text-[#85858b] font-mono tabular-nums">
                 <span>~/Project-Assets/{selectedFile.name}</span>
                 <span>{selectedFile.size}</span>
               </div>
@@ -223,7 +229,7 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
               key={selectedFile.id}
               role="menu"
               style={{ top: `${menuPosition.y}px`, left: `${menuPosition.x}px` }}
-              className="context-menu-pop absolute z-50 w-60 glass-dropdown rounded-lg py-1 text-xs text-zinc-100"
+              className="finder-menu absolute z-50 w-64 rounded-[10px] p-1 text-[13px] leading-[20px] text-[#ededed]"
               onClick={(e) => e.stopPropagation()}
             >
               {selectedFile.matched.includes('open-terminal') && (
@@ -231,9 +237,9 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
                   type="button"
                   role="menuitem"
                   onClick={() => handleActionClick('openTerminal')}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#0a84ff] hover:text-white text-left cursor-pointer"
+                  className="w-full h-8 px-2.5 rounded-[6px] flex items-center gap-2.5 hover:bg-[#0a84ff] hover:text-white text-left cursor-pointer group"
                 >
-                  <Terminal className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                  <Terminal className="w-4 h-4 text-[#85858b] group-hover:text-white shrink-0" strokeWidth={1.5} />
                   <span className="truncate">{t.menuItems.openTerminal}</span>
                 </button>
               )}
@@ -243,9 +249,9 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
                   type="button"
                   role="menuitem"
                   onClick={() => handleActionClick('openEditor')}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#0a84ff] hover:text-white text-left cursor-pointer"
+                  className="w-full h-8 px-2.5 rounded-[6px] flex items-center gap-2.5 hover:bg-[#0a84ff] hover:text-white text-left cursor-pointer group"
                 >
-                  <Code2 className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                  <Code2 className="w-4 h-4 text-[#85858b] group-hover:text-white shrink-0" strokeWidth={1.5} />
                   <span className="truncate">{t.menuItems.openEditor}</span>
                 </button>
               )}
@@ -255,9 +261,9 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
                   type="button"
                   role="menuitem"
                   onClick={() => handleActionClick('copyPath')}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#0a84ff] hover:text-white text-left cursor-pointer"
+                  className="w-full h-8 px-2.5 rounded-[6px] flex items-center gap-2.5 hover:bg-[#0a84ff] hover:text-white text-left cursor-pointer group"
                 >
-                  <Copy className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                  <Copy className="w-4 h-4 text-[#85858b] group-hover:text-white shrink-0" strokeWidth={1.5} />
                   <span className="truncate">{t.menuItems.copyPath}</span>
                 </button>
               )}
@@ -267,9 +273,9 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
                   type="button"
                   role="menuitem"
                   onClick={() => handleActionClick('copyName')}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#0a84ff] hover:text-white text-left cursor-pointer"
+                  className="w-full h-8 px-2.5 rounded-[6px] flex items-center gap-2.5 hover:bg-[#0a84ff] hover:text-white text-left cursor-pointer group"
                 >
-                  <FileCheck2 className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                  <FileCheck2 className="w-4 h-4 text-[#85858b] group-hover:text-white shrink-0" strokeWidth={1.5} />
                   <span className="truncate">{t.menuItems.copyName}</span>
                 </button>
               )}
@@ -279,9 +285,9 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
                   type="button"
                   role="menuitem"
                   onClick={() => handleActionClick('convertWebp')}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#0a84ff] hover:text-white text-left cursor-pointer"
+                  className="w-full h-8 px-2.5 rounded-[6px] flex items-center gap-2.5 hover:bg-[#0a84ff] hover:text-white text-left cursor-pointer group"
                 >
-                  <ImageIcon className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                  <ImageIcon className="w-4 h-4 text-[#85858b] group-hover:text-white shrink-0" strokeWidth={1.5} />
                   <span className="truncate">{t.menuItems.convertWebp}</span>
                 </button>
               )}
@@ -291,9 +297,9 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
                   type="button"
                   role="menuitem"
                   onClick={() => handleActionClick('formatJson')}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#0a84ff] hover:text-white text-left cursor-pointer"
+                  className="w-full h-8 px-2.5 rounded-[6px] flex items-center gap-2.5 hover:bg-[#0a84ff] hover:text-white text-left cursor-pointer group"
                 >
-                  <FileCode className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                  <FileCode className="w-4 h-4 text-[#85858b] group-hover:text-white shrink-0" strokeWidth={1.5} />
                   <span className="truncate">{t.menuItems.formatJson}</span>
                 </button>
               )}
@@ -303,22 +309,22 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
                   type="button"
                   role="menuitem"
                   onClick={() => handleActionClick('compress')}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#0a84ff] hover:text-white text-left cursor-pointer"
+                  className="w-full h-8 px-2.5 rounded-[6px] flex items-center gap-2.5 hover:bg-[#0a84ff] hover:text-white text-left cursor-pointer group"
                 >
-                  <Archive className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                  <Archive className="w-4 h-4 text-[#85858b] group-hover:text-white shrink-0" strokeWidth={1.5} />
                   <span className="truncate">{t.menuItems.compress}</span>
                 </button>
               )}
 
-              <div className="h-px bg-white/10 my-1" />
+              <div className="h-px bg-[#ededed]/8 my-1" />
 
-              <div className="px-3 py-1 text-zinc-500 flex items-center justify-between text-[11px]">
+              <div className="h-7 px-2.5 flex items-center justify-between text-[12px] leading-[16px] text-[#85858b]">
                 <span>Get Info</span>
-                <span className="font-mono text-[10px]">⌘I</span>
+                <kbd className="keycap">⌘I</kbd>
               </div>
-              <div className="px-3 py-1 text-zinc-500 flex items-center justify-between text-[11px]">
+              <div className="h-7 px-2.5 flex items-center justify-between text-[12px] leading-[16px] text-[#85858b]">
                 <span>Quick Look</span>
-                <span className="font-mono text-[10px]">Space</span>
+                <kbd className="keycap">Space</kbd>
               </div>
             </div>
           )}

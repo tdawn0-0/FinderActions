@@ -2,6 +2,7 @@ import { latestReleaseURL } from '../release';
 import React from 'react';
 import { Download } from 'lucide-react';
 import { GithubIcon } from './GithubIcon';
+import { GlyphFolderVisual } from './GlyphFolderVisual';
 import type { Language } from '../types';
 import { translations } from '../i18n';
 
@@ -13,37 +14,43 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
   const t = translations[lang].hero;
 
   return (
-    <section className="pt-14 pb-8 md:pt-20 md:pb-10 px-4 sm:px-6 text-center">
-      <div className="max-w-3xl mx-auto flex flex-col items-center">
-        <h1 className="text-3xl sm:text-5xl md:text-[56px] font-semibold tracking-[-0.025em] text-white leading-[1.08] mb-7">
-          {t.title}
-        </h1>
+    <section className="pt-12 pb-12 md:pt-20 md:pb-16 px-6 md:px-8">
+      <div className="max-w-[1120px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="lg:col-span-7 flex flex-col items-start text-left">
+          <h1 className="text-[36px] sm:text-[48px] md:text-[54px] font-medium tracking-[-0.03em] leading-[1.08] text-[#ededed] mb-5 text-balance max-w-[13.5em]">
+            {t.title}
+          </h1>
 
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-4">
-          <a
-            href={latestReleaseURL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="pressable inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-[#0a84ff] hover:bg-[#1b8fff]"
-          >
-            <Download className="w-4 h-4" />
-            <span>{t.ctaDownload}</span>
-          </a>
+          <p className="text-[18px] leading-[28px] text-[#a1a1a6] max-w-[34rem] mb-8">
+            {t.subhead}
+          </p>
 
-          <a
-            href="https://github.com/tdawn0-0/FinderActions"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="pressable inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-zinc-200 hover:text-white bg-white/6 hover:bg-white/10 border border-white/10"
-          >
-            <GithubIcon className="w-4 h-4" />
-            <span>{t.ctaGithub}</span>
-          </a>
+          <div className="flex flex-wrap items-center gap-3">
+            <a
+              href={latestReleaseURL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary h-11 px-5 rounded-[8px] inline-flex items-center gap-2 text-[14px] leading-[20px] font-medium"
+            >
+              <Download className="w-4 h-4 shrink-0" strokeWidth={1.5} />
+              <span>{t.ctaDownload}</span>
+            </a>
+
+            <a
+              href="https://github.com/tdawn0-0/FinderActions"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary h-11 px-5 rounded-[8px] inline-flex items-center gap-2 text-[14px] leading-[20px] font-normal"
+            >
+              <GithubIcon className="w-4 h-4 shrink-0 text-[#85858b]" />
+              <span>{t.ctaGithub}</span>
+            </a>
+          </div>
         </div>
 
-        <p className="text-xs font-mono text-zinc-500">
-          {t.meta}
-        </p>
+        <div className="lg:col-span-5 flex items-center justify-center">
+          <GlyphFolderVisual lang={lang} />
+        </div>
       </div>
     </section>
   );

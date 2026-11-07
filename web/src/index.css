@@ -2,11 +2,19 @@
 
 @layer base {
   :root {
-    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-    --mac-bg: #0b0c10;
-    --mac-surface: rgba(20, 22, 29, 0.78);
-    --mac-border: rgba(255, 255, 255, 0.08);
-    --mac-accent: #0a84ff;
+    --bg-deep: #0f0f10;
+    --bg-page: #141415;
+    --bg-card: #19191b;
+    --bg-raised: #232325;
+    --hairline: rgba(237, 237, 237, 0.08);
+    --text-primary: #ededed;
+    --text-secondary: #a1a1a6;
+    --text-muted: #85858b;
+    --accent: #0a84ff;
+    --positive: #4cc38a;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
   }
 
   html {
@@ -15,57 +23,103 @@
   }
 
   body {
-    background-color: var(--mac-bg);
-    color: #f4f4f5;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
     margin: 0;
   }
 
+  code,
+  pre,
+  kbd,
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+
   ::selection {
-    background-color: var(--mac-accent);
+    background-color: var(--accent);
     color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 1.5px solid var(--text-secondary);
+    outline-offset: 2px;
   }
 }
 
-.glass-panel {
-  background: var(--mac-surface);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid var(--mac-border);
+.keycap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 5px;
+  background-color: var(--bg-raised);
+  border: 1px solid var(--hairline);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
-.glass-dropdown {
-  background: rgba(28, 30, 38, 0.92);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 18px 38px -10px rgba(0, 0, 0, 0.72), 0 0 0 0.5px rgba(255, 255, 255, 0.08);
+.btn-primary {
+  background-color: var(--text-primary);
+  color: var(--bg-page);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: transform 140ms var(--ease), background-color 140ms var(--ease);
 }
 
-.pressable {
-  transition: transform 140ms var(--ease-out), background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+.btn-primary:hover {
+  background-color: #ffffff;
 }
 
-.pressable:active {
+.btn-primary:active {
   transform: scale(0.98);
 }
 
-.context-menu-pop {
-  transform-origin: top left;
-  animation: menuEnter 150ms var(--ease-out);
+.btn-secondary {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--hairline);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 140ms var(--ease), background-color 140ms var(--ease), border-color 140ms var(--ease);
 }
 
-@keyframes menuEnter {
+.btn-secondary:hover {
+  background-color: var(--bg-raised);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.surface-active {
+  background-color: var(--bg-raised);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.finder-menu {
+  background-color: #1e1e21;
+  border: 1px solid rgba(237, 237, 237, 0.12);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transform-origin: top left;
+  animation: menuRise 180ms var(--ease);
+}
+
+@keyframes menuRise {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
 }
 
@@ -73,13 +127,15 @@
   html {
     scroll-behavior: auto;
   }
-  .pressable {
-    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+  .btn-primary,
+  .btn-secondary {
+    transition: background-color 140ms var(--ease);
   }
-  .pressable:active {
+  .btn-primary:active,
+  .btn-secondary:active {
     transform: none;
   }
-  .context-menu-pop {
+  .finder-menu {
     animation: none;
   }
 }

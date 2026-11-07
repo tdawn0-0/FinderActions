@@ -30,14 +30,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0c10] text-zinc-100 flex flex-col font-sans antialiased">
-      <div
-        className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[360px] pointer-events-none opacity-20 overflow-hidden -z-10"
-        aria-hidden="true"
-      >
-        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[560px] h-[300px] rounded-full bg-sky-500/25 blur-[120px]" />
-      </div>
-
+    <div className="min-h-screen bg-[#141415] text-[#ededed] flex flex-col antialiased">
       <Navbar lang={lang} onToggleLang={toggleLanguage} />
 
       <main className="flex-1 flex flex-col">

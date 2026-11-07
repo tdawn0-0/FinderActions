@@ -1,6 +1,6 @@
 import { latestReleaseURL } from '../release';
 import React, { useState } from 'react';
-import { Check, Copy } from 'lucide-react';
+import { Check, Copy, ArrowUpRight } from 'lucide-react';
 import type { Language } from '../types';
 import { translations } from '../i18n';
 
@@ -23,70 +23,72 @@ killall Finder`;
   };
 
   return (
-    <section id="guide" className="py-12 md:py-16 px-4 sm:px-6">
-      <div className="max-w-5xl mx-auto">
-        <h2 className="text-xl sm:text-2xl font-semibold text-white tracking-tight mb-5">
+    <section id="guide" className="py-20 md:py-24 px-6 md:px-8 border-t border-[#ededed]/8">
+      <div className="max-w-[1120px] mx-auto">
+        <h2 className="text-[28px] md:text-[32px] leading-[1.15] font-medium text-[#ededed] mb-10">
           {t.title}
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
-          <div className="glass-panel rounded-2xl p-5 border border-white/8 bg-[#10121a] flex flex-col justify-between gap-4">
-            <div>
-              <h3 className="text-sm font-semibold text-white tracking-tight mb-1.5">
-                {t.step1Title}
-              </h3>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                {t.step1Desc}
-              </p>
-            </div>
-            <a
-              href={latestReleaseURL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-medium text-[#0a84ff] hover:underline w-fit"
-            >
-              {t.downloadLink}
-            </a>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          <div className="lg:col-span-6 flex flex-col divide-y divide-[#ededed]/8 border-y border-[#ededed]/8">
+            {t.steps.map((step, idx) => (
+              <div key={step.num} className="py-5 flex items-start gap-5">
+                <span className="text-[12px] leading-[22px] font-mono tabular-nums text-[#85858b] w-6 shrink-0">
+                  {step.num}
+                </span>
+                <div className="flex flex-col gap-1.5">
+                  <h3 className="text-[15px] leading-[22px] font-medium text-[#ededed]">
+                    {step.title}
+                  </h3>
+                  <p className="text-[14px] leading-[22px] text-[#a1a1a6]">
+                    {step.desc}
+                  </p>
+                  {idx === 0 && (
+                    <a
+                      href={latestReleaseURL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-flex items-center gap-1.5 text-[13px] leading-[20px] text-[#ededed] hover:text-[#0a84ff] transition-colors w-fit"
+                    >
+                      <span>{t.downloadLink}</span>
+                      <ArrowUpRight className="w-4 h-4 text-[#85858b]" strokeWidth={1.5} />
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
 
-          <div className="glass-panel rounded-2xl p-5 border border-white/8 bg-[#10121a]">
-            <h3 className="text-sm font-semibold text-white tracking-tight mb-1.5">
-              {t.step2Title}
-            </h3>
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              {t.step2Desc}
-            </p>
-          </div>
-
-          <div className="glass-panel rounded-2xl p-5 border border-white/8 bg-[#10121a]">
-            <h3 className="text-sm font-semibold text-white tracking-tight mb-1.5">
-              {t.step3Title}
-            </h3>
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              {t.step3Desc}
-            </p>
-          </div>
-        </div>
-
-        <details className="glass-panel rounded-xl border border-white/8 bg-[#0f1118] group">
-          <summary className="px-5 py-3 text-xs font-medium text-zinc-300 cursor-pointer select-none flex items-center justify-between">
-            <span>{t.troubleTitle}</span>
-            <span className="font-mono text-zinc-500 group-open:rotate-180 transition-transform">▾</span>
-          </summary>
-          <div className="px-5 pb-4 pt-1 border-t border-white/6">
-            <div className="relative bg-black/50 rounded-lg p-3 border border-white/8 font-mono text-xs text-zinc-300 overflow-x-auto leading-relaxed">
+          <div className="lg:col-span-6 rounded-[16px] overflow-hidden bg-[#19191b] border border-[#ededed]/8">
+            <div className="h-12 px-4 border-b border-[#ededed]/8 flex items-center justify-between gap-3">
+              <span className="text-[13px] leading-[20px] text-[#a1a1a6]">
+                {t.troubleTitle}
+              </span>
               <button
                 type="button"
                 onClick={handleCopyTrouble}
-                className="pressable absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded text-[11px] text-zinc-300 bg-white/8 hover:bg-white/12 cursor-pointer"
+                className="btn-secondary h-8 px-3 rounded-[8px] inline-flex items-center gap-2 text-[12px] leading-[16px] shrink-0 cursor-pointer"
               >
-                {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                <span>{copied ? t.copiedCmd : t.copyCmd}</span>
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4 text-[#4cc38a] shrink-0" strokeWidth={1.5} />
+                    <span className="text-[#4cc38a]">{t.copiedCmd}</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 text-[#85858b] shrink-0" strokeWidth={1.5} />
+                    <span>{t.copyCmd}</span>
+                  </>
+                )}
               </button>
-              <pre><code>{troubleCmd}</code></pre>
+            </div>
+            <div className="p-5 bg-[#0f0f10] font-mono text-[12px] leading-[22px] text-[#ededed] overflow-x-auto">
+              <pre>
+                <code>{troubleCmd}</code>
+              </pre>
             </div>
           </div>
-        </details>
+        </div>
       </div>
     </section>
   );
