@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
   :root {
@@ -63,15 +64,15 @@
 
 .container-page {
   width: 100%;
-  max-width: 1180px;
+  max-width: 1200px;
   margin-inline: auto;
   padding-inline: 24px;
 }
 
 .display {
-  letter-spacing: -0.042em;
+  letter-spacing: -0.045em;
   font-weight: 650;
-  line-height: 1.04;
+  line-height: 1.02;
 }
 
 .eyebrow {
@@ -84,49 +85,47 @@
 }
 
 .hero-bg {
-  background: linear-gradient(180deg, #e2e2e5 0%, #ececee 46%, var(--color-paper) 100%);
+  background: linear-gradient(180deg, #e2e2e5 0%, #ececee 45%, var(--color-paper) 100%);
 }
 
 .dark .hero-bg {
-  background: linear-gradient(180deg, #16161b 0%, #111115 46%, var(--color-paper) 100%);
+  background: linear-gradient(180deg, #16161b 0%, #111115 45%, var(--color-paper) 100%);
 }
 
-/* Shoji inline headline tactile chips */
+/* Exact Shoji inline headline tactile chips */
 .hchip {
-  vertical-align: -0.11em;
-  height: 0.88em;
+  vertical-align: -0.1em;
+  height: 0.86em;
   background: #16161a;
   border-radius: 0.24em;
-  margin: 0 0.08em;
-  padding: 0.06em;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  margin: 0 0.06em;
+  padding: 0.055em;
+  display: inline-block;
   box-shadow:
     inset 0 0.02em rgba(255, 255, 255, 0.18),
-    0 0.12em 0.3em -0.08em rgba(20, 30, 60, 0.42),
+    0 0.12em 0.3em -0.08em rgba(20, 30, 60, 0.45),
     0 0.04em 0.08em rgba(0, 0, 0, 0.2);
 }
 
-.hchip-menu {
-  width: 1.48em;
+.hchip-fold {
+  width: 1.5em;
   transform: rotate(-4deg);
 }
 
 .hchip-mark {
-  background: #ffffff;
-  width: 1.04em;
+  background: #e4e4e9;
+  width: 1.05em;
   transform: rotate(5deg);
-  box-shadow:
-    0 0 0 1px rgba(15, 23, 42, 0.08),
-    0 0.12em 0.28em -0.08em rgba(15, 23, 42, 0.22);
 }
 
 .dark .hchip-mark {
-  background: #1c1c22;
+  background: #0c0c0f;
+}
+
+.dark .hchip {
   box-shadow:
     inset 0 0.02em rgba(255, 255, 255, 0.14),
-    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 0 0 0.01em rgba(255, 255, 255, 0.1),
     0 0.12em 0.3em -0.08em rgba(0, 0, 0, 0.7);
 }
 
@@ -134,7 +133,7 @@
 .btn-primary {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   height: 48px;
   padding-inline: 22px 8px;
   border-radius: 999px;
@@ -142,13 +141,13 @@
   color: var(--color-paper);
   font-size: 15px;
   font-weight: 560;
-  box-shadow: 0 10px 30px -8px rgba(11, 11, 15, 0.45), inset 0 1px rgba(255, 255, 255, 0.14);
+  box-shadow: 0 10px 30px -8px rgba(11, 11, 15, 0.5), inset 0 1px rgba(255, 255, 255, 0.14);
   transition: transform 0.2s var(--ease-out-soft), box-shadow 0.2s ease;
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 16px 36px -10px rgba(11, 11, 15, 0.55), inset 0 1px rgba(255, 255, 255, 0.18);
+  box-shadow: 0 16px 36px -10px rgba(11, 11, 15, 0.55), inset 0 1px rgba(255, 255, 255, 0.14);
 }
 
 .btn-primary:active {
@@ -156,7 +155,7 @@
 }
 
 .dark .btn-primary {
-  box-shadow: 0 10px 34px -10px rgba(43, 143, 255, 0.38);
+  box-shadow: 0 10px 34px -10px rgba(120, 160, 255, 0.45);
 }
 
 .btn-dot {
@@ -179,7 +178,7 @@
   padding-inline: 20px;
   border-radius: 999px;
   color: var(--color-ink);
-  background: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 60%, transparent);
   box-shadow: 0 0 0 1px var(--color-line);
   font-size: 15px;
   font-weight: 520;
@@ -203,16 +202,21 @@
   border-radius: 999px;
   background: var(--color-surface);
   color: var(--color-ink);
-  border: 1px solid color-mix(in srgb, var(--color-ink) 16%, transparent);
-  box-shadow: 0 6px 18px -10px rgba(15, 23, 42, 0.22);
-  font-size: 14px;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 20%, transparent);
+  box-shadow: 0 6px 18px -10px rgba(15, 23, 42, 0.25);
+  font-size: 14.5px;
   font-weight: 500;
   line-height: 1;
   transition: border-color 0.2s ease;
 }
 
 .shoji-badge:hover {
-  border-color: color-mix(in srgb, var(--color-ink) 34%, transparent);
+  border-color: color-mix(in srgb, var(--color-ink) 38%, transparent);
+}
+
+.dark .shoji-badge {
+  box-shadow: none;
+  border-color: rgba(255, 255, 255, 0.28);
 }
 
 .shoji-badge-new {
@@ -220,7 +224,7 @@
   color: var(--color-accent);
   border-radius: 999px;
   padding: 6px 11px;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
 }
 
@@ -229,8 +233,8 @@
   color: var(--color-accent);
   font-variant-numeric: tabular-nums;
   border-radius: 999px;
-  padding: 2px 9px;
-  font-size: 12.5px;
+  padding: 2px 8px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -247,12 +251,12 @@
 .fit-art {
   background: color-mix(in srgb, var(--color-ink) 4%, transparent);
   border-radius: 16px;
-  height: 132px;
+  height: 124px;
   padding: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 14px;
   overflow: hidden;
 }
 
@@ -261,9 +265,9 @@
   box-shadow: 0 0 0 1px var(--color-line);
   color: var(--color-ink);
   border-radius: 999px;
-  padding: 5px 12px;
-  font-size: 13.5px;
-  font-weight: 540;
+  padding: 5px 11px;
+  font-size: 14px;
+  font-weight: 550;
 }
 
 .fit-keycap {
@@ -271,25 +275,45 @@
   min-width: 38px;
   height: 38px;
   padding-inline: 10px;
-  box-shadow: inset 0 -2px 0 rgba(15, 23, 42, 0.12), 0 0 0 1px var(--color-line);
+  box-shadow: inset 0 -2px 0 rgba(15, 23, 42, 0.14), 0 0 0 1px var(--color-line);
   color: var(--color-ink);
   border-radius: 9px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
 }
 
-/* Shoji MacBook Pro Hardware Frame */
+/* Exact Shoji MacBook Pro Hardware Frame (--W set in px on .tp-demo) */
+.hero-mac {
+  width: min(1040px, 100%);
+  margin: 48px auto 0;
+  padding-inline: 16px;
+  position: relative;
+  container-type: inline-size;
+}
+
+.demo-glow {
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    color-mix(in srgb, var(--color-accent) 22%, transparent),
+    transparent 70%
+  );
+  filter: blur(20px);
+}
+
 .mbp {
+  --lid-edge: calc(var(--W) * 0.0028);
+  --bezel: calc(var(--W) * 0.011);
   --metal: linear-gradient(100deg, #8f9195, #f2f3f4 16%, #cfd1d4 50%, #f2f3f4 84%, #8f9195);
   --metal-base: linear-gradient(90deg, #77797f 0%, #d7d9dc 5%, #f3f4f5 28%, #e2e3e5 72%, #d7d9dc 95%, #77797f 100%);
   width: 100%;
-  display: flex;
+  perspective: calc(var(--W) * 2.4);
   flex-direction: column;
   align-items: center;
+  display: flex;
   position: relative;
 }
 
@@ -300,32 +324,46 @@
 
 .mbp-lid {
   z-index: 2;
-  width: 92%;
-  padding: 3px;
-  border-radius: 24px 24px 4px 4px;
+  width: 88%;
+  padding: var(--lid-edge);
+  border-radius: calc(var(--W) * 0.024) calc(var(--W) * 0.024) calc(var(--W) * 0.004) calc(var(--W) * 0.004);
   background: var(--metal);
-  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.25), 0 24px 56px -20px rgba(20, 30, 60, 0.35);
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.25),
+    0 calc(var(--W) * 0.02) calc(var(--W) * 0.05) calc(var(--W) * -0.02) rgba(20, 30, 60, 0.35);
   position: relative;
 }
 
 .mbp-bezel {
-  padding: 11px 11px 13px;
-  border-radius: 21px 21px 3px 3px;
+  padding: var(--bezel) var(--bezel) calc(var(--bezel) * 1.15);
+  border-radius: calc(var(--W) * 0.021) calc(var(--W) * 0.021) calc(var(--W) * 0.003) calc(var(--W) * 0.003);
   background: #050506;
   position: relative;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.mbp-screen {
+  position: relative;
+}
+
+.demo-frame {
+  border-radius: calc(var(--W) * 0.007);
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #000;
 }
 
 .mbp-notch {
-  z-index: 30;
-  border-radius: 0 0 7px 7px;
+  z-index: 40;
+  border-radius: 0 0 calc(var(--W) * 0.006) calc(var(--W) * 0.006);
   pointer-events: none;
   background: #050506;
-  width: 116px;
-  height: 18px;
-  display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  width: 11.5%;
+  height: 3.1%;
+  display: flex;
   position: absolute;
   top: 0;
   left: 50%;
@@ -333,28 +371,40 @@
 }
 
 .mbp-notch i {
-  width: 5px;
-  height: 5px;
+  width: calc(var(--W) * 0.0045);
+  height: calc(var(--W) * 0.0045);
   background: radial-gradient(circle at 35% 35%, #2a3350, #07080b 70%);
   border-radius: 50%;
   display: block;
 }
 
+.mbp-glare {
+  z-index: 35;
+  border-radius: calc(var(--W) * 0.007);
+  pointer-events: none;
+  background: linear-gradient(118deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 32%, transparent 33%);
+  position: absolute;
+  inset: 0;
+}
+
 .mbp-hinge {
   z-index: 1;
-  width: 90%;
-  height: 10px;
-  border-radius: 0 0 4px 4px;
+  width: 86.5%;
+  height: calc(var(--W) * 0.011);
+  border-radius: 0 0 calc(var(--W) * 0.004) calc(var(--W) * 0.004);
   background: linear-gradient(#050506, #2a2b2c 55%, #080809);
   margin-top: -1px;
+  position: relative;
 }
 
 .mbp-base {
   z-index: 1;
   width: 100%;
-  height: 22px;
-  margin-top: -3px;
-  border-radius: 3px 3px 22px 22px / 3px 3px 16px 16px;
+  height: calc(var(--W) * 0.03);
+  margin-top: calc(var(--W) * -0.004);
+  border-radius:
+    calc(var(--W) * 0.003) calc(var(--W) * 0.003) calc(var(--W) * 0.03) calc(var(--W) * 0.03) /
+    calc(var(--W) * 0.003) calc(var(--W) * 0.003) calc(var(--W) * 0.022) calc(var(--W) * 0.022);
   background: var(--metal-base);
   position: relative;
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.7), inset 0 -2px 3px rgba(0, 0, 0, 0.25);
@@ -366,10 +416,10 @@
 
 .mbp-base::before {
   content: "";
-  border-radius: 0 0 10px 10px;
-  background: linear-gradient(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.04));
+  border-radius: 0 0 calc(var(--W) * 0.012) calc(var(--W) * 0.012);
+  background: linear-gradient(rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.04));
   width: 14%;
-  height: 42%;
+  height: 38%;
   position: absolute;
   top: 0;
   left: 50%;
@@ -377,14 +427,14 @@
 }
 
 .mbp-feet {
-  width: 88%;
-  height: 5px;
-  display: flex;
+  width: 86%;
+  height: calc(var(--W) * 0.006);
   justify-content: space-between;
+  display: flex;
 }
 
 .mbp-feet i {
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 calc(var(--W) * 0.004) calc(var(--W) * 0.004);
   background: #1a1b1d;
   width: 7%;
   height: 100%;
@@ -392,12 +442,12 @@
 }
 
 .mbp-shadow {
-  width: 102%;
-  height: 18px;
-  margin-top: -10px;
-  filter: blur(5px);
+  width: 104%;
+  height: calc(var(--W) * 0.02);
+  margin-top: calc(var(--W) * -0.012);
+  filter: blur(calc(var(--W) * 0.004));
   pointer-events: none;
-  background: radial-gradient(50% 50%, rgba(15, 16, 18, 0.28), rgba(15, 16, 18, 0.08) 55%, transparent 75%);
+  background: radial-gradient(50% 50%, rgba(15, 16, 18, 0.3), rgba(15, 16, 18, 0.1) 55%, transparent 75%);
 }
 
 /* Verdict circles in Comparison table */
