@@ -19,7 +19,7 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
       {/* Shoji Closing CTA Callout */}
       <div className="container-page pb-20 sm:pb-28 flex flex-col items-center text-center">
         <div className="w-14 h-14 rounded-[16px] bg-[var(--color-surface)] shadow-[0_0_0_1px_var(--color-line),0_12px_28px_-10px_rgba(15,23,42,0.18)] flex items-center justify-center mb-6">
-          <ShojiMark className="w-8 h-8 text-[var(--color-ink)]" />
+          <ShojiMark className="w-10 h-10" />
         </div>
 
         <h2 className="display text-balance text-[clamp(32px,4.2vw,54px)] text-[var(--color-ink)]">
@@ -54,7 +54,7 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
       <div className="border-t border-[var(--color-line)] py-8">
         <div className="container-page flex flex-col sm:flex-row items-center justify-between gap-4 text-[13.5px] text-[var(--color-ink-3)]">
           <div className="flex items-center gap-2.5">
-            <ShojiMark className="w-[18px] h-[18px] text-[var(--color-ink)]" />
+            <ShojiMark className="w-[22px] h-[22px]" />
             <span className="font-semibold text-[var(--color-ink)]">FinderActions</span>
             <span>·</span>
             <span>MIT License</span>

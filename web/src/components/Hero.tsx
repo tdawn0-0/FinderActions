@@ -14,42 +14,39 @@ const FoldChip: React.FC = () => (
   <span className="hchip hchip-fold">
     <span className="relative block h-full w-full overflow-hidden rounded-[0.2em] bg-[linear-gradient(160deg,#dfe7ff,#f3dff0_60%,#ffe9d6)] dark:bg-[linear-gradient(160deg,#1d2547,#33203d_60%,#3a2a24)]">
       <span
-        className="absolute block rounded-[0.07em] shadow-[0_0.02em_0.06em_rgba(0,0,0,0.25)]"
-        style={{ background: 'var(--color-accent)', left: '3.2%', top: '5%', width: '45.5%', height: '90%' }}
+        className="absolute block rounded-[0.05em]"
+        style={{ background: 'var(--color-accent)', left: '6%', top: '12%', width: '88%', height: '24%' }}
       />
       <span
-        className="absolute block rounded-[0.07em] shadow-[0_0.02em_0.06em_rgba(0,0,0,0.25)]"
-        style={{ background: 'color-mix(in srgb, var(--color-accent) 55%, white)', left: '52%', top: '5%', width: '45%', height: '43%' }}
-      />
-      <span
-        className="absolute block rounded-[0.07em] shadow-[0_0.02em_0.06em_rgba(0,0,0,0.25)]"
-        style={{ background: 'color-mix(in srgb, var(--color-accent) 35%, white)', left: '52%', top: '53%', width: '45%', height: '42%' }}
-      />
+        className="absolute block rounded-[0.07em] bg-white/95 dark:bg-[#26262c] shadow-[0_0.03em_0.08em_rgba(0,0,0,0.28)]"
+        style={{ left: '22%', top: '28%', width: '68%', height: '64%' }}
+      >
+        <span
+          className="absolute block rounded-[0.03em]"
+          style={{ background: 'var(--color-accent)', left: '8%', top: '14%', width: '84%', height: '28%' }}
+        />
+        <span
+          className="absolute block rounded-[0.03em] bg-black/15 dark:bg-white/20"
+          style={{ left: '8%', top: '52%', width: '66%', height: '16%' }}
+        />
+        <span
+          className="absolute block rounded-[0.03em] bg-black/12 dark:bg-white/15"
+          style={{ left: '8%', top: '76%', width: '52%', height: '14%' }}
+        />
+      </span>
     </span>
   </span>
 );
 
 const MarkChip: React.FC = () => (
   <span className="hchip hchip-mark">
-    <span className="flex h-full w-full items-center justify-center rounded-[0.2em] bg-[linear-gradient(180deg,#ffffff,#eeeef2)] text-[#141418] dark:bg-[linear-gradient(180deg,#2c2c33,#1c1c21)] dark:text-white">
-      <svg viewBox="-12 -12 80 76" className="h-[62%] w-auto overflow-visible" aria-hidden="true">
-        <path
-          d="M13,0 H32.5 A1.5,1.5 0 0 1 34,1.5 V17 A7,7 0 0 1 27,24 H1.5 A1.5,1.5 0 0 1 0,22.5 V13 A13,13 0 0 1 13,0 Z"
-          fill="currentColor"
-        />
-        <path
-          d="M39.5,0 H43 A13,13 0 0 1 56,13 V22.5 A1.5,1.5 0 0 1 54.5,24 H45 A7,7 0 0 1 38,17 V1.5 A1.5,1.5 0 0 1 39.5,0 Z"
-          fill="currentColor"
-        />
-        <path
-          d="M1.5,28 H27 A7,7 0 0 1 34,35 V50.5 A1.5,1.5 0 0 1 32.5,52 H13 A13,13 0 0 1 0,39 V29.5 A1.5,1.5 0 0 1 1.5,28 Z"
-          fill="currentColor"
-        />
-        <path
-          d="M45,28 H54.5 A1.5,1.5 0 0 1 56,29.5 V39 A13,13 0 0 1 43,52 H39.5 A1.5,1.5 0 0 1 38,50.5 V35 A7,7 0 0 1 45,28 Z"
-          fill="currentColor"
-        />
-      </svg>
+    <span className="flex h-full w-full items-center justify-center rounded-[0.2em] bg-[linear-gradient(180deg,#ffffff,#eeeef2)] dark:bg-[linear-gradient(180deg,#2c2c33,#1c1c21)] overflow-hidden p-[0.04em]">
+      <img
+        src="/app-icon.png"
+        alt=""
+        aria-hidden="true"
+        className="w-full h-full object-contain drop-shadow-[0_1px_2px_rgba(15,23,42,0.18)]"
+      />
     </span>
   </span>
 );

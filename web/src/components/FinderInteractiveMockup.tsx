@@ -14,7 +14,6 @@ import {
   FileCheck2,
   Layers,
   Hammer,
-  Check,
   Wifi,
   Search,
 } from 'lucide-react';
@@ -116,7 +115,7 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
     { name: 'Finder', bg: 'linear-gradient(180deg,#59b8ff,#0a6ce8)', icon: <Folder className="w-6 h-6 text-white" strokeWidth={1.8} />, active: true },
     { name: 'Ghostty', bg: 'linear-gradient(180deg,#2c2e3b,#14151c)', icon: <Terminal className="w-6 h-6 text-[#4cc38a]" strokeWidth={1.9} />, active: true },
     { name: 'Cursor', bg: 'linear-gradient(180deg,#3b82f6,#1d4ed8)', icon: <Code2 className="w-6 h-6 text-white" strokeWidth={1.9} />, active: true },
-    { name: 'Actions', bg: 'linear-gradient(180deg,#1f1f24,#0b0b0f)', icon: <Hammer className="w-6 h-6 text-white" strokeWidth={1.8} />, active: true },
+    { name: 'FinderActions', bg: '#ffffff', icon: <img src="/app-icon.png" alt="" className="w-[40px] h-[40px] object-contain" />, active: true },
   ];
 
   return (
@@ -186,9 +185,7 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
                           role="status"
                           className="absolute top-11 right-4 z-40 w-[340px] rounded-[16px] px-4 py-3 bg-white/92 backdrop-blur-xl shadow-[0_16px_38px_-8px_rgba(0,0,0,0.28),0_0_0_0.5px_rgba(0,0,0,0.12)] flex items-center gap-3 text-[#1d1d1f]"
                         >
-                          <span className="w-7 h-7 rounded-full bg-[#0a7cff] text-white flex items-center justify-center shrink-0">
-                            <Check className="w-4 h-4" strokeWidth={2.6} />
-                          </span>
+                          <img src="/app-icon.png" alt="" className="w-8 h-8 rounded-[7px] object-contain shrink-0" />
                           <div className="min-w-0">
                             <div className="text-[12.5px] font-semibold leading-tight">
                               FinderActions

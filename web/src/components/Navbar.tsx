@@ -11,22 +11,13 @@ interface NavbarProps {
   onToggleTheme: () => void;
 }
 
-export const ShojiMark: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
+export const ShojiMark: React.FC<{ className?: string }> = ({ className = 'w-6 h-6' }) => (
+  <img
+    src="/app-icon.png"
+    alt=""
     aria-hidden="true"
-    className={`shrink-0 ${className}`}
-  >
-    <rect x="2" y="3" width="20" height="18" rx="5.5" fill="currentColor" />
-    <path
-      d="M9.5 9.25L6.75 12L9.5 14.75M14.5 9.25L17.25 12L14.5 14.75M12.75 8.5L11.25 15.5"
-      stroke="var(--color-paper)"
-      strokeWidth="1.9"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
+    className={`shrink-0 object-contain select-none ${className}`}
+  />
 );
 
 export const AppleLogo: React.FC<{ className?: string }> = ({ className = 'w-3.5 h-3.5' }) => (
@@ -59,7 +50,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           href="#"
           className="flex items-center gap-2.5 text-[16px] font-semibold tracking-tight text-[var(--color-ink)] shrink-0"
         >
-          <ShojiMark className="w-[22px] h-[22px]" />
+          <ShojiMark className="w-[26px] h-[26px]" />
           <span>FinderActions</span>
         </a>
 
