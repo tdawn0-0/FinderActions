@@ -12,12 +12,12 @@ export const translations = {
       download: 'Get FinderActions',
     },
     hero: {
-      badgeNew: 'v1.0.4',
-      badgeText: 'FinderActions 1.0.4: portable .faaction packages & live test',
+      badgeNew: 'v1.0.5',
+      badgeText: 'FinderActions 1.0.5: built-in Finder Cut & Move Here',
       titleLead: 'Your Finder,',
       titleMuted: 'right-click',
       titleEnd: 'scripted.',
-      lede: 'Right-click any file to copy its path, open it in Ghostty or Cursor, or run a plain shell script. No Electron, no accounts, no setup maze.',
+      lede: 'Right-click any file to cut and move it, copy its path, open it in Ghostty or Cursor, or run a plain shell script. No Electron, no accounts, no setup maze.',
       ctaPrimary: 'Download for Mac',
       ctaTry: 'Try it live',
       ctaGithub: 'Source on GitHub',
@@ -26,7 +26,7 @@ export const translations = {
       metaTag: 'MIT License',
     },
     demo: {
-      menubarReady: '4 actions ready',
+      menubarReady: '5 actions ready',
       sidebar: {
         favorites: 'Favorites',
         recents: 'Recents',
@@ -38,6 +38,9 @@ export const translations = {
       },
       itemCount: '5 items',
       menuItems: {
+        cut: 'Cut',
+        moveHere: 'Move Here (1)',
+        clearCut: 'Clear Cut',
         openTerminal: 'Open in Terminal — Ghostty',
         openEditor: 'Open in Cursor',
         copyPath: 'Copy Path',
@@ -47,6 +50,9 @@ export const translations = {
         formatJson: 'Format JSON',
       },
       toastFeedback: {
+        cut: 'Cut 1 item',
+        moveHere: 'Moved 1 item',
+        clearCut: 'Cleared 1 cut item',
         openTerminal: 'Opened Ghostty at ~/Project-Assets',
         openEditor: 'Opened in Cursor',
         copyPath: 'Copied /Users/dev/Project-Assets/hero-banner.png',
@@ -102,8 +108,8 @@ export const translations = {
       cards: [
         {
           id: 'paths',
-          title: 'Copy Path in one click',
-          body: 'Copies clean absolute paths or basenames for one or multiple selected items without holding Option.',
+          title: 'Cut & Copy Path in one click',
+          body: 'Cut and move files from the right-click menu, or copy clean absolute paths and basenames without holding Option.',
         },
         {
           id: 'terminals',
@@ -140,7 +146,7 @@ export const translations = {
       headers: ['Capability', 'FinderActions', 'Automator / Shortcuts', 'Sandboxed Menu Apps', 'Electron Launchers'],
       rows: [
         {
-          topic: 'One-click Copy Path & Terminal',
+          topic: 'One-click Cut, Copy Path & Terminal',
           fa: { v: 'yes' as const, t: 'Built in from first launch' },
           mac: { v: 'some' as const, t: 'Manual workflow setup' },
           sbx: { v: 'yes' as const, t: 'Built in' },
@@ -266,12 +272,12 @@ export const translations = {
       download: '免费下载',
     },
     hero: {
-      badgeNew: 'v1.0.4',
-      badgeText: 'FinderActions 1.0.4：支持 .faaction 便携包与真实文件测试',
+      badgeNew: 'v1.0.5',
+      badgeText: 'FinderActions 1.0.5：新增访达右键「剪切」与「移动到此处」',
       titleLead: '你的访达，',
       titleMuted: '右键动作',
       titleEnd: '随手脚本化。',
-      lede: '在任意文件上轻点右键，即可复制绝对路径、在 Ghostty 或 Cursor 中打开目录，或直接运行本地 Shell 脚本。无 Electron、无账号、开箱即用。',
+      lede: '在任意文件上轻点右键，即可剪切移动、复制绝对路径、在 Ghostty 或 Cursor 中打开目录，或直接运行本地 Shell 脚本。无 Electron、无账号、开箱即用。',
       ctaPrimary: '下载 macOS 版',
       ctaTry: '在线试玩',
       ctaGithub: 'GitHub 源码',
@@ -280,7 +286,7 @@ export const translations = {
       metaTag: 'MIT 许可',
     },
     demo: {
-      menubarReady: '4 个动作已就绪',
+      menubarReady: '5 个动作已就绪',
       sidebar: {
         favorites: '个人收藏',
         recents: '最近项目',
@@ -292,6 +298,9 @@ export const translations = {
       },
       itemCount: '5 项',
       menuItems: {
+        cut: '剪切',
+        moveHere: '移动到此处 (1)',
+        clearCut: '取消剪切',
         openTerminal: '在终端中打开 — Ghostty',
         openEditor: '使用 Cursor 打开',
         copyPath: '复制路径',
@@ -301,6 +310,9 @@ export const translations = {
         formatJson: '格式化 JSON',
       },
       toastFeedback: {
+        cut: '已剪切 1 个项目',
+        moveHere: '已移动 1 个项目',
+        clearCut: '已取消 1 个待剪切项目',
         openTerminal: '已在 Ghostty 打开 ~/Project-Assets',
         openEditor: '已使用 Cursor 打开',
         copyPath: '已复制 /Users/dev/Project-Assets/hero-banner.png',
@@ -356,8 +368,8 @@ export const translations = {
       cards: [
         {
           id: 'paths',
-          title: '一键复制干净路径',
-          body: '无需按住 Option 键，单选或多选即可直接复制完整绝对路径或纯文件名。',
+          title: '一键剪切与复制路径',
+          body: '右键即可剪切并移动文件，也能直接复制完整绝对路径或纯文件名，无需按住 Option 键。',
         },
         {
           id: 'terminals',
@@ -394,7 +406,7 @@ export const translations = {
       headers: ['能力维度', 'FinderActions', 'Automator / 快捷指令', '沙盒右键工具', 'Electron 启动器'],
       rows: [
         {
-          topic: '一键复制路径与打开终端',
+          topic: '一键剪切、复制路径与打开终端',
           fa: { v: 'yes' as const, t: '开箱内置' },
           mac: { v: 'some' as const, t: '需手动拼装工作流' },
           sbx: { v: 'yes' as const, t: '内置' },

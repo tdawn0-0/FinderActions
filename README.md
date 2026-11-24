@@ -88,11 +88,24 @@ Enabled by default (keep the menu small):
 | Copy Path | `shell` |
 | Copy Filename | `shell` |
 | Open in Visual Studio Code | selected editor |
+| Cut / Move Here / Clear Cut | built-in |
 
 Choose the terminal and one or more editors in **Settings → Applications**.
 Finder always shows one generic **Open in Terminal** command; each selected editor
 gets its own command. The built-in catalog covers common terminals and editors,
 and **Choose Application…** supports any additional macOS `.app`.
+
+### Cut and Move Here
+
+Right-click selected items and choose **Cut**. The items are queued in the Host and
+their file URLs are also written to the system pasteboard, so Finder's native
+Option-Command-V keeps working. Then right-click a folder, or the blank space of a
+folder window, to get **Move Here (N)** and **Clear Cut**.
+
+Moving never overwrites: an item whose name already exists at the destination is
+skipped, stays in the cut queue, and is named in the logs. Items that moved, were
+already in place, or no longer exist leave the queue. A folder cannot be moved into
+itself. Turn the feature off in **Settings → General → Right-Click Cut & Move Here**.
 
 ## Write a shell action
 

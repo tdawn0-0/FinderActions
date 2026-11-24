@@ -8,6 +8,9 @@ import {
   Code2,
   Copy,
   Archive,
+  Scissors,
+  FolderInput,
+  CircleX,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -52,6 +55,7 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
   const [selectedFile, setSelectedFile] = useState<FileItem>(FILES[0]);
   const [menuOpen, setMenuOpen] = useState(true);
   const [menuPosition, setMenuPosition] = useState({ x: 480, y: 230 });
+  const [cutItem, setCutItem] = useState<string | null>(null);
   const [toastKey, setToastKey] = useState<keyof typeof t.toastFeedback | null>(null);
   const [wrapWidth, setWrapWidth] = useState(1008);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -353,6 +357,19 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
                           className="finder-menu-pop absolute z-30 w-[264px] rounded-[12px] p-1.5 bg-[#f6f6f8]/95 backdrop-blur-2xl shadow-[0_22px_48px_-10px_rgba(0,0,0,0.34),0_0_0_0.5px_rgba(0,0,0,0.18)] text-[14px] text-[#1d1d1f]"
                           onClick={(e) => e.stopPropagation()}
                         >
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => {
+                              setCutItem(selectedFile.name);
+                              handleActionClick('cut');
+                            }}
+                            className="w-full h-8 px-3 rounded-[7px] flex items-center gap-2.5 hover:bg-[#0a7cff] hover:text-white text-left cursor-pointer group"
+                          >
+                            <Scissors className="w-4 h-4 text-[#52525b] group-hover:text-white shrink-0" />
+                            <span className="truncate">{t.menuItems.cut}</span>
+                          </button>
+
                           {selectedFile.matched.includes('open-terminal') && (
                             <button
                               type="button"
@@ -434,6 +451,36 @@ export const FinderInteractiveMockup: React.FC<FinderInteractiveMockupProps> = (
                             >
                               <Archive className="w-4 h-4 text-[#52525b] group-hover:text-white shrink-0" />
                               <span className="truncate">{t.menuItems.compress}</span>
+                            </button>
+                          )}
+
+                          {cutItem !== null && selectedFile.iconType === 'folder' && (
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={() => {
+                                setCutItem(null);
+                                handleActionClick('moveHere');
+                              }}
+                              className="w-full h-8 px-3 rounded-[7px] flex items-center gap-2.5 hover:bg-[#0a7cff] hover:text-white text-left cursor-pointer group"
+                            >
+                              <FolderInput className="w-4 h-4 text-[#52525b] group-hover:text-white shrink-0" />
+                              <span className="truncate">{t.menuItems.moveHere}</span>
+                            </button>
+                          )}
+
+                          {cutItem !== null && (
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={() => {
+                                setCutItem(null);
+                                handleActionClick('clearCut');
+                              }}
+                              className="w-full h-8 px-3 rounded-[7px] flex items-center gap-2.5 hover:bg-[#0a7cff] hover:text-white text-left cursor-pointer group"
+                            >
+                              <CircleX className="w-4 h-4 text-[#52525b] group-hover:text-white shrink-0" />
+                              <span className="truncate">{t.menuItems.clearCut}</span>
                             </button>
                           )}
 
