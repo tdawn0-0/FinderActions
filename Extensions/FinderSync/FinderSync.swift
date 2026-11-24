@@ -42,7 +42,7 @@ final class FinderSync: FIFinderSync {
     override func menu(for menuKind: FIMenuKind) -> NSMenu {
         let menu = NSMenu(title: "")
         let kind = mapKind(menuKind)
-        let context = currentSelectionContext()
+        let context = currentSelectionContext(menuKind: kind)
 
         // Live Host process check — do NOT trust cached snap.hostRunning
         let hostUp = ipc.isHostRunning()
@@ -108,13 +108,13 @@ final class FinderSync: FIFinderSync {
         return urls.map(\.path)
     }
 
-    private func currentSelectionContext() -> SelectionContext {
+    private func currentSelectionContext(menuKind: MenuKind) -> SelectionContext {
         let urls = FIFinderSyncController.default().selectedItemURLs() ?? []
         let paths = urls.map(\.path)
         let isDir: [Bool] = urls.map { url in
             (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
         }
-        return SelectionContext(paths: paths, isDirectory: isDir)
+        return SelectionContext(paths: paths, isDirectory: isDir, menuKind: menuKind)
     }
 
     private func mapKind(_ kind: FIMenuKind) -> MenuKind {

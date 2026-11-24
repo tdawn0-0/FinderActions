@@ -67,9 +67,29 @@ public struct ExecLogEntry: Codable, Identifiable, Sendable, Equatable {
 /// Settings uses it only for explicit test runs.
 public final class ActionExecutor: @unchecked Sendable {
     public let store: ManifestStore
+    public let cutBuffer: CutBuffer
+    private let writePasteboardURLs: @Sendable ([String]) -> Void
 
-    public init(store: ManifestStore) {
+    public init(
+        store: ManifestStore,
+        cutBuffer: CutBuffer = CutBuffer(),
+        writePasteboardURLs: @escaping @Sendable ([String]) -> Void = ActionExecutor.defaultWritePasteboardURLs
+    ) {
         self.store = store
+        self.cutBuffer = cutBuffer
+        self.writePasteboardURLs = writePasteboardURLs
+    }
+
+    /// Mirrors the cut selection onto the system pasteboard so Finder's native
+    /// Option-Command-V also works. Pasteboard access is serialized on the main thread.
+    public static let defaultWritePasteboardURLs: @Sendable ([String]) -> Void = { paths in
+        let write = {
+            let urls = paths.map { URL(fileURLWithPath: $0) as NSURL }
+            let pasteboard = NSPasteboard.general
+            pasteboard.clearContents()
+            pasteboard.writeObjects(urls)
+        }
+        if Thread.isMainThread { write() } else { DispatchQueue.main.sync { write() } }
     }
 
     public func execute(action: ActionDefinition, paths: [String], containerPath: String?) -> ExecResult {
@@ -90,11 +110,7 @@ public final class ActionExecutor: @unchecked Sendable {
         case .appleScript:
             return runAppleScript(action: action, paths: resolvedPaths, containerPath: containerPath)
         case .builtin:
-            return ExecResult(
-                success: false,
-                summary: "Builtin action '\(action.builtinId ?? "?")' not implemented in P0",
-                exitCode: 1
-            )
+            return runBuiltin(action: action, rawPaths: paths, resolvedPaths: resolvedPaths)
         }
     }
 
@@ -106,6 +122,77 @@ public final class ActionExecutor: @unchecked Sendable {
             return ExecResult(success: false, summary: "Action disabled: \(request.actionId)", exitCode: 1)
         }
         return execute(action: action, paths: request.paths, containerPath: request.containerPath)
+    }
+
+    // MARK: - Built-in (Cut)
+
+    private func runBuiltin(action: ActionDefinition, rawPaths: [String], resolvedPaths: [String]) -> ExecResult {
+        guard let builtin = CutBuiltinID(rawValue: action.builtinId ?? "") else {
+            return ExecResult(success: false, summary: "Unsupported built-in action '\(action.builtinId ?? "?")'", exitCode: 1)
+        }
+        switch builtin {
+        case .cut:
+            // Never fall back to the container: cutting needs an explicit selection.
+            guard !rawPaths.isEmpty else {
+                return ExecResult(success: false, summary: String(localized: "Select at least one item to cut"), exitCode: 1)
+            }
+            let stored = cutBuffer.set(rawPaths)
+            writePasteboardURLs(stored)
+            return ExecResult(success: true, summary: String.localizedStringWithFormat(
+                NSLocalizedString("Cut %lld item(s)", comment: "Cut summary"), Int64(stored.count)))
+        case .moveHere:
+            let sources = cutBuffer.items
+            guard !sources.isEmpty else {
+                return ExecResult(success: false, summary: String(localized: "Cut queue is empty"), exitCode: 1)
+            }
+            var isDirectory: ObjCBool = false
+            guard let destination = resolvedPaths.first,
+                  FileManager.default.fileExists(atPath: destination, isDirectory: &isDirectory), isDirectory.boolValue else {
+                return ExecResult(success: false, summary: String(localized: "Destination is not a folder"), exitCode: 1)
+            }
+            let result = CutFileMover.move(sources: sources, toDirectory: destination)
+            cutBuffer.remove(result.completedPaths)
+            return cutMoveExecResult(result)
+        case .clear:
+            let cleared = cutBuffer.clear()
+            let summary = cleared == 0
+                ? String(localized: "Cut queue is empty")
+                : String.localizedStringWithFormat(NSLocalizedString("Cleared %lld cut item(s)", comment: "Clear cut summary"), Int64(cleared))
+            return ExecResult(success: true, summary: summary)
+        }
+    }
+
+    private func cutMoveExecResult(_ result: CutMoveResult) -> ExecResult {
+        let moved = Int64(result.movedPaths.count)
+        let conflicts = Int64(result.conflictPaths.count)
+        let failures = Int64(result.failedItems.count + result.invalidDestinationPaths.count + result.missingPaths.count)
+        let summary: String
+        if failures > 0 {
+            summary = moved > 0
+                ? String.localizedStringWithFormat(NSLocalizedString("Moved %lld, %lld failed", comment: ""), moved, failures + conflicts)
+                : String.localizedStringWithFormat(NSLocalizedString("Could not move %lld item(s)", comment: ""), failures + conflicts)
+        } else if conflicts > 0 {
+            summary = moved > 0
+                ? String.localizedStringWithFormat(NSLocalizedString("Moved %lld, skipped %lld due to name conflict", comment: ""), moved, conflicts)
+                : String.localizedStringWithFormat(NSLocalizedString("Skipped %lld item(s) due to name conflict", comment: ""), conflicts)
+        } else if moved > 0 {
+            summary = String.localizedStringWithFormat(NSLocalizedString("Moved %lld item(s)", comment: ""), moved)
+        } else {
+            summary = String(localized: "Already in destination")
+        }
+
+        func name(_ path: String) -> String { (path as NSString).lastPathComponent }
+        var lines: [String] = []
+        lines += result.conflictPaths.map { "Name conflict (not overwritten): \(name($0))" }
+        lines += result.missingPaths.map { "Missing: \(name($0))" }
+        lines += result.invalidDestinationPaths.map { "Cannot move into itself: \(name($0))" }
+        lines += result.failedItems.map { "Failed: \(name($0.path)) — \($0.reason)" }
+        return ExecResult(
+            success: result.isSuccess,
+            summary: summary,
+            exitCode: result.isSuccess ? 0 : 1,
+            stderr: lines.joined(separator: "\n")
+        )
     }
 
     // MARK: - Application

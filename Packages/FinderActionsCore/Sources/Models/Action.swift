@@ -13,7 +13,8 @@ public enum ActionType: String, Codable, Sendable, CaseIterable {
 public extension ActionType {
     /// Types a user may assign to a manifest action in Settings.
     /// `.terminal` actions are generated from Open With settings and are stripped
-    /// from the manifest on save; `.builtin` has no executor yet.
+    /// from the manifest on save; `.builtin` actions are composed from runtime
+    /// features (e.g. Cut), never created by users.
     static let userAssignable: [ActionType] = [.shell, .application, .appleScript]
 }
 
@@ -125,6 +126,8 @@ public struct ActionDefinition: Codable, Sendable, Identifiable, Equatable {
     public var appleScript: AppleScriptConfig?
     /// For `builtin` type: e.g. "cut-add", "cut-move-here", "cut-copy-here", "cut-clear"
     public var builtinId: String?
+    /// Restricts the Finder menu kinds this action appears in. `nil` = all kinds.
+    public var allowedMenuKinds: [MenuKind]?
 
     public init(
         id: String,
@@ -141,7 +144,8 @@ public struct ActionDefinition: Codable, Sendable, Identifiable, Equatable {
         shell: ShellConfig? = nil,
         application: ApplicationConfig? = nil,
         appleScript: AppleScriptConfig? = nil,
-        builtinId: String? = nil
+        builtinId: String? = nil,
+        allowedMenuKinds: [MenuKind]? = nil
     ) {
         self.id = id
         self.name = name
@@ -158,6 +162,7 @@ public struct ActionDefinition: Codable, Sendable, Identifiable, Equatable {
         self.application = application
         self.appleScript = appleScript
         self.builtinId = builtinId
+        self.allowedMenuKinds = allowedMenuKinds
     }
 }
 

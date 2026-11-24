@@ -56,9 +56,15 @@ public enum ExecuteRequestValidator {
         guard action.enabled else { return .failure(.actionDisabled(action.id)) }
         let context = SelectionContext(
             paths: request.paths,
-            isDirectory: request.paths.map { metadata[$0] ?? false }
+            isDirectory: request.paths.map { metadata[$0] ?? false },
+            menuKind: request.menuKind
         )
-        guard ShowWhenMatcher.shouldShow(showWhen: action.showWhen, extRules: action.extRules, context: context) else {
+        guard ShowWhenMatcher.shouldShow(
+            showWhen: action.showWhen,
+            extRules: action.extRules,
+            allowedMenuKinds: action.allowedMenuKinds,
+            context: context
+        ) else {
             return .failure(.selectionNotAllowed(action.id))
         }
         return .success(action)
@@ -66,7 +72,11 @@ public enum ExecuteRequestValidator {
 
     public static func diskFileInfo(_ path: String) -> Bool? {
         var isDirectory: ObjCBool = false
-        guard FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) else { return nil }
-        return isDirectory.boolValue
+        if FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) {
+            return isDirectory.boolValue
+        }
+        // Dangling symlinks fail `fileExists` but are still real directory entries.
+        if (try? FileManager.default.attributesOfItem(atPath: path)) != nil { return false }
+        return nil
     }
 }

@@ -72,6 +72,7 @@ final class AppState {
     let executor: ActionExecutor
 
     var openWithSettings: OpenWithSettings = .defaults
+    var cutActionsEnabled = true
 
     var onManifestChanged: (() -> Void)?
 
@@ -79,7 +80,11 @@ final class AppState {
     private var pendingSave: Task<Void, Never>?
 
     var effectiveManifest: ActionManifest {
-        OpenWithActions.compose(baseManifest: manifest, settings: openWithSettings)
+        CutActions.compose(
+            baseManifest: OpenWithActions.compose(baseManifest: manifest, settings: openWithSettings),
+            enabled: cutActionsEnabled,
+            cutCount: 0
+        )
     }
 
     init(store: ManifestStore = .makeDefault(), logStore: ExecLogStore? = nil, preferences: PreferencesStore = .live) {
@@ -117,6 +122,7 @@ final class AppState {
             configurationError = error.localizedDescription
             writesBlocked = true
         }
+        cutActionsEnabled = SharedConfiguration.loadCutEnabled(preferences: preferences)
     }
 
     func seedDefaults() {
@@ -130,6 +136,7 @@ final class AppState {
             isDirty = false
             onManifestChanged?()
         } catch { configurationError = error.localizedDescription }
+        cutActionsEnabled = SharedConfiguration.loadCutEnabled(preferences: preferences)
     }
 
     @discardableResult
@@ -342,6 +349,7 @@ final class AppState {
 
     func persistSettings() {
         notificationMode.persist(preferences: preferences)
+        SharedConfiguration.saveCutEnabled(cutActionsEnabled, preferences: preferences)
         onManifestChanged?()
     }
 

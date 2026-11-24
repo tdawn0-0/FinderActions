@@ -17,7 +17,8 @@ public enum SnapshotBuilder {
                     showWhen: action.showWhen,
                     enabled: action.enabled,
                     isSeparator: false,
-                    extRules: action.extRules
+                    extRules: action.extRules,
+                    allowedMenuKinds: action.allowedMenuKinds
                 )
             }
         return MenuSnapshot(
@@ -36,6 +37,7 @@ public enum SnapshotBuilder {
             return ShowWhenMatcher.shouldShow(
                 showWhen: item.showWhen,
                 extRules: item.extRules,
+                allowedMenuKinds: item.allowedMenuKinds,
                 context: context
             )
         }

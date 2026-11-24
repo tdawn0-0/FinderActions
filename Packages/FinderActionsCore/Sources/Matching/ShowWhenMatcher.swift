@@ -5,10 +5,13 @@ public struct SelectionContext: Sendable, Equatable {
     public var paths: [String]
     /// Whether each path is a directory (same order as paths). Empty = unknown.
     public var isDirectory: [Bool]
+    /// The Finder menu the selection was made in, when known.
+    public var menuKind: MenuKind?
 
-    public init(paths: [String], isDirectory: [Bool] = []) {
+    public init(paths: [String], isDirectory: [Bool] = [], menuKind: MenuKind? = nil) {
         self.paths = paths
         self.isDirectory = isDirectory
+        self.menuKind = menuKind
     }
 
     public var count: Int { paths.count }
@@ -88,9 +91,14 @@ public enum ShowWhenMatcher {
     public static func shouldShow(
         showWhen: ShowWhen,
         extRules: ExtRules?,
+        allowedMenuKinds: [MenuKind]? = nil,
         context: SelectionContext
     ) -> Bool {
-        matches(showWhen: showWhen, context: context)
+        if let allowedMenuKinds, !allowedMenuKinds.isEmpty {
+            guard let menuKind = context.menuKind, allowedMenuKinds.contains(menuKind) else { return false }
+            if !allowedMenuKinds.contains(.contextualMenuForContainer) && context.paths.isEmpty { return false }
+        }
+        return matches(showWhen: showWhen, context: context)
             && matchesExtRules(extRules, context: context)
     }
 }

@@ -12,6 +12,7 @@ public struct MenuSnapshotItem: Codable, Sendable, Equatable, Identifiable {
     public var enabled: Bool
     public var isSeparator: Bool
     public var extRules: ExtRules?
+    public var allowedMenuKinds: [MenuKind]?
 
     public var id: String { actionId }
 
@@ -24,7 +25,8 @@ public struct MenuSnapshotItem: Codable, Sendable, Equatable, Identifiable {
         showWhen: ShowWhen = .always,
         enabled: Bool = true,
         isSeparator: Bool = false,
-        extRules: ExtRules? = nil
+        extRules: ExtRules? = nil,
+        allowedMenuKinds: [MenuKind]? = nil
     ) {
         self.actionId = actionId
         self.title = title
@@ -35,6 +37,7 @@ public struct MenuSnapshotItem: Codable, Sendable, Equatable, Identifiable {
         self.enabled = enabled
         self.isSeparator = isSeparator
         self.extRules = extRules
+        self.allowedMenuKinds = allowedMenuKinds
     }
 }
 

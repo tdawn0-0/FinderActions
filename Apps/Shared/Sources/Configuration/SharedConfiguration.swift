@@ -6,6 +6,26 @@ import FinderActionsCore
 @MainActor
 enum SharedConfiguration {
     static let openWithDefaultsKey = "openWithSettings.v2"
+    static let cutEnabledDefaultsKey = "cutActionsEnabled.v1"
+
+    /// Cut is on unless the user turned it off.
+    static func loadCutEnabled(preferences: PreferencesStore = .live) -> Bool {
+        preferences.object(forKey: cutEnabledDefaultsKey) as? Bool ?? true
+    }
+
+    static func saveCutEnabled(_ enabled: Bool, preferences: PreferencesStore = .live) {
+        preferences.set(enabled, forKey: cutEnabledDefaultsKey)
+    }
+
+    static func localizedCutLabels(count: Int) -> CutMenuLabels {
+        CutMenuLabels(
+            cutTitle: NSLocalizedString("Cut", comment: "Finder menu: cut selection"),
+            moveHereTitle: count > 0
+                ? String.localizedStringWithFormat(NSLocalizedString("Move Here (%lld)", comment: "Finder menu: move cut items here"), Int64(count))
+                : NSLocalizedString("Move Here", comment: "Finder menu: move cut items here"),
+            clearTitle: NSLocalizedString("Clear Cut", comment: "Finder menu: clear cut queue")
+        )
+    }
 
     /// Seeds defaults on first launch; otherwise migrates the stored manifest to
     /// its base form (Open With actions are generated, never stored). Always
@@ -33,6 +53,7 @@ enum SharedConfiguration {
         let manifest = DefaultActions.manifest()
         try store.save(manifest)
         saveOpenWithSettings(.defaults, preferences: preferences)
+        saveCutEnabled(true, preferences: preferences)
         return (manifest, .defaults)
     }
 

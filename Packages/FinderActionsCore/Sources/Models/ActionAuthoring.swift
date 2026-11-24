@@ -68,7 +68,8 @@ public enum ActionAuthoring {
                   !(script.scriptFile ?? "").isEmpty || !(script.scriptInline ?? "").isEmpty else { return "Choose a script file or enter an inline script." }
         case .application:
             guard let app = action.application, !app.bundleId.isEmpty || !(app.pathFallback ?? "").isEmpty else { return "Choose an application." }
-        case .builtin: return "This built-in action is not supported."
+        case .builtin:
+            if CutBuiltinID(rawValue: action.builtinId ?? "") == nil { return "This built-in action is not supported." }
         case .terminal: break
         }
         return nil

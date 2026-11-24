@@ -10,6 +10,8 @@ final class HostRuntimeState {
     private(set) var openWithSettings: OpenWithSettings = .defaults
     private(set) var notificationsEnabled = true
     private(set) var notificationMode: ExecutionNotificationMode = .all
+    private(set) var cutEnabled = true
+    let cutBuffer: CutBuffer
     static let maximumConcurrentExecutions = 16
     private(set) var activeExecutions: [String: ActiveExecution] = [:]
     var onActivityChanged: (() -> Void)?
@@ -21,21 +23,35 @@ final class HostRuntimeState {
     let executor: ActionExecutor
 
     var effectiveManifest: ActionManifest {
-        OpenWithActions.compose(baseManifest: manifest, settings: openWithSettings)
+        let withOpenWith = OpenWithActions.compose(baseManifest: manifest, settings: openWithSettings)
+        let count = cutBuffer.count
+        return CutActions.compose(
+            baseManifest: withOpenWith,
+            enabled: cutEnabled,
+            cutCount: count,
+            labels: SharedConfiguration.localizedCutLabels(count: count)
+        )
     }
 
     var needsOnboarding: Bool {
         !preferences.bool(forKey: "didCompleteOnboarding")
     }
 
-    init(store: ManifestStore = .makeDefault(), logStore: ExecLogStore? = nil, preferences: PreferencesStore = .live) {
+    init(
+        store: ManifestStore = .makeDefault(),
+        logStore: ExecLogStore? = nil,
+        preferences: PreferencesStore = .live,
+        writePasteboardURLs: @escaping @Sendable ([String]) -> Void = ActionExecutor.defaultWritePasteboardURLs
+    ) {
         self.preferences = preferences
         self.store = store
         let logsDirectory = store.fileURL
             .deletingLastPathComponent()
             .appendingPathComponent("logs", isDirectory: true)
         self.logStore = logStore ?? ExecLogStore(directory: logsDirectory)
-        self.executor = ActionExecutor(store: store)
+        let buffer = CutBuffer()
+        self.cutBuffer = buffer
+        self.executor = ActionExecutor(store: store, cutBuffer: buffer, writePasteboardURLs: writePasteboardURLs)
         loadPreferences()
     }
 
@@ -107,6 +123,8 @@ final class HostRuntimeState {
     private func loadPreferences() {
         notificationMode = ExecutionNotificationMode.load(preferences: preferences)
         notificationsEnabled = notificationMode != .off
+        cutEnabled = SharedConfiguration.loadCutEnabled(preferences: preferences)
+        if !cutEnabled { cutBuffer.clear() }
     }
 
 }

@@ -160,6 +160,7 @@ public enum OpenWithActions {
             action.type == .terminal
                 || obsoleteBuiltInIds.contains(action.id)
                 || action.id.hasPrefix("open-with.")
+                || CutActions.isCutAction(action.id)
         }
         return result
     }

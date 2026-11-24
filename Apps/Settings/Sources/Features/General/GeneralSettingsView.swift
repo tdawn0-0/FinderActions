@@ -25,6 +25,11 @@ struct GeneralSettingsView: View {
                         Text(mode.title).tag(mode)
                     }
                 }
+
+                Toggle("Right-Click Cut & Move Here", isOn: $bindableState.cutActionsEnabled)
+                Text("Adds Cut to Finder's context menu, then shows Move Here and Clear Cut until items are moved.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             Section("Storage") {
@@ -73,6 +78,7 @@ struct GeneralSettingsView: View {
         .formStyle(.grouped)
         .navigationTitle("General")
         .onChange(of: state.notificationMode) { _, _ in state.persistSettings() }
+        .onChange(of: state.cutActionsEnabled) { _, _ in state.persistSettings() }
         .alert("Reset Defaults?", isPresented: $showResetConfirm) {
             Button("Reset", role: .destructive) { state.seedDefaults() }
             Button("Cancel", role: .cancel) {}

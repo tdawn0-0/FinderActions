@@ -131,6 +131,8 @@ final class IPCServer {
             durationSeconds: run.map { max(0, Date().timeIntervalSince($0.startedAt)) }, source: .finder
         ))
         notify(result: result, actionId: request.actionId, actionName: run?.actionName ?? request.actionId)
+        // The cut queue changed what the Finder menu should offer.
+        if CutActions.isCutAction(request.actionId) { onSnapshotNeeded?() }
     }
 
     private func notify(result: ExecResult, actionId: String, actionName: String) {
